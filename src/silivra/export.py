@@ -7,11 +7,47 @@ import shutil
 import tempfile
 
 from silivra.checkpoint import resolve_checkpoint, sha256, verify_checkpoint, write_json
+from silivra.data import DATASET_REVISION, DATASET_URL
+
+
+def _license_metadata(state: dict, manifest: dict) -> dict:
+    """Report data declarations separately from the project's weight designation.
+
+    An instruction checkpoint's base hashes do not establish a complete license
+    chain. This exporter cannot decide the legal status of those parameters.
+    """
+    dataset = manifest.get("dataset", {})
+    dataset = dataset if isinstance(dataset, dict) else {}
+    splits = manifest.get("splits", {})
+    splits = splits if isinstance(splits, dict) else {}
+    sources = [source for split in splits.values() if isinstance(split, dict)
+               for source in (split.get("sources") or []) if isinstance(source, dict)]
+    licenses = sorted({source["license"] for source in [dataset, *sources]
+                       if isinstance(source, dict) and isinstance(source.get("license"), str)})
+    original = (
+        state.get("training_mode", "pretraining") == "pretraining"
+        and state.get("initialization") == "random; no pretrained weights or tokenizer"
+        and dataset.get("name") == "roneneldan/TinyStories"
+        and dataset.get("url") == DATASET_URL and dataset.get("revision") == DATASET_REVISION
+        and licenses == ["CDLA-Sharing-1.0"] and not sources
+    )
+    return {
+        "code_license": "MIT",
+        "weight_license_status": "project_designated" if original else "review_required",
+        "weight_license": (
+            "MIT to the extent of project rights for the original TinyStories pretraining lineage; see THIRD_PARTY_NOTICES.md"
+            if original else
+            "Source-specific review required; no weight license is designated by this export. See data_manifest.json and THIRD_PARTY_NOTICES.md"
+        ),
+        "declared_training_data_licenses": licenses,
+        "license_note": "Dataset license declarations are provenance, not a legal determination of the license for trained parameters.",
+    }
 
 
 def export_model(run_dir: Path, output: Path, *, which="best", archive=False) -> dict:
     checkpoint = resolve_checkpoint(run_dir, which)
     state = verify_checkpoint(checkpoint)
+    licenses = _license_metadata(state, json.loads((checkpoint / "data_manifest.json").read_text()))
     output = output.resolve()
     archive_path = Path(str(output) + ".zip")
     if output.exists():
@@ -47,6 +83,9 @@ def export_model(run_dir: Path, output: Path, *, which="best", archive=False) ->
         for folder, pattern in (("src", "*.py"), ("tests", "*.py"), ("scripts", "*.py"), ("configs", "*.json"), ("docs", "*.md"), ("docs", "*.json"), ("licenses", "*.txt"), ("examples", "*.jsonl"), (".github", "*.yml")):
             files.extend(sorted((repo / folder).rglob(pattern)))
         for file in files:
+            if (file.is_symlink() or any(part in {".codex", ".silivra"} for part in file.relative_to(repo).parts)
+                    or file.name.lower() in {"agents.md", "agents.override.md"}):
+                continue
             destination = source / file.relative_to(repo)
             destination.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(file, destination)
@@ -55,12 +94,12 @@ def export_model(run_dir: Path, output: Path, *, which="best", archive=False) ->
         kv_dim = cfg["n_kv_heads"] * (dim // cfg["n_heads"])
         parameters = cfg["vocab_size"] * dim + layers * (2 * dim**2 + 2 * dim * kv_dim + 3 * dim * intermediate + 2 * dim) + dim
         write_json(staging / "export.json", {
-            "format_version": 1, "kind": "inference bundle with complete project source",
+            "format_version": 1, "kind": "inference bundle with project source snapshot",
             "model": "Silivra Tiny", "training_step": state["step"],
             "tokens_seen": state.get("tokens_seen"), "validation_loss": state["validation_loss"],
             "training_mode": state.get("training_mode", "pretraining"),
             "parameters": parameters, "initialization": state["initialization"],
-            "weight_license": "MIT to the extent of project rights; see THIRD_PARTY_NOTICES.md",
+            **licenses,
             "raw_training_data_included": False, "optimizer_included": False,
         })
         command = ('uv run silivra chat --run .. --no-tools --memory-chars 0 "Say hello."'
@@ -72,14 +111,16 @@ def export_model(run_dir: Path, output: Path, *, which="best", archive=False) ->
             + state.get("training_mode", "pretraining") + ". "
             "Assistant capability is experimental and must be evaluated. See source/docs/MODEL_CARD.md, "
             "source/docs/CAPABILITY_RESULTS.md and source/docs/INITIAL_RESULTS.md.\n\n"
-            "This bundle includes the complete source checkout under source/, FP32 model.safetensors, "
+            "This bundle includes selected public project source under source/, FP32 model.safetensors, "
             "the original tokenizer, training settings, data provenance, licenses, and file hashes. "
             "Raw/tokenized stories and optimizer state are excluded.\n\n"
             "From the source/ folder, run `uv sync --locked`, then "
             + "`" + command + "`. "
             "After setup it works offline with `uv run --offline`.\n\n"
-            "Code and model parameters: MIT to the extent of project rights. "
-            "TinyStories data: CDLA-Sharing-1.0. Retain THIRD_PARTY_NOTICES.md and licenses/.\n",
+            "Code: MIT. Model parameters: " + licenses["weight_license"] + ".\n\n"
+            "Declared training-data licenses: " + (", ".join(licenses["declared_training_data_licenses"]) or "unknown")
+            + ". These declarations do not automatically license model parameters. "
+            "Retain THIRD_PARTY_NOTICES.md and licenses/.\n",
             encoding="utf-8",
         )
         write_json(staging / "checksums.json", {

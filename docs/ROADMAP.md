@@ -16,6 +16,10 @@ together. Every milestone needs evidence before it is called complete.
 - Assistant-only instruction tuning, attributed JSONL validation, exact split-overlap
   checks, immutable base lineage and separate resumable instruction checkpoints.
 - Native diagnostic evaluation, portable runtime tests, project documentation and CI.
+- Interactive terminal with lazy checkpoint selection, live provisional answers,
+  cooperative cancellation, scoped sessions/preferences/input history, explicit
+  tools and per-process permissions. Interface behavior is tested independently
+  from native model task accuracy.
 
 These are working engineering components. They do not establish a capable learned
 assistant. See [CAPABILITY_RESULTS.md](CAPABILITY_RESULTS.md) for measured boundaries.

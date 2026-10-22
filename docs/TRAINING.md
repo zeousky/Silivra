@@ -90,8 +90,10 @@ EOS receive loss; earlier assistant turns, user/system/tool content and padding
 receive zero loss. Prefix and answer are encoded separately so the inference
 prefix token IDs match exactly. A sample that exceeds the requested context
 fails with its record and turn number. Answers and tool results are never
-silently truncated to fit. Do not increase the prepared context beyond the base
-model's context limit.
+silently truncated to fit. For a deliberate longer-context instruction run, set
+`context_length` in its fine-tuning config and prepare data within that limit.
+This extends the run's context configuration without replacing the tokenizer or
+base weights. Usable long-context behavior still requires separate evaluation.
 
 The output contains a checksummed tokenizer, token/mask archives, normalized
 source JSONL and a manifest carrying input hashes, output hashes and attribution.
@@ -162,9 +164,9 @@ versions and regressions together.
 Continue pretraining with stronger technical data before expecting instruction
 tuning to supply knowledge absent from the base. The current 512-token context
 and small architecture limit how much code, tool schema, memory and history can
-fit. Larger context or architecture changes require a deliberate training and
-evaluation migration; the trainer rejects incompatible prepared data rather
-than implying such a migration happened automatically.
+fit. The v2 run explicitly extends context to 1,024 tokens. Larger context or
+architecture changes require a deliberate training and evaluation migration;
+the trainer rejects data beyond the configured limit.
 
 Test protocol validity, correct tool names and arguments, grounded final
 answers, actual code-test outcomes, recovery behavior and memory retrieval
@@ -212,3 +214,46 @@ against the base and tuned checkpoint. It never executes proposals. Keep this
 measure separate from the six fixed assistant diagnostics and actual multi-step
 coding/research performance. The original 512-token context cannot sustain long
 observations, memory, tool schemas and conversation history at once.
+
+## Assistant v2 run
+
+`configs/assistant-v2.json` defines a separate 8,000-step instruction run from the
+immutable original pretraining checkpoint at step 2,500. It retains all 14,162,304
+parameters and the original tokenizer. Its 1,024-token context, batch size four,
+64-token padding buckets, 200-step learning-rate warmup and cosine decay are saved
+in every checkpoint. Bucketing trims padding after the last supervised label;
+it never trims an answer. AdamW, schedule step, sampler and RNG state resume.
+
+The existing `data/instructions-v2` manifest identifies 24,908 training and 1,311
+validation conversations (26,314 and 1,390 assistant-turn samples). It combines
+the pinned attributed Dolly-15k conversion, original Codex-authored MIT procedural
+exercises, and a replay of original TinyStories training stories. See
+[attribution](../THIRD_PARTY_NOTICES.md) before redistributing any data or weights.
+Replay validation measures retention of previously pretrained stories; it is not
+unseen language data. The independent original TinyStories validation token stream
+is measured separately for regressions.
+
+To resume the existing artifacts without changing their objective or hashes:
+
+```sh
+uv run silivra finetune --resume \
+  --base runs/silivra-tiny/checkpoints/step-0002500 \
+  --run runs/silivra-assistant-v2 --config configs/assistant-v2.json \
+  --data data/instructions-v2 --max-minutes 35
+```
+
+Check for another trainer before starting; the trainer also holds an exclusive
+run lock. The time limit checkpoints the latest completed update. Resume again if
+the run has not reached 8,000 steps. A completed run performs no further updates.
+Original checkpoints remain immutable, including the interrupted step 500.
+
+`scripts/build-curriculum-v2.py` and `silivra.corpus` support new, separately named
+data builds; never regenerate the data inside an existing run. The historical v2
+corpus manifest records a generator hash different from the unfinished source
+that was recovered with this run. Its existing data files are hash-verified, but
+the current generator cannot be claimed to exactly regenerate that historical
+corpus. Keep the saved manifest and source hashes as the run's provenance.
+
+The public repository contains code, config and sanitized evaluation evidence;
+resuming requires the local ignored datasets, tokenizer and checkpoint artifacts.
+See [capability results](CAPABILITY_RESULTS.md) for measured outcomes and failures.

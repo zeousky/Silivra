@@ -18,6 +18,38 @@ Raw stories and their reversible token encodings retain the data license; **they
 
 Silivra's original software is licensed under MIT. Locally generated initial checkpoints are designated MIT to the extent of the project's rights. This relies on the interpretation that trained parameters qualify as computational Results under CDLA-Sharing-1.0 §3.5, with the §1.11 limitation concerning reproduction of source data. The tokenizer vocabulary is learned from the data; keep this notice and the data-license text with it. These notes do not relabel or override upstream rights. Before a public checkpoint release, evaluate memorized source reproduction and package the applicable notices.
 
+## Databricks Dolly 15k
+
+The optional assistant v2 instruction mix uses **databricks-dolly-15k**, created by
+Databricks employees. Copyright (2023) [Databricks, Inc.](https://www.databricks.com/). Some reference passages
+come from Wikipedia; copyright belongs to Wikipedia editors and contributors.
+
+- [Dataset and attribution at the pinned revision](https://huggingface.co/datasets/databricks/databricks-dolly-15k/blob/bdd27f4d94b9c1f951818a7da7fd7aeea5dbff1a/README.md).
+- Immutable revision: `bdd27f4d94b9c1f951818a7da7fd7aeea5dbff1a`.
+- Source file: `databricks-dolly-15k.jsonl`, 13,085,339 bytes; SHA-256
+  `2df9083338b4abd6bceb5635764dab5d833b393b55759dffb0959b6fcbf794ec`.
+- License: [Creative Commons Attribution-ShareAlike 3.0 Unported](https://creativecommons.org/licenses/by-sa/3.0/)
+  ([legal code](https://creativecommons.org/licenses/by-sa/3.0/legalcode)).
+- Upstream reference-text source: [Wikipedia](https://www.wikipedia.org/).
+
+Silivra modifications: strip outer whitespace; quote supplied context as untrusted
+source data; wrap each complete response in a JSON `final` action; add the local
+assistant policy; reject examples that exceed the original tokenizer's context
+budget; deduplicate normalized conversations/user prefixes; and create a seeded
+training/validation split. No tokenizer fitting uses this corpus. Dolly examples
+and their converted/tokenized forms retain CC BY-SA 3.0; they are not MIT code.
+If distributing those data, retain upstream credit, link the license, describe
+the changes, and distribute adaptations under the applicable ShareAlike terms.
+The code repository excludes raw and prepared datasets. A future weight release
+needs a separate license and source-reproduction review; these data notices do
+not designate assistant v2 weights as MIT or override upstream rights.
+
+The v2 mix also contains deterministic Codex-authored exercises (MIT) and optional
+TinyStories **training**-split replay (CDLA-Sharing-1.0, as above). A held-out replay
+conversation can still have prior pretraining exposure; it measures retention,
+not independent language generalization. Dataset manifests retain per-source
+attribution and hashes without publishing local data or private machine paths.
+
 ## Runtime dependencies and research
 
 - [Apple MLX](https://github.com/ml-explore/mlx), MIT, Copyright Apple Inc. The installed distribution provides its own notices.

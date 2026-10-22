@@ -1,6 +1,7 @@
 """Completion behavior against uncached inference, including rolling windows."""
 
 import unittest
+from types import SimpleNamespace
 
 import mlx.core as mx
 from tokenizers import Tokenizer, decoders, models, pre_tokenizers, trainers
@@ -100,6 +101,68 @@ class CompletionTests(unittest.TestCase):
     def test_benchmark_requires_enough_tokens_for_decode_measurement(self):
         with self.assertRaises(ValueError):
             benchmark(self.model, self.tokenizer, trials=1, max_new_tokens=1)
+
+    def scripted_model(self, text):
+        tokenizer = self.tokenizer
+        sequence = tokenizer.encode(text, add_special_tokens=False).ids + [tokenizer.token_to_id("<eos>")]
+
+        class ScriptedModel:
+            config = SimpleNamespace(vocab_size=tokenizer.get_vocab_size(), max_seq_len=128)
+            calls = 0
+
+            def eval(self):
+                pass
+
+            def make_cache(self):
+                return [SimpleNamespace(offset=0)]
+
+            def __call__(self, tokens, cache):
+                selected = sequence[self.calls]
+                self.calls += 1
+                cache[0].offset += tokens.shape[1]
+                scores = mx.full((1, 1, self.config.vocab_size), -1000.0)
+                return scores.at[0, 0, selected].add(2000.0)
+
+        return ScriptedModel()
+
+    def test_live_stream_is_unicode_safe_and_matches_final_text(self):
+        expected = "Café 👋, done."
+        model = self.scripted_model(expected)
+        chunks, calls_at_update = [], []
+
+        def update(text):
+            chunks.append(text)
+            calls_at_update.append(model.calls)
+
+        result = complete(model, self.tokenizer, "", temperature=0, top_k=0,
+                          max_new_tokens=64, on_text=update)
+        self.assertEqual(result["text"], expected)
+        self.assertEqual("".join(chunks), expected)
+        self.assertFalse(any("�" in chunk for chunk in chunks))
+        self.assertLess(calls_at_update[0], model.calls)
+        self.assertFalse(result["cancelled"])
+
+    def test_cancellation_before_prefill_runs_no_model(self):
+        model = self.scripted_model("unused")
+        chunks = []
+        result = complete(model, self.tokenizer, "", temperature=0, top_k=0,
+                          on_text=chunks.append, cancelled=lambda: True)
+        self.assertEqual(model.calls, 0)
+        self.assertEqual(result["generated_tokens"], 0)
+        self.assertIsNone(result["time_to_first_token_seconds"])
+        self.assertEqual(result["text"], "")
+        self.assertTrue(result["cancelled"])
+        self.assertEqual(chunks, [])
+
+    def test_cancellation_from_callback_prevents_next_model_step(self):
+        model = self.scripted_model("A very long response.")
+        chunks = []
+        result = complete(model, self.tokenizer, "", temperature=0, top_k=0,
+                          on_text=chunks.append, cancelled=lambda: bool(chunks))
+        self.assertEqual(model.calls, 1)
+        self.assertEqual(result["generated_tokens"], 1)
+        self.assertEqual(result["text"], "".join(chunks))
+        self.assertTrue(result["cancelled"])
 
 
 if __name__ == "__main__":

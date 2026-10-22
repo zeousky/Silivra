@@ -1,6 +1,7 @@
 """Synthetic tiny-model SFT checks; no pretrained run or paid service is used."""
 
 import contextlib
+import fcntl
 import io
 import json
 from pathlib import Path
@@ -67,6 +68,10 @@ class FinetuneTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             base, data, config = self.fixture(root)
+            # Resume across warmup/decay with dynamic input widths, as used by
+            # assistant-v2, rather than checking only constant-rate updates.
+            config.context_length, config.bucket_size = 192, 32
+            config.warmup_steps, config.min_lr_ratio = 3, .2
             base_path = resolve_checkpoint(base)
             original_hashes = {item.name: sha256(item) for item in base_path.iterdir() if item.is_file()}
             with contextlib.redirect_stdout(io.StringIO()), \
@@ -116,6 +121,19 @@ class FinetuneTests(unittest.TestCase):
             self.assertEqual(json.loads((full / "data_manifest.json").read_text())["kind"], "silivra-instructions")
             self.assertEqual(original_hashes, {item.name: sha256(item) for item in base_path.iterdir() if item.is_file()})
 
+    def test_exclusive_run_lock_refuses_second_trainer_without_checkpoint_changes(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            base, data, config = self.fixture(root)
+            run = root / "locked"
+            run.mkdir()
+            with (run / ".lock").open("a") as lock, \
+                    patch("silivra.finetune.require_apple_gpu", return_value={"test": "synthetic"}):
+                fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                with self.assertRaisesRegex(RuntimeError, "Another trainer"):
+                    finetune(data, base, run, config, resume=True)
+                self.assertEqual([item.name for item in run.iterdir()], [".lock"])
+
     def test_mismatched_tokenizer_and_corrupted_data_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -154,6 +172,25 @@ class FinetuneTests(unittest.TestCase):
             self.assertEqual(lineage["finetuning_step"], 1)
             self.assertEqual(lineage["parent"]["pretraining_step"], 1)
             self.assertNotIn("pretraining_step", lineage)
+
+    def test_context_extension_schedule_and_legacy_config_resume(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            base, data, config = self.fixture(root)
+            config.context_length, config.bucket_size = 192, 32
+            config.warmup_steps, config.min_lr_ratio = 1, .2
+            from silivra.finetune import learning_rate
+            schedule = learning_rate(config)
+            self.assertLess(float(schedule(mx.array(0)).item()), float(schedule(mx.array(1)).item()))
+            self.assertAlmostEqual(float(schedule(mx.array(config.steps)).item()), config.learning_rate * .2)
+            with contextlib.redirect_stdout(io.StringIO()), \
+                    patch("silivra.finetune.require_apple_gpu", return_value={"test": "synthetic"}):
+                finetune(data, base, root / "extended", config, max_minutes=1)
+                finetune(data, base, root / "extended", resume=True, max_minutes=1)
+            checkpoint = resolve_checkpoint(root / "extended")
+            state = verify_checkpoint(checkpoint)
+            self.assertEqual(state["model_config"]["max_seq_len"], 192)
+            self.assertEqual(verify_checkpoint(resolve_checkpoint(base))["model_config"]["max_seq_len"], 96)
             self.assertFalse((root / "new").exists())
 
 

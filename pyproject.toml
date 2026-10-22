@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "silivra"
-version = "0.2.0"
+version = "0.3.0"
 description = "From-scratch language models, local assistant tools, and durable private memory"
 readme = "README.md"
 requires-python = ">=3.12,<3.14"
@@ -13,6 +13,8 @@ dependencies = [
   "mlx==0.32.4; sys_platform == 'darwin' and platform_machine == 'arm64'",
   "numpy==2.5.4",
   "tokenizers==0.23.3",
+  "rich==15.0.0",
+  "prompt-toolkit==3.0.53",
 ]
 
 [project.scripts]

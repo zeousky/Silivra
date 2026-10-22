@@ -8,7 +8,12 @@ from pathlib import Path
 
 def parser():
     root = argparse.ArgumentParser(description="Silivra: from-scratch AI training and a local assistant runtime.")
-    sub = root.add_subparsers(dest="command", required=True)
+    from silivra import __version__
+    root.add_argument("--version", action="version", version=f"Silivra {__version__}")
+    root.add_argument("--workspace", dest="startup_workspace", type=Path, default=Path.cwd(), help="Workspace for the interactive terminal")
+    root.add_argument("--model", dest="startup_model", type=Path, help="Local model run/checkpoint for the interactive terminal")
+    root.add_argument("--user", dest="startup_user", default="local", help="Local user label for the interactive terminal")
+    sub = root.add_subparsers(dest="command", required=False)
     sub.add_parser("doctor", help="Inspect non-identifying hardware and MLX Metal support")
     prep = sub.add_parser("prepare", help="Download bounded story subsets and train a new BPE tokenizer")
     prep.add_argument("--data", type=Path, default=Path("data/tinystories"))
@@ -70,17 +75,17 @@ def _assistant_parsers(sub):
 
     chat = sub.add_parser("chat", help="Experimental own-checkpoint assistant with bounded JSON tool actions")
     chat.add_argument("prompt", nargs="?", help="Omit for an interactive session; /exit quits and /new starts a session")
-    chat.add_argument("--run", type=Path, default=Path("runs/silivra-instruct"))
-    chat.add_argument("--which", choices=("latest", "best"), default="best")
+    chat.add_argument("--run", type=Path, default=None, help="Run/checkpoint; interactive mode also remembers /model")
+    chat.add_argument("--which", choices=("latest", "best"), default=None)
     chat.add_argument("--session", help="Resume a session in this user/project scope")
     chat.add_argument("--tool", dest="selected_tools", action="append", help="Expose selected enabled tools; repeat as needed (default: none)")
     chat.add_argument("--all-tools", action="store_true", help="Expose every enabled tool; needs a sufficiently long-context checkpoint")
     chat.add_argument("--no-tools", action="store_true")
-    chat.add_argument("--max-new-tokens", type=int, default=96)
-    chat.add_argument("--max-steps", type=int, default=6)
-    chat.add_argument("--max-seconds", type=float, default=120)
-    chat.add_argument("--history-messages", type=int, default=8)
-    chat.add_argument("--memory-chars", type=int, default=1500)
+    chat.add_argument("--max-new-tokens", type=int, help="Output reservation (interactive: saved preference; one-shot default: 96)")
+    chat.add_argument("--max-steps", type=int, help="Turn action limit (interactive: saved preference; one-shot default: 6)")
+    chat.add_argument("--max-seconds", type=float, help="Turn time budget (interactive: saved preference; one-shot default: 120)")
+    chat.add_argument("--history-messages", type=int, help="Previous messages (interactive: saved preference; one-shot default: 8)")
+    chat.add_argument("--memory-chars", type=int, help="Retrieved memory budget (interactive: saved preference; one-shot default: 1500)")
     chat.add_argument("--json", action="store_true")
     workspace(chat, memory=True, permissions=True)
 
@@ -140,15 +145,26 @@ def _assistant_command(args):
                                 allow_exec=args.allow_exec, allow_network=args.allow_network)
         if args.command == "tools":
             return registry.schemas()
-        arguments = json.loads(args.arguments)
-        if not isinstance(arguments, dict):
-            raise ValueError("--arguments must be a JSON object.")
+        from silivra.terminal import _json
+        arguments = _json(args.arguments)
         result = registry.execute(args.name, arguments)
         if not result.get("ok"):
             print(json.dumps(result, indent=2))
             raise SystemExit(1)
         return result
     if args.command in ("memory", "chat"):
+        if args.command == "chat" and args.prompt is None and not args.json and sys.stdin.isatty():
+            from silivra.terminal import run_terminal
+            if sum((bool(args.no_tools), bool(args.selected_tools), bool(args.all_tools))) > 1:
+                raise ValueError("Choose --no-tools, --all-tools, or --tool selections.")
+            selection = None if args.all_tools else ([] if args.no_tools else args.selected_tools or ())
+            raise SystemExit(run_terminal(workspace=args.workspace, user=args.user, run=args.run, which=args.which,
+                                          memory=args.memory, session_id=args.session, tool_names=selection,
+                                          allow_write=args.allow_write, allow_network=args.allow_network,
+                                          allow_exec=args.allow_exec, max_new_tokens=args.max_new_tokens,
+                                          config_overrides={key: getattr(args, key) for key in
+                                                            ("max_steps", "max_seconds", "history_messages", "memory_chars")
+                                                            if getattr(args, key) is not None}))
         from silivra.agent import project_scope
         from silivra.memory import MemoryStore
         scope = project_scope(args.workspace, args.user)
@@ -186,10 +202,19 @@ def _assistant_command(args):
                 raise ValueError("Choose --no-tools, --all-tools, or --tool selections.")
             tools = ToolRegistry(args.workspace, allow_write=args.allow_write,
                                  allow_exec=args.allow_exec, allow_network=args.allow_network)
-            backend = MLXBackend(args.run, which=args.which, max_new_tokens=args.max_new_tokens)
+            from silivra.terminal import default_model_run
+            if args.prompt is None and not sys.stdin.isatty():
+                args.prompt = sys.stdin.read(32_001)
+            if args.prompt is not None and (not args.prompt.strip() or len(args.prompt) > 32_000):
+                raise ValueError("prompt must contain 1–32,000 characters.")
+            config = AgentConfig(max_steps=args.max_steps if args.max_steps is not None else 6,
+                                 max_seconds=args.max_seconds if args.max_seconds is not None else 120,
+                                 history_messages=args.history_messages if args.history_messages is not None else 8,
+                                 memory_chars=args.memory_chars if args.memory_chars is not None else 1500)
+            backend = MLXBackend(args.run or default_model_run(args.workspace), which=args.which or "best",
+                                 max_new_tokens=args.max_new_tokens if args.max_new_tokens is not None else 96)
             agent = Agent(backend, tools, store, scope,
-                          config=AgentConfig(max_steps=args.max_steps, max_seconds=args.max_seconds,
-                                             history_messages=args.history_messages, memory_chars=args.memory_chars),
+                          config=config,
                           tool_names=None if args.all_tools else (args.selected_tools or []))
             print("Experimental local checkpoint: tool-following ability must be evaluated separately.", file=sys.stderr)
             session = args.session
@@ -249,6 +274,22 @@ def _assistant_command(args):
 def main():
     args = parser().parse_args()
     try:
+        if args.command is None:
+            if sys.stdin.isatty():
+                from silivra.terminal import run_terminal
+                raise SystemExit(run_terminal(workspace=args.startup_workspace, user=args.startup_user, run=args.startup_model))
+            prompt = sys.stdin.read(32_001)
+            if not prompt.strip():
+                parser().print_help()
+                return
+            chat_args = ["chat", "--workspace", str(args.startup_workspace), "--user", args.startup_user, "--", prompt]
+            if args.startup_model:
+                chat_args[1:1] = ["--run", str(args.startup_model)]
+            args = parser().parse_args(chat_args)
+            result = _assistant_command(args)
+            if result is not None:
+                print(json.dumps(result, indent=2, ensure_ascii=False))
+            return
         if args.command == "doctor":
             from silivra.runtime import hardware_info
             result = hardware_info()

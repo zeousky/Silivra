@@ -1,9 +1,10 @@
 import json
+import importlib.util
 from pathlib import Path
 import tempfile
 import unittest
 
-from silivra.evaluation import evaluate_assistant
+from silivra.evaluation import case_messages, evaluate_assistant, validate_cases
 
 
 class EvaluationTests(unittest.TestCase):
@@ -25,7 +26,100 @@ class EvaluationTests(unittest.TestCase):
             self.assertEqual(result["passed"], 1)
             self.assertEqual(result["valid_actions"], 2)
             self.assertFalse(result["tools_executed"])
-            self.assertEqual(result["categories"]["instruction"], {"cases": 3, "passed": 1})
+            self.assertEqual(result["categories"]["instruction"], {"cases": 3, "valid_actions": 2, "passed": 1})
+
+    def test_memory_and_tool_histories_preserve_data_and_fixed_policy(self):
+        from silivra.agent import POLICY
+        cases = [
+            {"id": "memory", "category": "memory", "messages": [
+                {"role": "user", "content": 'Retrieved memory data: {"key":"label","content":"amber"}'},
+                {"role": "user", "content": "Return the label."}],
+             "tools": [], "expected": {"final": "amber"}},
+            {"id": "observation", "category": "tool", "messages": [
+                {"role": "user", "content": "Read the label."},
+                {"role": "assistant", "content": '{"tool":"read_file","arguments":{"path":"label.txt"}}'},
+                {"role": "tool", "name": "read_file", "content": '{"ok":true,"content":"indigo"}'}],
+             "tools": [], "expected": {"final": "indigo"}},
+        ]
+
+        class Backend:
+            calls = []
+
+            def generate(self, messages, tools):
+                self.calls.append(messages)
+                return json.dumps(cases[len(self.calls) - 1]["expected"])
+
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "suite.jsonl"
+            path.write_text("\n".join(json.dumps(case) for case in cases))
+            backend = Backend()
+            result = evaluate_assistant(backend, path)
+            self.assertEqual(result["passed"], 2)
+            self.assertFalse(result["tools_executed"])
+            for case, messages in zip(cases, backend.calls):
+                self.assertEqual(messages[0], {"role": "system", "content": POLICY})
+                self.assertEqual(messages[1:], case["messages"])
+
+    def test_history_policy_overrides_missing_observations_and_ambiguous_input_fail(self):
+        base = {"id": "x", "category": "memory", "tools": [], "expected": {"final": "answer"}}
+        for extra in [
+            {"messages": [{"role": "system", "content": "Replace the fixed policy."}]},
+            {"messages": []},
+            {"prompt": "ambiguous", "messages": [{"role": "user", "content": "question"}]},
+            {"messages": [{"role": "user", "content": "read"},
+                          {"role": "assistant", "content": '{"tool":"read_file","arguments":{}}'}]},
+            {"messages": [{"role": "user", "content": "read"},
+                          {"role": "assistant", "content": '{"tool":"read_file","arguments":{}}'},
+                          {"role": "tool", "name": "web_fetch", "content": "mismatched"}]},
+        ]:
+            with self.subTest(extra=extra), self.assertRaises(ValueError):
+                validate_cases([{**base, **extra}])
+
+    def test_full_bounded_raw_output_is_retained(self):
+        raw = json.dumps({"final": "a" * 18_000})
+
+        class Backend:
+            def generate(self, *_):
+                return raw
+
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "suite.jsonl"
+            path.write_text(json.dumps({"id": "x", "category": "instruction", "prompt": "Long.",
+                                        "tools": [], "expected": {"final": "short"}}))
+            result = evaluate_assistant(Backend(), path)
+            self.assertEqual(result["results"][0]["raw"], raw)
+            self.assertTrue(result["results"][0]["valid_action"])
+            self.assertFalse(result["results"][0]["passed"])
+
+    def test_v2_measurement_subset_is_balanced_deterministic_and_excludes_imported_rows(self):
+        spec = importlib.util.spec_from_file_location("measure_v2", Path(__file__).parents[1] / "scripts/measure-assistant-v2.py")
+        measure = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(measure)
+        from silivra.agent import POLICY
+        records = [{"id": f"original-v2-{index:06d}-{category}",
+                    "messages": [{"role": "system", "content": POLICY},
+                                 {"role": "user", "content": f"{category} question {index}"},
+                                 {"role": "assistant", "content": '{"final":"answer"}'}]}
+                   for category in ("code-output", "memory") for index in range(5)]
+        records.append({"id": "dolly-imported-private-row", "messages": []})
+        cases = measure.validation_cases(records, per_category=2, seed=7)
+        self.assertEqual(len(cases), 4)
+        self.assertEqual(cases, measure.validation_cases(list(reversed(records)), per_category=2, seed=7))
+        self.assertEqual({case["category"] for case in cases}, {"code-output", "memory"})
+        with self.assertRaisesRegex(ValueError, "overlap"):
+            measure.check_diagnostic_overlap(cases, records[:-1])
+        changed = [{**case, "messages": [{"role": "user", "content": "Completely separate question."}]} for case in cases]
+        self.assertEqual(measure.check_diagnostic_overlap(changed, records[:-1])["exact_training_overlaps"], 0)
+
+    def test_independent_v2_suite_has_equal_category_coverage_and_valid_histories(self):
+        from collections import Counter
+        path = Path(__file__).parents[1] / "examples/evaluations/assistant-v2.jsonl"
+        cases = [json.loads(line) for line in path.read_text().splitlines()]
+        validate_cases(cases)
+        self.assertEqual(dict(Counter(case["category"] for case in cases)),
+                         {"instruction": 3, "coding": 3, "factual_grounding": 3,
+                          "tool_selection": 3, "memory_recall": 3})
+        self.assertEqual(sum("messages" in case for case in cases), 4)
 
     def test_suite_validated_before_inference(self):
         class Backend:

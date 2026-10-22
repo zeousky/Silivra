@@ -36,6 +36,10 @@ class FinetuneConfig:
     log_every: int = 10
     seed: int = 42
     memory_gib: float = 6.0
+    context_length: int | None = None
+    bucket_size: int = 0
+    warmup_steps: int = 0
+    min_lr_ratio: float = 1.0
 
     def validate(self):
         for name in ("steps", "batch_size", "eval_every", "eval_batches", "save_every", "log_every"):
@@ -53,6 +57,31 @@ class FinetuneConfig:
             raise ValueError("weight_decay must be finite and in [0, 1]")
         if type(self.seed) is not int or not 0 <= self.seed < 2**64:
             raise ValueError("seed must be an integer in [0, 2**64)")
+        if self.context_length is not None and (type(self.context_length) is not int
+                                               or not 32 <= self.context_length <= 4096):
+            raise ValueError("context_length must be None or an integer in [32, 4096]")
+        if type(self.bucket_size) is not int or self.bucket_size not in (0, 32, 64, 128, 256):
+            raise ValueError("bucket_size must be one of 0, 32, 64, 128, 256")
+        if type(self.warmup_steps) is not int or not 0 <= self.warmup_steps < self.steps:
+            raise ValueError("warmup_steps must be an integer in [0, steps)")
+        if (type(self.min_lr_ratio) not in (int, float) or not math.isfinite(self.min_lr_ratio)
+                or not 0 < self.min_lr_ratio <= 1):
+            raise ValueError("min_lr_ratio must be finite and in (0, 1]")
+
+
+def learning_rate(config):
+    """A checkpoint-step-based schedule whose state resumes with AdamW."""
+    import mlx.optimizers as optim
+    if config.warmup_steps == 0 and config.min_lr_ratio == 1:
+        return config.learning_rate
+    decay = optim.cosine_decay(config.learning_rate, config.steps - config.warmup_steps,
+                               end=config.learning_rate * config.min_lr_ratio)
+    if not config.warmup_steps:
+        return decay
+    return optim.join_schedules([
+        optim.linear_schedule(config.learning_rate * .1, config.learning_rate, config.warmup_steps),
+        decay,
+    ], [config.warmup_steps])
 
 
 def masked_loss(model, x, y, mask):
@@ -183,12 +212,17 @@ def finetune(data_dir: Path, base_checkpoint: Path, run_dir: Path, config: Finet
         base["pretraining_step"] = base_state["step"]
     manifest = _manifest(data_dir)
     architecture = ModelConfig.from_dict(base_state["model_config"])
+    if config.context_length is not None:
+        if config.context_length < architecture.max_seq_len:
+            raise ValueError("context_length may extend, but cannot shrink the base checkpoint context")
+        architecture = ModelConfig.from_dict({**architecture.to_dict(), "max_seq_len": config.context_length})
     if (manifest["tokenizer"]["sha256"] != base["tokenizer_sha256"]
             or manifest["tokenizer"]["vocab_size"] != architecture.vocab_size
             or manifest["max_seq_len"] > architecture.max_seq_len):
         raise ValueError("Instruction tokenizer or context limit does not match the base checkpoint")
     datasets = {split: InstructionDataset(data_dir / manifest["splits"][split]["path"],
-                 architecture.max_seq_len, architecture.vocab_size) for split in ("train", "valid")}
+                 architecture.max_seq_len, architecture.vocab_size, bucket_size=config.bucket_size)
+                for split in ("train", "valid")}
     hardware = require_apple_gpu(config.memory_gib)
     if not resume and run_dir.exists() and any(run_dir.iterdir()):
         raise FileExistsError("Fine-tuning run must be absent or empty; use --resume for an existing run")
@@ -213,15 +247,16 @@ def finetune(data_dir: Path, base_checkpoint: Path, run_dir: Path, config: Finet
                 raise ValueError("Resume requires SFT checkpoint format_version=2 with exact token counters; start a separate new run for older experimental checkpoints")
             if (previous.get("training_mode") != "instruction_sft"
                     or previous.get("prompt_format") != PROMPT_FORMAT
-                    or previous["training_config"] != asdict(config)
+                    or asdict(FinetuneConfig(**previous["training_config"])) != asdict(config)
                     or previous["base_checkpoint"] != base
+                    or previous["model_config"] != architecture.to_dict()
                     or previous["data_manifest_sha256"] != sha256(data_dir / "manifest.json")):
                 raise ValueError("Resume requires the original SFT base, data and training configuration")
         mx.random.seed(config.seed)
         rng = np.random.default_rng(config.seed)
         model = SilivraLM(architecture)
         model.load_weights(str(checkpoint / "model.safetensors"))
-        optimizer = optim.AdamW(learning_rate=config.learning_rate, weight_decay=config.weight_decay)
+        optimizer = optim.AdamW(learning_rate=learning_rate(config), weight_decay=config.weight_decay)
         step, best_loss, seconds_before = 0, float("inf"), 0.0
         supervised_tokens_seen, input_tokens_seen = 0, 0
         if previous:
@@ -281,7 +316,9 @@ def finetune(data_dir: Path, base_checkpoint: Path, run_dir: Path, config: Finet
                 input_tokens_seen += int(mx.sum(y != manifest["tokenizer"]["pad_id"]).item())
                 if step % config.log_every == 0 or step == config.steps:
                     row = {"event": "sft_train", "step": step, "loss": float(loss.item()),
-                           "gradient_norm": float(norm.item()), **memory_stats()}
+                           "gradient_norm": float(norm.item()),
+                           "learning_rate": float(optimizer.learning_rate.item()),
+                           "input_width": int(x.shape[1]), **memory_stats()}
                     print(json.dumps(row), flush=True)
                     log.write(json.dumps(row) + "\n")
                 if mx.get_peak_memory() > config.memory_gib * 1024**3:

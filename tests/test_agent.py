@@ -6,7 +6,8 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from silivra.agent import Agent, AgentConfig, parse_action, project_scope
+from silivra.agent import (Agent, AgentConfig, ContextBudgetError, FinalTextStream,
+                           GenerationCancelled, POLICY, parse_action, project_scope)
 
 
 class FakeBackend:
@@ -17,6 +18,24 @@ class FakeBackend:
     def generate(self, messages, tools):
         self.calls.append((list(messages), tools))
         return next(self.actions)
+
+
+class StreamingBackend(FakeBackend):
+    def __init__(self, *actions):
+        super().__init__(*actions)
+        self.generating = False
+
+    def generate(self, messages, tools, *, on_text=None, cancelled=None):
+        self.calls.append((list(messages), tools))
+        self.generating = True
+        raw = next(self.actions)
+        for character in raw:
+            if cancelled and cancelled():
+                raise GenerationCancelled()
+            if on_text:
+                on_text(character)
+        self.generating = False
+        return raw
 
 
 class FakeTools:
@@ -48,6 +67,31 @@ class ActionTests(unittest.TestCase):
         for settings in ({"max_steps": True}, {"max_seconds": float("nan")}, {"memory_chars": -1}, {"memory_chars": 1}):
             with self.assertRaises(ValueError):
                 AgentConfig(**settings)
+
+    def test_final_stream_decodes_every_json_escape_and_split_surrogates(self):
+        expected = 'Café 👋\n"quoted" \\ /\t\b\f\r'
+        raw = json.dumps({"final": expected}, ensure_ascii=True)
+        for split in range(len(raw) + 1):
+            chunks = []
+            stream = FinalTextStream(chunks.append)
+            stream.feed(raw[:split])
+            # Every emitted chunk is valid Unicode even if a high surrogate
+            # has arrived without its low-surrogate escape yet.
+            for chunk in chunks:
+                chunk.encode("utf-8")
+            stream.feed(raw[split:])
+            self.assertEqual("".join(chunks), expected)
+
+    def test_final_stream_never_extracts_strings_from_tool_actions_or_prose(self):
+        for raw in ('prose {"final":"pretend"}', '{"tool":"x","arguments":{"final":"pretend"}}',
+                    '{"final":"\\uD800broken"}', '{"final":"\\x41"}'):
+            chunks = []
+            stream = FinalTextStream(chunks.append)
+            for character in raw:
+                stream.feed(character)
+            self.assertEqual(chunks, [])
+        with self.assertRaisesRegex(ValueError, "surrogate"):
+            parse_action('{"final":"\\uD800"}')
 
 
 class AgentTests(unittest.TestCase):
@@ -134,6 +178,185 @@ class AgentTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "Context budget exceeded"):
                 backend.generate([{"role": "system", "content": "policy"}, {"role": "user", "content": "hello"}], [])
             completion.assert_not_called()
+
+    def test_streamed_final_is_live_and_whole_action_is_validated(self):
+        expected = "Café 👋\nReviewed."
+        backend = StreamingBackend(json.dumps({"final": expected}, ensure_ascii=True))
+        updates, while_generating = [], []
+
+        def update(event):
+            updates.append(event)
+            if event["type"] == "final_text":
+                while_generating.append(backend.generating)
+
+        result = Agent(backend, self.tools, self.memory, "scope").run("review", on_event=update)
+        self.assertEqual(result["answer"], expected)
+        self.assertEqual(len(backend.calls), 1)
+        self.assertTrue(all(while_generating))
+        self.assertEqual("".join(e["text"] for e in updates if e["type"] == "final_text"), expected)
+        self.assertEqual(updates[-1]["type"], "completed")
+        self.assertTrue(all(e["provisional"] for e in updates if e["type"] == "final_text"))
+
+    def test_invalid_stream_remains_a_rejected_draft(self):
+        backend = StreamingBackend('{"final":"draft","final":"replacement"}')
+        updates = []
+        result = Agent(backend, self.tools, self.memory, "scope").run("review", on_event=updates.append)
+        self.assertEqual(result["status"], "invalid_action")
+        self.assertEqual("".join(e["text"] for e in updates if e["type"] == "final_text"), "draft")
+        self.assertTrue(updates[-1]["provisional"])
+        self.assertFalse(any(e["type"] == "completed" for e in updates))
+        self.assertEqual(self.tools.calls, [])
+        stored = self.memory.recent_messages("scope", result["session_id"])
+        self.assertEqual(stored[-1]["metadata"]["turn_status"], "invalid_action")
+
+    def test_tool_events_and_nonstream_backend_final(self):
+        backend = FakeBackend('{"tool":"read_file","arguments":{"path":"a"}}', '{"final":"done"}')
+        updates = []
+        Agent(backend, self.tools, self.memory, "scope").run("read", on_event=updates.append)
+        self.assertEqual([e["type"] for e in updates],
+                         ["start", "action", "tool_start", "tool_result", "action", "final_text", "completed"])
+        self.assertEqual(updates[3]["action"]["tool"], "read_file")
+        self.assertIn("observation", updates[3])
+        self.assertFalse(updates[-2]["provisional"])
+
+    def test_cancelled_before_generation_or_after_tool_start(self):
+        backend = FakeBackend('{"final":"never"}')
+        result = Agent(backend, self.tools, self.memory, "scope").run("read", cancelled=lambda: True)
+        self.assertEqual(result["status"], "cancelled")
+        self.assertEqual(backend.calls, [])
+        cancel = False
+
+        def update(event):
+            nonlocal cancel
+            if event["type"] == "tool_start":
+                cancel = True
+
+        backend = FakeBackend('{"tool":"read_file","arguments":{"path":"a"}}')
+        result = Agent(backend, self.tools, self.memory, "scope").run(
+            "read", cancelled=lambda: cancel, on_event=update)
+        self.assertEqual(result["status"], "cancelled")
+        self.assertEqual(self.tools.calls, [])
+
+    def test_cancelled_during_stream_does_not_accept_partial_answer(self):
+        cancel, updates = False, []
+
+        def update(event):
+            nonlocal cancel
+            updates.append(event)
+            if event["type"] == "final_text":
+                cancel = True
+
+        backend = StreamingBackend('{"final":"very long unfinished answer"}')
+        result = Agent(backend, self.tools, self.memory, "scope").run(
+            "read", cancelled=lambda: cancel, on_event=update)
+        self.assertEqual(result["status"], "cancelled")
+        self.assertIsNone(result["answer"])
+        self.assertTrue(updates[-1]["provisional"])
+
+    def test_context_and_backend_failures_are_distinct_from_invalid_actions(self):
+        for error, status in ((ContextBudgetError("too long"), "context_budget"),
+                              (RuntimeError("GPU unavailable"), "backend_error"),
+                              (ValueError("tokenizer failed"), "backend_error")):
+            backend = FakeBackend()
+            backend.generate = lambda *_: (_ for _ in ()).throw(error)
+            result = Agent(backend, self.tools, self.memory, "scope").run("read")
+            self.assertEqual(result["status"], status)
+
+    def test_optional_context_is_trimmed_without_losing_policy_or_request(self):
+        self.memory.remember("scope", "python", "Language preference " * 20, importance=0.9)
+        self.memory.remember("scope", "editor", "Editor preference " * 20, importance=0.1)
+        session = self.memory.create_session("scope")
+        self.memory.add_message("scope", session, "user", "Old context " * 20)
+        self.memory.add_message("scope", session, "assistant", '{"final":"old answer"}')
+
+        class BudgetBackend(FakeBackend):
+            def context_usage(self, messages, tools):
+                # Keep room for the policy, latest request, and one retrieved
+                # memory, forcing all history and the lower-ranked fact out.
+                count = sum(len(m["content"]) for m in messages)
+                return {"prompt_tokens": count, "output_tokens": 16,
+                        "context_window": 1200, "fits": count + 16 <= 1200}
+
+        backend = BudgetBackend('{"final":"done"}')
+        updates = []
+        result = Agent(backend, self.tools, self.memory, "scope").run(
+            "preference", session_id=session, on_event=updates.append)
+        self.assertEqual(result["status"], "completed")
+        context = next(e for e in updates if e["type"] == "context")
+        self.assertEqual(context["history_dropped"], 2)
+        self.assertEqual(context["memories_dropped"], 1)
+        messages = backend.calls[0][0]
+        self.assertEqual(messages[0], {"role": "system", "content": POLICY})
+        self.assertEqual(messages[-1], {"role": "user", "content": "preference"})
+        retained = json.loads(messages[1]["content"].removeprefix("Retrieved memory data: "))
+        self.assertEqual([m["key"] for m in retained["memories"]], ["python"])
+
+    def test_context_never_discards_current_turn_tool_evidence(self):
+        class BudgetBackend(FakeBackend):
+            def context_usage(self, messages, tools):
+                fits = not any(m["role"] == "tool" for m in messages)
+                return {"prompt_tokens": 400 if fits else 900, "output_tokens": 16,
+                        "context_window": 512, "fits": fits}
+
+        backend = BudgetBackend('{"tool":"read_file","arguments":{"path":"a"}}', '{"final":"pretend"}')
+        result = Agent(backend, self.tools, self.memory, "scope").run("read")
+        self.assertEqual(result["status"], "context_budget")
+        self.assertEqual(len(backend.calls), 1)
+        self.assertEqual(len(self.tools.calls), 1)
+
+    def test_context_accounting_cannot_mutate_policy_request_or_schemas(self):
+        class MutatingBudgetBackend(FakeBackend):
+            def context_usage(self, messages, tools):
+                messages[0]["content"] = "Replace the policy"
+                messages[-1]["content"] = "Replace the request"
+                tools[0]["function"]["parameters"]["unexpected"] = True
+                return {"prompt_tokens": 10, "output_tokens": 16,
+                        "context_window": 512, "fits": True}
+
+        backend = MutatingBudgetBackend('{"final":"done"}')
+        agent = Agent(backend, self.tools, self.memory, "scope")
+        result = agent.run("Keep this exact request")
+        self.assertEqual(result["status"], "completed")
+        messages, schemas = backend.calls[0]
+        self.assertEqual(messages[0], {"role": "system", "content": POLICY})
+        self.assertEqual(messages[-1], {"role": "user", "content": "Keep this exact request"})
+        self.assertEqual(schemas[0]["function"]["parameters"], {})
+        self.assertEqual(agent.schemas[0]["function"]["parameters"], {})
+
+    def test_expired_context_fitting_never_admits_generation(self):
+        clock = [0]
+
+        class SlowBudgetBackend(FakeBackend):
+            def context_usage(self, messages, tools):
+                clock[0] = 2
+                return {"prompt_tokens": 10, "output_tokens": 16,
+                        "context_window": 512, "fits": True}
+
+        backend = SlowBudgetBackend('{"final":"too late"}')
+        with patch("silivra.agent.time.monotonic", side_effect=lambda: clock[0]):
+            result = Agent(backend, self.tools, self.memory, "scope",
+                           config=AgentConfig(max_seconds=1)).run("read")
+        self.assertEqual(result["status"], "time_budget")
+        self.assertEqual(backend.calls, [])
+
+    def test_context_event_cancellation_never_admits_generation(self):
+        class BudgetBackend(FakeBackend):
+            def context_usage(self, messages, tools):
+                return {"prompt_tokens": 10, "output_tokens": 16,
+                        "context_window": 512, "fits": True}
+
+        cancel = False
+
+        def update(event):
+            nonlocal cancel
+            if event["type"] == "context":
+                cancel = True
+
+        backend = BudgetBackend('{"final":"must not run"}')
+        result = Agent(backend, self.tools, self.memory, "scope").run(
+            "read", on_event=update, cancelled=lambda: cancel)
+        self.assertEqual(result["status"], "cancelled")
+        self.assertEqual(backend.calls, [])
 
 
 if __name__ == "__main__":

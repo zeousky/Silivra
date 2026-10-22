@@ -6,6 +6,30 @@ An independent AI project combining **language models trained from random initia
 
 Public source: [zeousky/Silivra](https://github.com/zeousky/Silivra). Code is MIT; weights, private chats, memory databases and raw datasets are excluded from this repository.
 
+## Interactive terminal
+
+```sh
+uv sync --locked
+uv run silivra --model runs/silivra-assistant-v2
+```
+
+The terminal loads your local checkpoint on the first ordinary message. `/help`
+lists commands; `/models`, `/model PATH`, `/new`, `/sessions`, and `/resume ID`
+manage checkpoints and conversations. `/tool read_file {"path":"pyproject.toml"}`
+executes an explicit workspace read. `/memory remember language This project uses Python.`
+saves a durable fact only at your request. `/exit` quits.
+
+Start with `/tools none` for plain conversation, or select a focused tool with
+`/tools read_file`. Writes, network and command execution each need an explicit
+permission grant for the current process. Preferences and input history stay in
+ignored private `.silivra/` state. Streaming answers are labelled as drafts until
+their complete JSON action validates. See the [terminal guide](docs/CLI.md) for
+multiline input, cancellation, settings, permissions, memory and direct tools.
+
+Weights remain local: cloning this public repository does not include a trained
+checkpoint. The interactive interface and passing runtime tests do not establish
+general coding or assistant ability; consult the measured results above.
+
 ## Coding and research tools
 
 After `uv sync --locked`, tools work independently of whether the model has learned to choose them:
@@ -128,4 +152,6 @@ See [the model card](docs/MODEL_CARD.md), [training results](docs/INITIAL_RESULT
 
 Read the [roadmap](docs/ROADMAP.md) and [contribution guide](CONTRIBUTING.md). Linux CI checks portable memory/tools/data/orchestration behavior; numerical training and inference tests run on Apple silicon. Public source publication does not publish the local weights or datasets. Local Codex instructions live in an ignored `AGENTS.md`; public architecture and roadmap documents keep the shared engineering contract visible.
 
-Code: MIT. Training data: CDLA-Sharing-1.0 with separate attribution. See the licensing notes before distributing corpus artifacts.
+Code: MIT. Data licenses are source-specific: original exercises MIT,
+Dolly CC BY-SA 3.0, and TinyStories CDLA-Sharing-1.0. See the attribution and
+licensing notes before distributing corpus or model artifacts.

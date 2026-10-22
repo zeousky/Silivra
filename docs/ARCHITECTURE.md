@@ -54,6 +54,27 @@ Malformed outputs stop the turn visibly. There is no hidden hosted-model fallbac
 automatic JSON-to-shell conversion, or heuristic that pretends the base model
 has learned tool selection. The direct `tool` CLI works independently of that skill.
 
+## Interactive terminal
+
+`terminal.py` presents the same agent, tools and scoped SQLite store through a
+Rich/prompt-toolkit interface. `settings.py` keeps versioned preferences scoped to
+the local user and workspace. Model loading is lazy; explicit tools, help, settings
+and memory commands work without MLX. Interactive and one-shot CLI operations share
+the runtime and permission checks. Permission grants last only for the process.
+
+Native generation supports Unicode-safe text deltas and cooperative cancellation
+before prefill and between tokens. Final-answer text stays visibly provisional until
+the entire strict JSON action validates. The runtime checks cancellation and turn
+budgets before tool effects. It can trim older optional history and lower-ranked
+memory to fit actual tokenizer limits, and reports those omissions. It retains the
+system policy, current request, tool definitions and current-turn tool evidence;
+if those cannot fit, it stops with a context-budget error.
+
+Commands are accepted only from local user input. Model answers, file contents and
+observations are rendered as inert text. Input history is bounded, credential-
+redacted and scoped separately from conversation transcripts. The terminal guide
+describes the supported controls and operating boundaries.
+
 ## Tools and external data
 
 `tools.py` exposes typed schemas and validates arguments again at execution.

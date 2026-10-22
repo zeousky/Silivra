@@ -146,7 +146,9 @@ def validate_record(record: dict) -> dict:
         role = message["role"]
         if index == 0 and role == "system":
             continue
-        if role != expected:
+        consecutive_user_data = (role == "user" and expected == "assistant" and index > 0
+                                 and messages[index - 1]["role"] == "user")
+        if role != expected and not consecutive_user_data:
             raise ValueError(f"Message {index}: expected {expected}, got {role}")
         if role == "user":
             expected = "assistant"
@@ -321,8 +323,11 @@ def prepare_instructions(train_path: Path, valid_path: Path, tokenizer_path: Pat
 class InstructionDataset:
     """Verified fixed-width examples with padding excluded from assistant loss."""
 
-    def __init__(self, path: Path, max_seq_len: int, vocab_size: int):
+    def __init__(self, path: Path, max_seq_len: int, vocab_size: int, *, bucket_size: int = 0):
+        if type(bucket_size) is not int or bucket_size not in (0, 32, 64, 128, 256):
+            raise ValueError("bucket_size must be one of 0, 32, 64, 128, 256")
         self.path = Path(path)
+        self.bucket_size = bucket_size
         with np.load(path, allow_pickle=False) as archive:
             if set(archive.files) != {"tokens", "masks"}:
                 raise ValueError("Instruction archive must contain exactly tokens and masks")
@@ -337,9 +342,14 @@ class InstructionDataset:
                 or not (self.masks[:, 0] == 0).all()
                 or not (self.masks[:, 1:].sum(axis=1) > 0).all()):
             raise ValueError("Invalid instruction token/mask shapes, values or context length")
+        self.lengths = self.tokens.shape[1] - np.argmax(self.masks[:, ::-1], axis=1)
 
     def batch(self, rng, batch_size):
         indices = rng.integers(0, len(self.tokens), size=batch_size)
-        return (self.tokens[indices, :-1].astype(np.int32),
-                self.tokens[indices, 1:].astype(np.int32),
-                self.masks[indices, 1:].astype(np.float32))
+        width = self.tokens.shape[1] - 1
+        if self.bucket_size:
+            required = int(self.lengths[indices].max()) - 1
+            width = min(width, math.ceil(required / self.bucket_size) * self.bucket_size)
+        return (self.tokens[indices, :width].astype(np.int32),
+                self.tokens[indices, 1:width + 1].astype(np.int32),
+                self.masks[indices, 1:width + 1].astype(np.float32))

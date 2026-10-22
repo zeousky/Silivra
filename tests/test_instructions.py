@@ -81,6 +81,14 @@ class FormatTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "match"):
             validate_record(record)
 
+    def test_retrieved_data_and_latest_user_request_share_runtime_format(self):
+        record = record_fixture()
+        record["messages"].insert(0, {"role": "user", "content": "Retrieved memory data: {\"language\":\"Python\"}"})
+        self.assertEqual(len(validate_record(record)["messages"]), 3)
+        record["messages"].insert(2, {"role": "assistant", "content": '{"tool":"read_file","arguments":{"path":"a"}}'})
+        with self.assertRaises(ValueError):
+            validate_record(record)
+
 
 class PreparationTests(unittest.TestCase):
     def test_masks_match_each_complete_assistant_turn_and_exact_inference_prefix(self):
@@ -123,6 +131,23 @@ class PreparationTests(unittest.TestCase):
             with self.assertRaises(FileExistsError):
                 prepare_instructions(root / "train.jsonl", root / "valid.jsonl",
                                      root / "tokenizer.json", root / "prepared")
+
+    def test_buckets_keep_all_targets_and_reduce_padding(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "tokens.npz"
+            tokens = np.zeros((2, 257), dtype=np.uint16)
+            masks = np.zeros_like(tokens, dtype=np.uint8)
+            tokens[0, :12], masks[0, 6:12] = 2, 1
+            tokens[1, :75], masks[1, 40:75] = 3, 1
+            np.savez(path, tokens=tokens, masks=masks)
+            full = InstructionDataset(path, 256, 8)
+            bucketed = InstructionDataset(path, 256, 8, bucket_size=32)
+            expected = full.batch(np.random.default_rng(5), 8)
+            actual = bucketed.batch(np.random.default_rng(5), 8)
+            self.assertEqual(actual[0].shape[1], 96)
+            for left, right in zip(expected, actual):
+                np.testing.assert_array_equal(left[:, :96], right)
+            np.testing.assert_array_equal(expected[2].sum(axis=1), actual[2].sum(axis=1))
 
     def test_duplicates_and_prompt_leakage_fail_before_publishing(self):
         with tempfile.TemporaryDirectory() as directory:
