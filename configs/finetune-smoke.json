@@ -1,0 +1,12 @@
+{
+  "steps": 50,
+  "batch_size": 4,
+  "learning_rate": 0.0001,
+  "weight_decay": 0.01,
+  "eval_every": 25,
+  "eval_batches": 1,
+  "save_every": 25,
+  "log_every": 10,
+  "seed": 42,
+  "memory_gib": 6.0
+}

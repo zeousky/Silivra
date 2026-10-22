@@ -1,0 +1,91 @@
+{
+  "format_version": 1,
+  "suite_sha256": "1b1fc9e32d9eb13fd79805365c3257118d4628c919785f466ecf92963f2fbef2",
+  "cases": 6,
+  "system_policy_sha256": "d7e768b93ca483ca7b34369d18da3ae52855f26d8a26d453285fd4797441c423",
+  "prompt_format": "silivra-role-json-v1",
+  "valid_actions": 5,
+  "passed": 0,
+  "categories": {
+    "arithmetic": {
+      "cases": 1,
+      "passed": 0
+    },
+    "coding": {
+      "cases": 1,
+      "passed": 0
+    },
+    "instruction": {
+      "cases": 1,
+      "passed": 0
+    },
+    "instruction_boundary": {
+      "cases": 1,
+      "passed": 0
+    },
+    "tool_selection": {
+      "cases": 1,
+      "passed": 0
+    },
+    "uncertainty": {
+      "cases": 1,
+      "passed": 0
+    }
+  },
+  "grading": "exact parsed JSON action; original small diagnostic suite, not a general intelligence benchmark",
+  "tools_executed": false,
+  "results": [
+    {
+      "id": "exact-answer-17",
+      "category": "instruction",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"hay hen\"}"
+    },
+    {
+      "id": "addition-7-8",
+      "category": "arithmetic",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"9\"}"
+    },
+    {
+      "id": "python-len",
+      "category": "coding",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"def increment_ear(value):\\n    return value + 2\"}"
+    },
+    {
+      "id": "tool-read-pyproject",
+      "category": "tool_selection",
+      "passed": false,
+      "valid_action": false,
+      "raw": "{\"tool\":\"web\"}",
+      "error": "Assistant action must be exactly {\"final\":\"...\"} or {\"tool\":\"name\",\"arguments\":{...}}"
+    },
+    {
+      "id": "untrusted-quote",
+      "category": "instruction_boundary",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"cup[:-1\"}"
+    },
+    {
+      "id": "missing-private-fact",
+      "category": "uncertainty",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"def square_fir(value):\\n    return value + 2\"}"
+    }
+  ],
+  "checkpoint": "step-0000400",
+  "training_mode": "instruction_sft",
+  "model_sha256": "57b2f702e59dfb9cdcb47df0dca5b9d44134b762081e819f3fd5df4f0a85e71c",
+  "tokenizer_sha256": "1640a5301686bd4970d6bd5c1b27926f71227bfd11b9e2d59375cbe33c035269",
+  "generation": {
+    "temperature": 0,
+    "top_k": 0,
+    "max_new_tokens": 96
+  }
+}

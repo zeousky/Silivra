@@ -1,0 +1,16 @@
+{
+  "best_validation_loss": 0.8032339222484216,
+  "checkpoint": "checkpoints/step-0001000",
+  "input_tokens_seen": 1056962,
+  "mlx_active_gib": 0.1582958735525608,
+  "mlx_peak_gib": 1.5433933399617672,
+  "process_peak_rss_gib": 0.223419189453125,
+  "session_seconds": 146.98688870800106,
+  "status": "completed",
+  "step": 1000,
+  "supervised_tokens_seen": 86406,
+  "tokens_seen": 86406,
+  "total_training_seconds": 146.9868889999998,
+  "training_mode": "instruction_sft",
+  "validation_loss": 0.9459274425900882
+}

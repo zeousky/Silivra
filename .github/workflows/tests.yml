@@ -1,0 +1,26 @@
+name: Tests
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  portable:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: astral-sh/setup-uv@d0d8abe699bfb85fec6de9f7adb5ae17292296ff # v6
+        with:
+          version: "0.12.11"
+      - run: uv sync --locked
+      - name: Portable model-data and assistant tests (offline fixtures)
+        run: >-
+          uv run python -m unittest discover -s tests -p 'test_agent.py' -v &&
+          uv run python -m unittest discover -s tests -p 'test_memory.py' -v &&
+          uv run python -m unittest discover -s tests -p 'test_tools.py' -v &&
+          uv run python -m unittest discover -s tests -p 'test_web.py' -v &&
+          uv run python -m unittest discover -s tests -p 'test_instructions.py' -v &&
+          uv run python -m unittest discover -s tests -p 'test_evaluation.py' -v &&
+          uv run python -m unittest discover -s tests -p 'test_cli.py' -v &&
+          uv run python -m unittest discover -s tests -p 'test_curriculum.py' -v &&
+          uv run python -m unittest discover -s tests -p 'test_data.py' -v

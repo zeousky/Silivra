@@ -1,0 +1,52 @@
+{
+  "base_checkpoint": {
+    "pretraining_step": 2500,
+    "state_sha256": "102a32044eafc06dabd8f7b482baabf80089ea5d10eb5111695419be281e1a51",
+    "tokenizer_sha256": "1640a5301686bd4970d6bd5c1b27926f71227bfd11b9e2d59375cbe33c035269",
+    "weights_sha256": "633efc5b513b7de90de6d1e55d37f45948852d1c19728078a54f7502a6a7cf40"
+  },
+  "baseline_validation_loss": 8.341978194635196,
+  "data_manifest_sha256": "f7565e8bcdc20ee89046da3ddd45997e5e8ee45ad83b05673df6414a0cce0844",
+  "format_version": 1,
+  "hardware": {
+    "architecture": "arm64",
+    "gpu": {
+      "architecture": "applegpu_g16g",
+      "device_name": "Apple M4",
+      "max_buffer_length": 9534832640,
+      "max_recommended_working_set_size": 12713115648,
+      "memory_size": 17179869184,
+      "resource_limit": 499000
+    },
+    "macos": "27.0.1",
+    "metal_available": true,
+    "mlx": "0.32.4",
+    "platform": "darwin",
+    "python": "3.12.14",
+    "unified_memory_bytes": 17179869184
+  },
+  "model_config": {
+    "dim": 384,
+    "hidden_dim": 1024,
+    "max_seq_len": 512,
+    "n_heads": 6,
+    "n_kv_heads": 2,
+    "n_layers": 8,
+    "rope_theta": 10000.0,
+    "vocab_size": 4096
+  },
+  "prompt_format": "silivra-role-json-v1",
+  "training_config": {
+    "batch_size": 4,
+    "eval_batches": 25,
+    "eval_every": 100,
+    "learning_rate": 0.0002,
+    "log_every": 100,
+    "memory_gib": 6.0,
+    "save_every": 100,
+    "seed": 42,
+    "steps": 1000,
+    "weight_decay": 0.01
+  },
+  "training_mode": "instruction_sft"
+}

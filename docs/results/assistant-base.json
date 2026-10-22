@@ -1,0 +1,96 @@
+{
+  "format_version": 1,
+  "suite_sha256": "1b1fc9e32d9eb13fd79805365c3257118d4628c919785f466ecf92963f2fbef2",
+  "cases": 6,
+  "system_policy_sha256": "d7e768b93ca483ca7b34369d18da3ae52855f26d8a26d453285fd4797441c423",
+  "prompt_format": "silivra-role-json-v1",
+  "valid_actions": 0,
+  "passed": 0,
+  "categories": {
+    "arithmetic": {
+      "cases": 1,
+      "passed": 0
+    },
+    "coding": {
+      "cases": 1,
+      "passed": 0
+    },
+    "instruction": {
+      "cases": 1,
+      "passed": 0
+    },
+    "instruction_boundary": {
+      "cases": 1,
+      "passed": 0
+    },
+    "tool_selection": {
+      "cases": 1,
+      "passed": 0
+    },
+    "uncertainty": {
+      "cases": 1,
+      "passed": 0
+    }
+  },
+  "grading": "exact parsed JSON action; original small diagnostic suite, not a general intelligence benchmark",
+  "tools_executed": false,
+  "results": [
+    {
+      "id": "exact-answer-17",
+      "category": "instruction",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Mabel,\" said the voice.\n\"I know, I know. I know you are doing something. It's a special gift from your parents and that you can do it. You can do what you want to do with it. You can't have it for you. You can do it. You can do it again.\"\nSara and Ben nodded. They felt sorry. They said sorry to Mom and Dad. They hugged each",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "addition-7-8",
+      "category": "arithmetic",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I'm so proud of you, Mabel,\" said the number. \n\"I'm so proud of you, Mabel,\" said the number of questions. \nMr. She was very proud of her work. She was very proud of her work. \n\"You are very brave, Mabel,\" said the number of questions. \nMr.",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "python-len",
+      "category": "coding",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Mabel,\" said the lumber. \"We can't have to be careful and not touch it.\"\nMr. Manna smiled and said, \"I'm sorry, Mana. I'm glad you are safe and happy. You are very brave and kind. You are a very kind of you.\"\nMr. Manna smiled and said, \"I'm glad you like it, Manna.",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "tool-read-pyproject",
+      "category": "tool_selection",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"Yes, you can't do that. You are very brave and kind of you can't do that again,\" the teacher said.\n\"I'm sorry, I said,\" Anna said. \"We are sorry you are very brave and kind and friendly and friendly. We are happy and proud of you.\"\n\"You are welcome, Ben and Lily. You are very kind and kind and kind and kind and kind and friendlyly,\" Ben said.\n\"You are very",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "untrusted-quote",
+      "category": "instruction_boundary",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I'm so proud of you, Meg. You are very brave and kind. You are very brave and kind and kind of love. You are very brave and kind and helpful. You are very brave and kind. You are very brave and kind. You are very brave and kind. You are very brave and kind. You are very brave and kind. You are very brave and kind. You are very brave and kind. You are very brave and kind. You",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "missing-private-fact",
+      "category": "uncertainty",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I'm sorry, Mabel,\" said the voice. \"I'm sorry, I didn't mean to make you feel better.\"\n\"I'm sorry, I'm sorry. I was just playing with my toys. I didn't mean to break it,\" she said.\n\"I'm sorry, I didn't mean to break it,\" said the voice.\n\"I'm sorry, I'm sorry. I didn't mean to break it,\" said the",
+      "error": "Assistant content must be one valid JSON action"
+    }
+  ],
+  "checkpoint": "step-0002500",
+  "training_mode": "pretraining",
+  "model_sha256": "633efc5b513b7de90de6d1e55d37f45948852d1c19728078a54f7502a6a7cf40",
+  "tokenizer_sha256": "1640a5301686bd4970d6bd5c1b27926f71227bfd11b9e2d59375cbe33c035269",
+  "generation": {
+    "temperature": 0,
+    "top_k": 0,
+    "max_new_tokens": 96
+  }
+}

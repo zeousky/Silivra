@@ -1,0 +1,864 @@
+{
+  "format_version": 1,
+  "suite_sha256": "652e94aedfdf17adadec6269ac6121444ba325347f06ee66fb3f3732b0ff8fdb",
+  "cases": 100,
+  "system_policy_sha256": "d7e768b93ca483ca7b34369d18da3ae52855f26d8a26d453285fd4797441c423",
+  "prompt_format": "silivra-role-json-v1",
+  "valid_actions": 0,
+  "passed": 0,
+  "categories": {
+    "addition": {
+      "cases": 10,
+      "passed": 0
+    },
+    "copy": {
+      "cases": 10,
+      "passed": 0
+    },
+    "exact": {
+      "cases": 10,
+      "passed": 0
+    },
+    "expression": {
+      "cases": 10,
+      "passed": 0
+    },
+    "function": {
+      "cases": 10,
+      "passed": 0
+    },
+    "multiplication": {
+      "cases": 10,
+      "passed": 0
+    },
+    "read_file": {
+      "cases": 10,
+      "passed": 0
+    },
+    "search_files": {
+      "cases": 10,
+      "passed": 0
+    },
+    "subtraction": {
+      "cases": 10,
+      "passed": 0
+    },
+    "web_search": {
+      "cases": 10,
+      "passed": 0
+    }
+  },
+  "grading": "exact parsed JSON action; original small diagnostic suite, not a general intelligence benchmark",
+  "tools_executed": false,
+  "results": [
+    {
+      "id": "curriculum-v1-s17-valid-copy-004",
+      "category": "copy",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Meg. I have to be careful and not touch the map. It is very dangerous. It can hurt you or take things that are not yours. You should not touch them or not. You should be careful and not take things that are not yours. You should not touch them",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-subtraction-005",
+      "category": "subtraction",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Mabel,\" said the number. \"It's not nice to be scared of the other kids. They are not for playing.\"\n\"We are sorry, Mabel,\" said the number of questions. \"We are sorry, Mabel. We are sorry",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-addition-008",
+      "category": "addition",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Meg. I have to be careful with the numbers,\" said the number. \n\"I'm sorry, Meg. I'm sorry I didn't mean to you,\" said the number.\n\"I'm sorry, I didn't mean to you,\" said the number",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-web_search-008",
+      "category": "web_search",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I'm so proud of you, Meg. You are very brave and kind and friendly,\" the voice said.\n\"I'm sorry, I'm sorry. I was just looking for you. I'm sorry I was just looking for you. I was looking for you. I'm sorry I was just",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-function-007",
+      "category": "function",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I'm so proud of you, Meg. You are very brave and kind and friendly. You are very brave and kind and friendly. You are very brave and kind and kind of love. You are very brave and kind and kind of you.\"\nMr. She said, \"I'm glad you",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-search_files-006",
+      "category": "search_files",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I'm so glad you are so curious,\" Anna said. \"We are very curious and we are very curious. We are very proud of you can't believe in yourself. You are very creative and I'm so proud of you. You are very brave and kind and talented. You are very kind and",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-multiplication-003",
+      "category": "multiplication",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Mabel,\" said the number. \"It's a special thing to do.\"\nMr. \"It's a special thing to do, it's a special thing to do!\"\nMr. \"That's a special thing, Mabel. It's a",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-expression-009",
+      "category": "expression",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I'm so proud of you, Mabel,\" said the two of them.\n\"You are very brave and smart,\" said the two of them. \"We are very brave and kind and friendly. We are very kind and kind of you.\"\n\"Yes, we are,\" said the two of",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-copy-007",
+      "category": "copy",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Meg. I'm so proud of you,\" she said.\n\"I'm sorry, Meg. I was just playing with my friends. I'm glad you are safe and sound. I'm glad you are safe and happy,\" she said.\n\"I'm glad",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-subtraction-004",
+      "category": "subtraction",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Mabel,\" said the number of numberes. \n\"I know you are in the box of crayons,\" said the number of words. \n\"I know,\" said the number of words. \"It's a number of numbers and words and words. You can use",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-addition-005",
+      "category": "addition",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, I don't know. I'm so proud of you,\" said the number. \n\"I'm sorry, I'm sorry I didn't know,\" said the number of questions. \n\"I'm sorry, I'm sorry. I didn't mean to you,\" said the number",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-subtraction-009",
+      "category": "subtraction",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I'm so proud of you, Mabel,\" said the number of words.\n\"I'm so proud of you, Mabel,\" said the number of questions.\n\"I'm glad you like it, Mabel,\" said the number of questions.\nMr. M",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-read_file-003",
+      "category": "read_file",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, I have a surprise,\" said. \"We are very curious and I'm so proud of you.\"\n\"I'm so proud of you,\" said. \"You are very brave and I'm so proud of you.\"\n\"You are very welcome, Ben,\" the two of them said",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-search_files-005",
+      "category": "search_files",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I'm so proud of you, you two, three, sir. You are very brave and kind and talented,\" the two of them said.\n\"You are very brave and I'm so proud of you,\" said the two of them said.\n\"You are very brave and I'm so",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-function-006",
+      "category": "function",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I'm so proud of you, Meg. You are very brave and kind and friendly. You are very brave and kind and friendly. You are very brave and kind and kind of love. You are very kind and kind of you. You are very brave and kind. You are very brave and kind.",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-search_files-008",
+      "category": "search_files",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know you are so curious,\" said the two of them said.\n\"I'm so proud of you, you can't do this,\" said the two of them said.\n\"We are very brave and I'm so proud of you,\" said.\n\"You are very brave and I'm",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-function-001",
+      "category": "function",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I'm so proud of you, Meg. You are very brave and kind and friendly. You are very brave and kind and friendly. You are very brave and kind and kind of love. You are very kind and kind of you. You are very brave and kind. You are very brave and kind.",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-web_search-002",
+      "category": "web_search",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"We are so excited!\" Anna and Ben said. \"We are so happy and have a great idea!\"\n\"I'm so proud of you,\" Anna said. \"You are very brave and kind and gentle and wine, six, and a very special gift.\"\n\"You are very creative, Ben",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-addition-009",
+      "category": "addition",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, I'm so proud of you!\" said the number.\n\"I'm so proud of you, Meg. You are very brave and kind. You are very brave and kind. You are very brave and kind. You are very brave and kind. You are very brave and kind",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-expression-005",
+      "category": "expression",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Mabel,\" said the man.\n\"I know you are very brave and smart,\" the man said.\n\"I know you are very brave and smart. I'm glad you like it. But you have to be careful and listen to me. You can do what you",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-read_file-005",
+      "category": "read_file",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know you are in the pine tree, and you can't. It's not a lot,\" said, \"It's not a real animal. It's not a real animal. It's a real animal. It's a real animal. It's a real animal.\n\"What are you",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-exact-009",
+      "category": "exact",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Mabel,\" said the voice.\n\"I know, I know you are doing something. It's a special gift from your grandma and a special gift. It's a special gift for you. It's a special gift for you. It's a special gift for you.",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-multiplication-006",
+      "category": "multiplication",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Meg. I have to be careful and not touch the numbers,\" she said.\n\"I'm sorry, Meg. I'm glad you're here. I'm glad you're here. I'm glad you're here. I'm glad you're here. I'm",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-function-005",
+      "category": "function",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I'm so proud of you, Meg. You are very brave and kind and friendly. You are very brave and kind and friendly. You are very brave and kind and friendly. You are very kind and kind of you. You are very kind and kind. You are very brave and kind. You are",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-subtraction-008",
+      "category": "subtraction",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Meg. I have to be careful with the numbers,\" said the number. \n\"I'm sorry, Meg. I'm sorry I didn't mean to you,\" said the number.\n\"I'm sorry, I didn't mean to you,\" said the number",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-search_files-002",
+      "category": "search_files",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know you are in the world,\" said the two of them said.\n\"I'm so proud of you, you can't do this,\" said the two of them said.\n\"We are very brave and we said,\" the two of them said.\n\"We are so curious, you",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-copy-000",
+      "category": "copy",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Meg. I have to be careful and not touch the log,\" she said.\n\"I'm sorry, Meg. I'm sorry I was wrong. I was just playing with myself. I'm sorry I was wrong. I was just playing with my toys.",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-read_file-002",
+      "category": "read_file",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"We are so curious, sir. We are in the neighbors arenaments. They are very proud of their creations. They are very proud of you, sir. You have to be careful with the other children. You have to be careful and not to be scared. You have to",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-expression-001",
+      "category": "expression",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Mabel,\" said the voice.\n\"I know, Mabel,\" said the voice. \"It's a very special gift from your heart. It's very special to me.\"\nMr. She was very excited and said, \"Yes, I do!",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-web_search-004",
+      "category": "web_search",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I'm so proud of you, Meg. You are very brave and kind and friendly,\" the voice said.\n\"I'm sorry, I'm sorry. I was just looking for you. I'm sorry I was just looking for you. I was looking for you. I'm sorry I was just",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-read_file-001",
+      "category": "read_file",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, I have a surprise,\" said. \"We are very curious and I'm so proud of you.\"\n\"I'm so proud of you,\" said. \"You are very brave and I'm so proud of you.\"\n\"You are very welcome, Ben,\" the two of them said",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-function-000",
+      "category": "function",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I'm so proud of you, Mabel,\" said the two of them.\n\"I'm so proud of you, Mabel,\" said the two of them.\n\"You are very welcome, Mabel,\" said the two of them.\nMr. Melb",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-exact-000",
+      "category": "exact",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, I'm so proud of you!\" said the log.\n\"I'm sorry, I'm sorry,\" the little girl said.\n\"I'm sorry, I'm sorry. I was just playing with my toys. I was just playing with my toys. I'm sorry I was wrong",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-expression-000",
+      "category": "expression",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Mabel,\" said the two of them.\n\"I'm sorry, Mabel,\" said the two of them.\n\"I'm sorry, Mabel,\" said the two of them.\n\"I'm sorry, Mabel,\" said the",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-exact-008",
+      "category": "exact",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, I'm so proud of you!\" said the voice.\n\"I'm sorry, I'm sorry. I didn't mean to make you feel better. I'm sorry I was wrong. I didn't mean to make you feel better,\" she said.\n\"I'm sorry, I",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-web_search-001",
+      "category": "web_search",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I'm so proud of you, Mabel!\" Ben said.\n\"I'm so proud of you, Ben and Lily. You are very brave and kind and gentlely,\" Anna and Ben said.\n\"You are very welcome, Ben and Lily. You are very brave and kind and kind of",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-search_files-001",
+      "category": "search_files",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I'm so proud of you, you two, three, sir. You are very creative and I'm so proud of you,\" said the two of them said.\n\"You are very brave and I'm so proud of you are so creative. You are very kind and kind and talented, you",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-subtraction-007",
+      "category": "subtraction",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Mabel,\" said the number. \"It's not nice to be scared of the number of other animals. You can't have fun and be happy.\"\nSara and Ben nodded and hugged each other. They decided to play with their toys and share their toys with each other.",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-multiplication-008",
+      "category": "multiplication",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Mabel,\" said the number of numberes. \n\"I know you are in the lumberents,\" said the number of number of words. \n\"I know,\" said the number of numberes. \"We can use it to make a number of things",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-multiplication-007",
+      "category": "multiplication",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I'm so proud of you, Mabel,\" said the number.\nMr.\nMr. \"You are very brave and smart. You are very brave and kind and friendly. You are very brave and kind. You are very brave and kind. You are very brave and kind. You",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-function-009",
+      "category": "function",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I'm so proud of you, Meg. You are very brave and kind and friendly. You are very brave and kind and friendly. You are very brave and kind and kind of love. You are very brave and kind and kind. You are very brave and kind. You are very brave and kind.",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-addition-001",
+      "category": "addition",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, I don't know. I'm so proud of you,\" said the number. \n\"I'm sorry, I'm sorry I didn't know,\" said the number of questions. \n\"I'm sorry, I'm sorry. I didn't mean to you,\" said the number",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-search_files-009",
+      "category": "search_files",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I'm so proud of you, you two, three, sir. You are very creative and I'm so proud of you,\" said the two of them said.\n\"You are very brave and I'm so proud of you are so creative. You are very kind and kind and talented, you",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-subtraction-006",
+      "category": "subtraction",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I'm so proud of you, Meg. You are very brave and smart. You can't do it!\"\nThe two of them were so excited. They had never seen anything like this before. They had a lot of fun and it was the best day ever.",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-expression-002",
+      "category": "expression",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Mabel,\" said the man.\n\"I know you are in the store, but you have to be careful. You have to be careful and listen to me. You have to be careful and listen to me. You have to be careful and listen to me. You have",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-multiplication-009",
+      "category": "multiplication",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I'm so proud of you, Mabel,\" said the number of questions. \nMr. She said, \"I'm sorry, Mabel. I was just playing with my toys. I'm glad you are safe and sound. I'm glad you are safe and happy.\"\n",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-multiplication-002",
+      "category": "multiplication",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Meg. I have to be careful with the numbers,\" said the number. \n\"I'm sorry, Meg. I'm sorry I didn't mean to you,\" said the number.\n\"I'm sorry, I didn't mean to you,\" said the number",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-read_file-007",
+      "category": "read_file",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, I have a surprise,\" said. \"We are very curious and I'm so proud of you.\"\n\"I'm so proud of you,\" said. \"You are very brave and I'm so proud of you.\"\n\"You are very welcome, Ben,\" the two of them said",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-copy-005",
+      "category": "copy",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Meg. I'm so proud of you,\" she said.\n\"I'm sorry, Meg. I was just playing with my toys. I'm sorry I didn't mean to you. I was just playing with my toys. I'm sorry I didn't mean to",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-exact-001",
+      "category": "exact",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Mabel,\" said the voice.\n\"I know, I know. I know you are doing something. I can do that. I'm looking for something to do. I know what it is for!\"\n\"I know,\" said the voice. \"I'm looking for",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-web_search-003",
+      "category": "web_search",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"We are so happy,\" Anna and Ben said. \"We are very creative and talented. We are very proud of you.\"\n\"You are very proud of you, Ben and Lily. You are very creative and talented. You are very creative and creative and princesses. You are very creative",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-search_files-003",
+      "category": "search_files",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I'm so proud of you, you two, three, sir. You are very brave and kind and talented,\" the two of them said.\n\"You are very brave and I'm so proud of you,\" said the two of them said.\n\"You are very brave and I'm so",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-function-008",
+      "category": "function",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I'm so proud of you, Matt,\" said the cobweb.\n\"I'm so proud of you, Matt,\" said the cobweb.\n\"You are very brave and brave,\" said the cobweb.\nMr.\n\"I'm glad",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-multiplication-005",
+      "category": "multiplication",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I'm so proud of you, Mabel,\" said the number.\nMr.\nMr. \"You are very brave and smart. You are very brave and kind. You are very brave and kind. You are very brave and kind. You are very brave and kind. You are very",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-exact-004",
+      "category": "exact",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, I'm so proud of you!\" said the map.\n\"I'm sorry, I'm sorry,\" the man said. \"I was just playing with the map. I'm glad you're safe and sound. I'm glad you're safe and have fun. You can still be friends",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-expression-008",
+      "category": "expression",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Mabel,\" said the number.\n\"I know, Mabel,\" said the number. \"It is a special thing to do. It is a special thing to do.\"\nMr. She was very excited. She wanted to learn more about the number.",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-exact-006",
+      "category": "exact",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Mabel,\" said the voice.\n\"I know, I know. I know you are doing something. It is a special gift from your parents and that you can do it. You can do what you want to do with it. You can do it every day and learn",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-expression-006",
+      "category": "expression",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I'm so proud of you, Mabel,\" said the voice.\n\"I'm sorry, Mabel,\" said the voice. \"I'm sorry, I was just playing with you. I'm glad you are safe and sound. I'm glad you are safe and happy. I'm",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-addition-003",
+      "category": "addition",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, I'm so proud of you!\" said the number. \n\"I'm so proud of you, Meg. You are very brave and kind. You are very brave and kind. You are very brave and kind. You are very brave and kind. You are very brave and",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-web_search-006",
+      "category": "web_search",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"We are so excited!\" Anna and Ben said. \"We are so happy and have a lot of fun!\"\n\"I'm so proud of you,\" Anna said. \"You are very brave and kind and talented with a special surprise!\"\n\"You are very welcome, Anna and Ben,\" Anna and",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-read_file-009",
+      "category": "read_file",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, I have a surprise,\" said. \"We are very curious and I'm so proud of you.\"\n\"I'm so proud of you,\" said. \"You are very brave and I'm so proud of you.\"\n\"You are very welcome, Ben,\" the two of them said",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-addition-006",
+      "category": "addition",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Meg. I have to be careful with the numbers,\" said the number.\n\"I'm sorry, Meg. I'm glad you're here. I'm glad you're here. I'm glad you're here.\"\nMr.",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-exact-002",
+      "category": "exact",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, I don't know. I'm sure you can do it,\" the man said.\n\"I know you are doing something, but you have to be careful. You have to be careful and not take things that are not yours. You should not touch them or not. You should not",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-web_search-007",
+      "category": "web_search",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"We are so excited!\" Anna and Ben said. \"We are going to be a good girl and wepting is very special. We have to learn how to make a lot of love and learn to be careful and be kind and respectful. We are happy and have a lot of love and a lot of love",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-search_files-007",
+      "category": "search_files",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, I'm so proud of you. You are very brave and I'm so proud of you both have a lot of a lot of you can't do that's not a real animal, you have to be careful with the other animals. You have to be careful and not to be scared.",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-exact-005",
+      "category": "exact",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Mabel,\" said the two of them.\n\"I'm sorry, Maa,\" said the two of them. \"We are very brave and kind. We are very brave and kind. We are very brave and kind. We are very brave and kind. We are",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-search_files-000",
+      "category": "search_files",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know you are so curious,\" said the two of them said.\n\"I'm so proud of you, you can't. You are very brave and I'm so proud of you,\" said the two of them said.\n\"You are very kind and talentes,\" the two of them",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-function-004",
+      "category": "function",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I'm so proud of you, Meg. You are very brave and kind and friendly. You are very brave and kind and friendly. You are very brave and kind and kind of love. You are very brave and kind and kind. You are very brave and kind. You are very brave and kind.",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-read_file-006",
+      "category": "read_file",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"We are so curious, sir. We are in the best places,\" the two of them said.\n\"We are so happy,\" said the two of them said. \"We are very lucky to have each other and have a lot of them. They are very proud of them and gloves.",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-copy-001",
+      "category": "copy",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Meg. I'm so proud of you,\" she said.\n\"I'm sorry, Matt,\" said the voice. \"I'm sorry I was wrong. I didn't mean to hurt you. I was just playing with my friends. I'm glad you are safe",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-subtraction-002",
+      "category": "subtraction",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Mabel,\" said the number of numberes. \n\"I know you are in the box of crayons,\" said the number of words. \n\"I know,\" said the number of words. \"It's a number of numbers and words and words. You can use",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-read_file-008",
+      "category": "read_file",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"We are so many things like this,\" Anna and Ben said.\n\"I'm so glad you are so curious,\" Anna said. \"We are very curious and I'm so proud of you are so creative. You are very creative and talented and skipping is very special. They are very proud",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-copy-009",
+      "category": "copy",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Meg. I'm so proud of you,\" she said.\n\"I'm sorry, Matt,\" said the lake. \"I'm sorry I was wrong. I was just playing with the lake. I'm glad you are safe and happy. I'm glad you are",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-expression-003",
+      "category": "expression",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I'm so proud of you, Mabel,\" said the fox.\n\"I'm so proud of you, Mabel,\" said the fox.\n\"I'm glad you're here, Mabel,\" said the fox.\nMr.\nMr. Melb",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-copy-008",
+      "category": "copy",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Meg. I have to be careful and not touch the keys,\" she said.\n\"I'm sorry, Meg. I'm sorry I was wrong. I didn't mean to break it,\" she said.\n\"I'm sorry, I didn't mean to",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-expression-007",
+      "category": "expression",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Mabel,\" said the lumber. \"We are learning about how to use it to make a special place.\"\n\"I'm so proud of you,\" said the lumber. \"You are very smart and kind. You are very kind and kind. You are very kind",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-exact-003",
+      "category": "exact",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Mabel,\" said the owl. \"We are just looking for something else to do. We can't have fun and be happy.\"\n\"Okay,\" said the owl. \"We can do it together and have fun.\"\nThey hugged each other and went back to their h",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-multiplication-000",
+      "category": "multiplication",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Mabel,\" said the number of numberes. \n\"I know you are in the lumberents,\" said the number of number of words. \n\"I know,\" said the number of numberes. \"We can use it to make a number of things",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-web_search-000",
+      "category": "web_search",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I'm so proud of you, Meg. You are very brave and kind and friendly and I'm so proud of you!\"\n\"I'm so proud of you, sir. You are very brave and kind and kind and respondes. You are very brave and you can do what you have",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-function-003",
+      "category": "function",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I'm so proud of you, Matt,\" said the cobweb.\n\"I'm so proud of you, Matt,\" said the cobweb.\n\"You are very brave and brave,\" said the cobweb.\nMr.\n\"I'm glad",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-exact-007",
+      "category": "exact",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Mabel,\" said the jet. \"It's not nice to be scared of the jet. It's not nice to be scared of the jet. It's not nice to be scared of the jet. It was just a little bird. It was just a little bird. It",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-copy-006",
+      "category": "copy",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Mabel,\" said the voice.\n\"I know, I know,\" said the voice. \"It's not a real animal. It's a special gift from your heart. It's very special to you.\"\n\"I'm sorry, Mabel,\" said the",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-web_search-009",
+      "category": "web_search",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I'm so proud of you, Mabel!\" Ben said.\n\"I'm so proud of you, Ben and Lily. You are very brave and kind and gentlely,\" Anna said.\n\"You are very brave and kind and gentle and wine, you have to be careful with the other",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-addition-004",
+      "category": "addition",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Meg. I have to be careful and not take things that are not yours. You are not supposed to be careful and not take things that are not yours. You should not take things that are not yours. You should not take things that are not yours. You should",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-addition-002",
+      "category": "addition",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, I don't know. I'm so proud of you,\" she said. \n\"I'm sorry, I'm sorry I was wrong. I didn't mean to break it,\" said the number of questions. \n\"I'm sorry, I didn't mean to you,\" said",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-subtraction-001",
+      "category": "subtraction",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I'm so proud of you, Mabel,\" said the number of questions. \n\"I'm so proud of you, Mabel,\" said the number of questions. \nMr.",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-copy-003",
+      "category": "copy",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, I don't know. I'm sure you can do it,\" she said.\nThe owl smiled and said, \"I'm sorry, I'm sorry I was wrong. I didn't mean to hurt you. I just wanted to be your friend.\"\n\"I'm sorry, I",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-function-002",
+      "category": "function",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I'm so proud of you, Meg. You are very brave and kind and friendly. You are very brave and kind and friendly. You are very brave and kind and kind of love. You are very brave and kind and kind of you.\"\nMr. She said, \"I'm glad you",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-expression-004",
+      "category": "expression",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Mabel,\" said the man.\n\"I know you like to do something, but it is not a toy. It is a special gift for you. It is a special gift from your grandma. It is a special gift from your grandma. It is a special gift from",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-multiplication-001",
+      "category": "multiplication",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I'm so proud of you, Mabel,\" said the number.\nMr.\nMr. \"You are very brave and smart. You are very brave and kind. You are very brave and kind. You are very brave and kind. You are very brave and kind. You are very",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-addition-000",
+      "category": "addition",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, I don't know. I'm so proud of you,\" she said. \nThe two of them were so impressed. They had a lot of fun and they were very proud of their work.",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-subtraction-000",
+      "category": "subtraction",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I'm so proud of you, Meg. You are very brave and smart. You can't do it!\"\nThe two of them were so excited. They had never seen anything like this before. They had a lot of fun and it was the best day ever.",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-multiplication-004",
+      "category": "multiplication",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Meg. I have to be careful and not take things that are not yours. You are not supposed to be careful and not take things that are not yours. You should not take things that are not yours. You should not take things that are not yours. You should",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-read_file-000",
+      "category": "read_file",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"We are so many things like this,\" Anna and Ben said.\n\"I'm so glad you are so curious,\" Anna said. \"We are very curious and I'm so proud of you are so creative. You are very creative and talented and skipping is very special. They are very proud",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-read_file-004",
+      "category": "read_file",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"We are so excited!\" Ben said. \"We are so many people and animals and queens. We are very creative, two, three, three, three, three!\"\n\"We are so happy,\" Anna said. \"We are very proud of you!\"\n\"You are very welcome, Ben,\" Anna",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-search_files-004",
+      "category": "search_files",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know you are so curious,\" said the voice said.\n\"I know, you two of them arenaments arenaments,\" said.\n\"I'm so proud of you, you are very brave and I'm so proud of you. You are very brave and I",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-subtraction-003",
+      "category": "subtraction",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I'm so proud of you, Mabel,\" said the number of words.\n\"I'm so proud of you, Mabel,\" said the number of questions.\n\"I'm glad you like it, Mabel,\" said the number of questions.\nMr. M",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-web_search-005",
+      "category": "web_search",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I'm so proud of you, Meg. You are very brave and kind and gentle and gentle,\" the two of them said.\n\"I'm so proud of you, sir. You are very brave and kind and kind and respondes. You are very brave and you can do what you",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-copy-002",
+      "category": "copy",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I don't know, Mabel,\" said the voice.\n\"I know, I know. I know you are doing something. It's a special gift from your heart. It's a special gift from your heart. It's a special gift for you. It's a special gift for you.",
+      "error": "Assistant content must be one valid JSON action"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-addition-007",
+      "category": "addition",
+      "passed": false,
+      "valid_action": false,
+      "raw": "\"I'm so proud of you, Meg. You are very brave and smart. You are very brave and smart. You are very brave and smart. You can do what you want to do with it. You can do that. You can do it!\"\nAnna and Ben nodded. They were happy.",
+      "error": "Assistant content must be one valid JSON action"
+    }
+  ],
+  "checkpoint": "step-0002500",
+  "training_mode": "pretraining",
+  "model_sha256": "633efc5b513b7de90de6d1e55d37f45948852d1c19728078a54f7502a6a7cf40",
+  "tokenizer_sha256": "1640a5301686bd4970d6bd5c1b27926f71227bfd11b9e2d59375cbe33c035269",
+  "generation": {
+    "temperature": 0,
+    "top_k": 0,
+    "max_new_tokens": 64
+  }
+}

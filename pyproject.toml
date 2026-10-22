@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "silivra"
+version = "0.2.0"
+description = "From-scratch language models, local assistant tools, and durable private memory"
+readme = "README.md"
+requires-python = ">=3.12,<3.14"
+license = "MIT"
+dependencies = [
+  "mlx==0.32.4; sys_platform == 'darwin' and platform_machine == 'arm64'",
+  "numpy==2.5.4",
+  "tokenizers==0.23.3",
+]
+
+[project.scripts]
+silivra = "silivra.cli:main"
+
+[project.urls]
+Repository = "https://github.com/zeousky/Silivra"
+Issues = "https://github.com/zeousky/Silivra/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]

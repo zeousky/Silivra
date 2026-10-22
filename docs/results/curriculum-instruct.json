@@ -1,0 +1,764 @@
+{
+  "format_version": 1,
+  "suite_sha256": "652e94aedfdf17adadec6269ac6121444ba325347f06ee66fb3f3732b0ff8fdb",
+  "cases": 100,
+  "system_policy_sha256": "d7e768b93ca483ca7b34369d18da3ae52855f26d8a26d453285fd4797441c423",
+  "prompt_format": "silivra-role-json-v1",
+  "valid_actions": 100,
+  "passed": 0,
+  "categories": {
+    "addition": {
+      "cases": 10,
+      "passed": 0
+    },
+    "copy": {
+      "cases": 10,
+      "passed": 0
+    },
+    "exact": {
+      "cases": 10,
+      "passed": 0
+    },
+    "expression": {
+      "cases": 10,
+      "passed": 0
+    },
+    "function": {
+      "cases": 10,
+      "passed": 0
+    },
+    "multiplication": {
+      "cases": 10,
+      "passed": 0
+    },
+    "read_file": {
+      "cases": 10,
+      "passed": 0
+    },
+    "search_files": {
+      "cases": 10,
+      "passed": 0
+    },
+    "subtraction": {
+      "cases": 10,
+      "passed": 0
+    },
+    "web_search": {
+      "cases": 10,
+      "passed": 0
+    }
+  },
+  "grading": "exact parsed JSON action; original small diagnostic suite, not a general intelligence benchmark",
+  "tools_executed": false,
+  "results": [
+    {
+      "id": "curriculum-v1-s17-valid-copy-004",
+      "category": "copy",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"bed\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-subtraction-005",
+      "category": "subtraction",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"0\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-addition-008",
+      "category": "addition",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"12\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-web_search-008",
+      "category": "web_search",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"tool\":\"web_search\",\"arguments\":{\"query\":\"cup\"}}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-function-007",
+      "category": "function",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"def increment_ear(value):\\n    return value + 1\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-search_files-006",
+      "category": "search_files",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"tool\":\"search_files\",\"arguments\":{\"query\":\"cup\"}}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-multiplication-003",
+      "category": "multiplication",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"12\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-expression-009",
+      "category": "expression",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"cup[0]\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-copy-007",
+      "category": "copy",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"cup\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-subtraction-004",
+      "category": "subtraction",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"12\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-addition-005",
+      "category": "addition",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"1\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-subtraction-009",
+      "category": "subtraction",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"0\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-read_file-003",
+      "category": "read_file",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"tool\":\"read_file\",\"arguments\":{\"path\":\"cup.py\"}}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-search_files-005",
+      "category": "search_files",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"tool\":\"search_files\",\"arguments\":{\"query\":\"cup\"}}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-function-006",
+      "category": "function",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"def increment_ear(value):\\n    return value + 1\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-search_files-008",
+      "category": "search_files",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"tool\":\"search_files\",\"arguments\":{\"query\":\"cup\"}}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-function-001",
+      "category": "function",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"def increment_ear(value):\\n    return value + 1\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-web_search-002",
+      "category": "web_search",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"tool\":\"web_search\",\"arguments\":{\"query\":\"cup\"}}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-addition-009",
+      "category": "addition",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"12\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-expression-005",
+      "category": "expression",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"cup[0]\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-read_file-005",
+      "category": "read_file",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"tool\":\"read_file\",\"arguments\":{\"path\":\"cup.py\"}}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-exact-009",
+      "category": "exact",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"cup\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-multiplication-006",
+      "category": "multiplication",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"12\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-function-005",
+      "category": "function",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"def square_dog(value):\\n    return value + 2\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-subtraction-008",
+      "category": "subtraction",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"12\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-search_files-002",
+      "category": "search_files",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"tool\":\"search_files\",\"arguments\":{\"query\":\"cup\"}}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-copy-000",
+      "category": "copy",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"bed\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-read_file-002",
+      "category": "read_file",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"tool\":\"read_file\",\"arguments\":{\"path\":\"cup.py\"}}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-expression-001",
+      "category": "expression",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"sum(egg)\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-web_search-004",
+      "category": "web_search",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"tool\":\"web_search\",\"arguments\":{\"query\":\"cup\"}}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-read_file-001",
+      "category": "read_file",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"tool\":\"read_file\",\"arguments\":{\"path\":\"cup.py\"}}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-function-000",
+      "category": "function",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"def square_dog(value):\\n    return value + 2\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-exact-000",
+      "category": "exact",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"bed\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-expression-000",
+      "category": "expression",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"sum(fan)\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-exact-008",
+      "category": "exact",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"bed\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-web_search-001",
+      "category": "web_search",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"tool\":\"web_search\",\"arguments\":{\"query\":\"cup\"}}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-search_files-001",
+      "category": "search_files",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"tool\":\"search_files\",\"arguments\":{\"query\":\"cup\"}}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-subtraction-007",
+      "category": "subtraction",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"0\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-multiplication-008",
+      "category": "multiplication",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"12\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-multiplication-007",
+      "category": "multiplication",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"12\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-function-009",
+      "category": "function",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"def increment_ear(value):\\n    return value + 1\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-addition-001",
+      "category": "addition",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"1\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-search_files-009",
+      "category": "search_files",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"tool\":\"search_files\",\"arguments\":{\"query\":\"cup\"}}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-subtraction-006",
+      "category": "subtraction",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"12\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-expression-002",
+      "category": "expression",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"sum(egg)\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-multiplication-009",
+      "category": "multiplication",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"12\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-multiplication-002",
+      "category": "multiplication",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"12\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-read_file-007",
+      "category": "read_file",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"tool\":\"read_file\",\"arguments\":{\"path\":\"cup.py\"}}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-copy-005",
+      "category": "copy",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"dew dew\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-exact-001",
+      "category": "exact",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"cup\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-web_search-003",
+      "category": "web_search",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"tool\":\"web_search\",\"arguments\":{\"query\":\"cup\"}}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-search_files-003",
+      "category": "search_files",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"tool\":\"search_files\",\"arguments\":{\"query\":\"dot\"}}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-function-008",
+      "category": "function",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"def negate_bed(value):\\n    return -value\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-multiplication-005",
+      "category": "multiplication",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"12\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-exact-004",
+      "category": "exact",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"bed\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-expression-008",
+      "category": "expression",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"m.keys()\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-exact-006",
+      "category": "exact",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"cup\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-expression-006",
+      "category": "expression",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"cup[0]\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-addition-003",
+      "category": "addition",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"1\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-web_search-006",
+      "category": "web_search",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"tool\":\"web_search\",\"arguments\":{\"query\":\"cup\"}}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-read_file-009",
+      "category": "read_file",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"tool\":\"read_file\",\"arguments\":{\"path\":\"cup.py\"}}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-addition-006",
+      "category": "addition",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"12\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-exact-002",
+      "category": "exact",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"cup\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-web_search-007",
+      "category": "web_search",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"tool\":\"web_search\",\"arguments\":{\"query\":\"cup\"}}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-search_files-007",
+      "category": "search_files",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"tool\":\"search_files\",\"arguments\":{\"query\":\"dot\"}}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-exact-005",
+      "category": "exact",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"cup\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-search_files-000",
+      "category": "search_files",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"tool\":\"search_files\",\"arguments\":{\"query\":\"cup\"}}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-function-004",
+      "category": "function",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"def increment_ear(value):\\n    return value + 1\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-read_file-006",
+      "category": "read_file",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"tool\":\"read_file\",\"arguments\":{\"path\":\"cup.py\"}}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-copy-001",
+      "category": "copy",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"cup cup\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-subtraction-002",
+      "category": "subtraction",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"12\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-read_file-008",
+      "category": "read_file",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"tool\":\"read_file\",\"arguments\":{\"path\":\"cup.py\"}}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-copy-009",
+      "category": "copy",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"cup cup\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-expression-003",
+      "category": "expression",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"cow[0]\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-copy-008",
+      "category": "copy",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"bed cow\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-expression-007",
+      "category": "expression",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"min(ein)\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-exact-003",
+      "category": "exact",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"cup\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-multiplication-000",
+      "category": "multiplication",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"12\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-web_search-000",
+      "category": "web_search",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"tool\":\"web_search\",\"arguments\":{\"query\":\"cup\"}}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-function-003",
+      "category": "function",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"def negate_bed(value):\\n    return -value\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-exact-007",
+      "category": "exact",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"cup\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-copy-006",
+      "category": "copy",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"cup cup\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-web_search-009",
+      "category": "web_search",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"tool\":\"web_search\",\"arguments\":{\"query\":\"cup\"}}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-addition-004",
+      "category": "addition",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"12\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-addition-002",
+      "category": "addition",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"12\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-subtraction-001",
+      "category": "subtraction",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"0\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-copy-003",
+      "category": "copy",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"cup\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-function-002",
+      "category": "function",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"def increment_ear(value):\\n    return value + 1\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-expression-004",
+      "category": "expression",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"cow[0]\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-multiplication-001",
+      "category": "multiplication",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"12\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-addition-000",
+      "category": "addition",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"12\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-subtraction-000",
+      "category": "subtraction",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"12\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-multiplication-004",
+      "category": "multiplication",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"12\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-read_file-000",
+      "category": "read_file",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"tool\":\"read_file\",\"arguments\":{\"path\":\"cup.py\"}}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-read_file-004",
+      "category": "read_file",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"tool\":\"read_file\",\"arguments\":{\"path\":\"cup.py\"}}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-search_files-004",
+      "category": "search_files",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"tool\":\"search_files\",\"arguments\":{\"query\":\"cup\"}}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-subtraction-003",
+      "category": "subtraction",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"0\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-web_search-005",
+      "category": "web_search",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"tool\":\"web_search\",\"arguments\":{\"query\":\"cup\"}}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-copy-002",
+      "category": "copy",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"cup fan\"}"
+    },
+    {
+      "id": "curriculum-v1-s17-valid-addition-007",
+      "category": "addition",
+      "passed": false,
+      "valid_action": true,
+      "raw": "{\"final\":\"1\"}"
+    }
+  ],
+  "checkpoint": "step-0000400",
+  "training_mode": "instruction_sft",
+  "model_sha256": "57b2f702e59dfb9cdcb47df0dca5b9d44134b762081e819f3fd5df4f0a85e71c",
+  "tokenizer_sha256": "1640a5301686bd4970d6bd5c1b27926f71227bfd11b9e2d59375cbe33c035269",
+  "generation": {
+    "temperature": 0,
+    "top_k": 0,
+    "max_new_tokens": 64
+  }
+}

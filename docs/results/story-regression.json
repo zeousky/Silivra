@@ -1,0 +1,17 @@
+{
+  "objective": "original TinyStories next-token loss regression; same fixed seed, 12 batches x16 sequences x256 tokens",
+  "records": [
+    {
+      "run": "silivra-tiny",
+      "checkpoint": "step-0002500",
+      "validation_loss": 2.3811201453208923,
+      "model_sha256": "633efc5b513b7de90de6d1e55d37f45948852d1c19728078a54f7502a6a7cf40"
+    },
+    {
+      "run": "silivra-instruct",
+      "checkpoint": "step-0000400",
+      "validation_loss": 6.150548338890076,
+      "model_sha256": "57b2f702e59dfb9cdcb47df0dca5b9d44134b762081e819f3fd5df4f0a85e71c"
+    }
+  ]
+}

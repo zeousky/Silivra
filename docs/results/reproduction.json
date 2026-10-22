@@ -1,0 +1,11 @@
+{
+  "date": "2026-10-22",
+  "generator_sha256": "b549d45651d0a3fa0805322051256d3e0fb104a05a65b6d9232eeba0a1491498",
+  "instruction_formatter_sha256": "60ff1f153d6f89de8deaf9dce76f24d8a6c275ed083c5418bab3696e1fb07215",
+  "finetune_source_sha256": "87c4745cab10dbeb017b5ddc4fcda6be795b457a4662e425c96f10e0d28c9050",
+  "prepared_data_manifest_sha256": "f7565e8bcdc20ee89046da3ddd45997e5e8ee45ad83b05673df6414a0cce0844",
+  "selected_checkpoint": "step-0000400",
+  "selection": "lowest sampled instruction validation loss, not task score",
+  "validation_evaluation_path": "data/curriculum-v1-eval/evaluation.jsonl",
+  "all_suites_execute_tools": false
+}

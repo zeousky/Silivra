@@ -1,0 +1,63 @@
+{
+  "evaluation": {
+    "file": "evaluation.jsonl",
+    "grading": "exact parsed actions on held-out procedural curriculum; not an independent benchmark",
+    "records": 100,
+    "sha256": "652e94aedfdf17adadec6269ac6121444ba325347f06ee66fb3f3732b0ff8fdb",
+    "source_split": "valid"
+  },
+  "format_version": 1,
+  "generation": "original AI-assisted procedural exercises; no external corpus or evaluation suite read",
+  "license": "MIT",
+  "scope": "narrow instruction/arithmetic/Python basics and one-tool proposals; not a broad intelligence corpus",
+  "seed": 17,
+  "source": "local:scripts/build-curriculum.py",
+  "splits": {
+    "train": {
+      "families": {
+        "addition": 40,
+        "copy": 40,
+        "exact": 40,
+        "expression": 40,
+        "function": 40,
+        "multiplication": 40,
+        "read_file": 40,
+        "search_files": 40,
+        "subtraction": 40,
+        "web_search": 40
+      },
+      "records": 400,
+      "sha256": "dafd5e1be11dceefd77c0dee8fd3ceb153eaf6312efe2856f2df7224cae5067f"
+    },
+    "valid": {
+      "families": {
+        "addition": 10,
+        "copy": 10,
+        "exact": 10,
+        "expression": 10,
+        "function": 10,
+        "multiplication": 10,
+        "read_file": 10,
+        "search_files": 10,
+        "subtraction": 10,
+        "web_search": 10
+      },
+      "records": 100,
+      "sha256": "700d57ef87788e9d80ba5b18ee2c15256ac320e4cb7226e65192c35d3d83ba4c"
+    }
+  },
+  "token_statistics": {
+    "train": {
+      "max_prompt_tokens": 405,
+      "max_sample_tokens": 440,
+      "max_target_tokens_including_eos": 37
+    },
+    "valid": {
+      "max_prompt_tokens": 405,
+      "max_sample_tokens": 440,
+      "max_target_tokens_including_eos": 36
+    }
+  },
+  "tokenizer_sha256": "1640a5301686bd4970d6bd5c1b27926f71227bfd11b9e2d59375cbe33c035269",
+  "validated_max_seq_len": 512
+}

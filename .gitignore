@@ -1,0 +1,37 @@
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.DS_Store
+data/
+runs/
+exports/
+dist/
+build/
+
+# Local Codex guidance is deliberately private (including nested variants).
+[Aa][Gg][Ee][Nn][Tt][Ss].md
+AGENTS.override.md
+.codex/
+
+# Private assistant state and credentials must never enter the public repository.
+.silivra/
+.env
+.env.*
+!.env.example
+*.sqlite
+*.sqlite3
+*.db
+*.sqlite-*
+*.sqlite3-*
+*.db-*
+*.pem
+*.key
+*.safetensors
+*.npz
+*.npy
+*.log
+.coverage
+htmlcov/
+.pytest_cache/
+.ruff_cache/

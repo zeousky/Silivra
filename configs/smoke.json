@@ -1,0 +1,13 @@
+{
+  "steps": 12,
+  "batch_size": 2,
+  "seq_len": 64,
+  "learning_rate": 0.001,
+  "warmup_steps": 2,
+  "eval_every": 6,
+  "eval_batches": 2,
+  "save_every": 6,
+  "log_every": 2,
+  "seed": 42,
+  "memory_gib": 6.0
+}
