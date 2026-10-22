@@ -180,12 +180,25 @@ class MemoryStore:
             CREATE INDEX IF NOT EXISTS messages_session ON messages(session_id, id);
             PRAGMA user_version=1;
         """)
-        # FTS5 secure deletion was added in SQLite 3.42. Ordinary DELETE remains
-        # correct on older supported runtimes; this strengthens local erasure.
-        try:
-            self._db.execute("INSERT INTO memory_fts(memory_fts, rank) VALUES('secure-delete', 1)")
-        except sqlite3.OperationalError:
-            pass
+        # FTS secure-delete exists from 3.42, but its integrity checker can report
+        # false corruption until 3.46.1 (https://sqlite.org/releaselog/3_46_1.html).
+        # Keep core secure_delete=ON and the complete backup integrity check on
+        # every version. Older engines retain forensic FTS term traces instead
+        # of enabling a mode that prevents valid backups from being verified.
+        if sqlite3.sqlite_version_info >= (3, 42, 0):
+            enabled = int(sqlite3.sqlite_version_info >= (3, 46, 1))
+            previous = self._db.execute(
+                "SELECT v FROM memory_fts_config WHERE k='secure-delete'"
+            ).fetchone()
+            self._db.execute(
+                "INSERT INTO memory_fts(memory_fts, rank) VALUES('secure-delete', ?)", (enabled,)
+            )
+            if not enabled and previous is not None and previous[0] == 1:
+                # A pre-fix store may already contain the empty index segments
+                # that trigger the older checker's false positive. Merge once
+                # when leaving that mode; merely changing the flag is not enough.
+                # This preserves indexed facts and does not rebuild from content.
+                self._db.execute("INSERT INTO memory_fts(memory_fts) VALUES('optimize')")
         self._db.commit()
 
     def remember(self, scope: str, key: str, content: str, *, category: str = "fact",

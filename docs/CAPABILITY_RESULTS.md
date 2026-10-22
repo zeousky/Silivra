@@ -8,7 +8,7 @@ original pretrained checkpoint is preserved unchanged.
 
 ## Engineering verification
 
-100 local tests pass on Apple M4/macOS/Python 3.12/MLX 0.32.4. They cover original
+103 local tests pass on Apple M4/macOS/Python 3.12/MLX 0.32.4. They cover original
 model numerics/pretraining, instruction masking and resume, data bounds and leakage,
 strict actions, permission denial and budgets, file conflicts/path confinement,
 network address/redirect limits, memory scopes/revisions/deletion/backup, CLI

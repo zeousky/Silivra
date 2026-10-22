@@ -13,6 +13,8 @@ jobs:
         with:
           version: "0.12.11"
       - run: uv sync --locked
+      - name: Record Python and SQLite runtime
+        run: uv run python -c "import sqlite3, sys; print(sys.version); print('SQLite', sqlite3.sqlite_version)"
       - name: Portable model-data and assistant tests (offline fixtures)
         run: >-
           uv run python -m unittest discover -s tests -p 'test_agent.py' -v &&

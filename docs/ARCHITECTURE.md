@@ -102,6 +102,13 @@ Default state lives in the ignored `.silivra/` directory with private file modes
 Backups contain every scope, whereas JSON exports contain only the current scope.
 Neither is published. Use the backup command rather than copying a live main DB.
 
+FTS5 secure deletion is enabled on SQLite 3.46.1 and later. Older runtimes retain
+ordinary SQLite secure deletion and full backup integrity checks; an existing
+affected FTS index is optimized once when disabling that optional mode. This avoids
+the older engine's [false corruption reports in FTS5 secure-delete mode](https://www.sqlite.org/releaselog/3_46_1.html).
+Physical erasure from older FTS index pages, snapshots and separate backups is
+not guaranteed by logical forgetting.
+
 ## Evidence and tests
 
 Runtime tests use scripted backends to verify orchestration, isolation, failure

@@ -7,6 +7,7 @@ import sqlite3
 import tempfile
 from threading import Barrier
 import unittest
+from unittest.mock import patch
 
 from silivra.memory import MemoryStore
 
@@ -165,6 +166,70 @@ class MemoryTests(unittest.TestCase):
         with self.assertRaises(FileExistsError):
             self.store.backup(self.path)
         self.assertEqual(backup.stat().st_mode & 0o777, 0o600)
+
+    def test_fts_secure_delete_uses_fixed_sqlite_version_boundary(self):
+        for version, enabled in (((3, 45, 1), 0), ((3, 46, 0), 0), ((3, 46, 1), 1)):
+            with self.subTest(version=version), patch("silivra.memory.sqlite3.sqlite_version_info", version):
+                path = Path(self.temporary.name) / ("boundary-" + "-".join(map(str, version)) + ".sqlite")
+                with MemoryStore(path) as store:
+                    self.assertEqual(store._db.execute("PRAGMA secure_delete").fetchone()[0], 1)
+                    self.assertEqual(store._db.execute(
+                        "SELECT v FROM memory_fts_config WHERE k='secure-delete'"
+                    ).fetchone()[0], enabled)
+
+    def test_legacy_sqlite_reopen_correction_export_and_backup_preserve_history(self):
+        path = Path(self.temporary.name) / "roundtrip.sqlite"
+        backup = Path(self.temporary.name) / "roundtrip-backup.sqlite"
+        with patch("silivra.memory.sqlite3.sqlite_version_info", (3, 45, 1)):
+            for content in ("Use Python.", "Use Rust."):
+                with MemoryStore(path) as store:
+                    store.remember("alice", "language", content)
+            with MemoryStore(path) as store:
+                self.assertEqual([item["content"] for item in store.revisions("alice", "language")],
+                                 ["Use Python.", "Use Rust."])
+            with MemoryStore(path) as store:
+                self.assertEqual(store.recall("alice", "Rust")[0]["content"], "Use Rust.")
+                self.assertEqual(store.recall("alice", "Python"), [])
+            with MemoryStore(path) as store:
+                self.assertEqual(store.export("alice")["memories"][0]["revision"], 2)
+            with MemoryStore(path) as store:
+                store.backup(backup)
+            with MemoryStore(backup) as snapshot:
+                self.assertEqual(snapshot._db.execute("PRAGMA integrity_check").fetchone()[0], "ok")
+                self.assertEqual(snapshot.recall("alice", "Rust")[0]["content"], "Use Rust.")
+                self.assertEqual(len(snapshot.revisions("alice", "language")), 2)
+
+    def test_legacy_sqlite_switches_existing_secure_store_with_one_merge(self):
+        path = Path(self.temporary.name) / "previous-secure.sqlite"
+        backup = Path(self.temporary.name) / "previous-secure-backup.sqlite"
+        with patch("silivra.memory.sqlite3.sqlite_version_info", (3, 46, 1)):
+            with MemoryStore(path) as store:
+                store.remember("alice", "language", "Use Python.")
+                store.remember("alice", "language", "Use Rust.")
+        traces = []
+        connect = sqlite3.connect
+
+        def traced_connect(*args, **kwargs):
+            connection = connect(*args, **kwargs)
+            connection.set_trace_callback(traces.append)
+            return connection
+
+        with patch("silivra.memory.sqlite3.sqlite_version_info", (3, 45, 1)), \
+                patch("silivra.memory.sqlite3.connect", side_effect=traced_connect):
+            with MemoryStore(path) as store:
+                self.assertEqual(store.recall("alice", "Rust")[0]["content"], "Use Rust.")
+                self.assertEqual(len(store.revisions("alice", "language")), 2)
+            with MemoryStore(path) as store:
+                store.backup(backup)
+                self.assertEqual(store._db.execute(
+                    "SELECT v FROM memory_fts_config WHERE k='secure-delete'"
+                ).fetchone()[0], 0)
+        merges = [statement for statement in traces if "VALUES('optimize')" in statement]
+        self.assertEqual(len(merges), 1)
+        self.assertTrue(any("PRAGMA integrity_check" in statement for statement in traces))
+        with MemoryStore(backup) as snapshot:
+            self.assertEqual(snapshot.recall("alice", "Rust")[0]["content"], "Use Rust.")
+            self.assertEqual(len(snapshot.revisions("alice", "language")), 2)
 
     def test_importance_breaks_equivalent_lexical_match_order(self):
         self.store.remember("alice", "more", "Python", importance=1)
