@@ -1,5 +1,10 @@
 # Assistant foundation results — 2026-10-22
 
+**Latest experiment:** [Assistant v2 results](ASSISTANT_V2_RESULTS.md) records the
+completed 8,000-step run and interactive CLI. Independent task accuracy remained
+0/15 despite better instruction loss and formatting. This page preserves the
+earlier foundation experiments below.
+
 The assistant runtime, tool and memory system, instruction data pipeline and
 bounded MLX fine-tuning are implemented. **The current model is not a useful
 general assistant.** Training improved JSON formatting but did not produce correct

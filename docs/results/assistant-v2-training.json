@@ -1,0 +1,230 @@
+{
+  "format_version": 1,
+  "date": "2026-10-22",
+  "training_mode": "instruction_sft",
+  "resumed_from_step": 500,
+  "completed_step": 8000,
+  "status": "completed",
+  "resume_boundary": "An unsaved historical step600 log entry was preserved; updates resumed from immutable checkpoint500.",
+  "initial_checkpoint_checksums": {
+    "data_manifest.json": "5f87cbc17af6afd4cfd8f9258bf31aa03aea1a15cf28f678c37ed04c9477d51c",
+    "mlx_rng.npz": "5a89830230de09324eba3913a178a6e412cc2e65659fdf85b78669198376248d",
+    "model.safetensors": "543f4d6548d29da4bcdefbd1521a7cb3ea2612882eb6386663d97d1d7daf54e4",
+    "optimizer.npz": "c4bea37bac6d19c4f4ebeb3f883a2acfa61f22eb5ac701b9091718a4fe740564",
+    "state.json": "772a6ba5316459299a1639b80534e692a70b7d07e12cd669354d144813079c6a",
+    "tokenizer.json": "1640a5301686bd4970d6bd5c1b27926f71227bfd11b9e2d59375cbe33c035269"
+  },
+  "original_base": {
+    "pretraining_step": 2500,
+    "state_sha256": "102a32044eafc06dabd8f7b482baabf80089ea5d10eb5111695419be281e1a51",
+    "tokenizer_sha256": "1640a5301686bd4970d6bd5c1b27926f71227bfd11b9e2d59375cbe33c035269",
+    "weights_sha256": "633efc5b513b7de90de6d1e55d37f45948852d1c19728078a54f7502a6a7cf40"
+  },
+  "original_artifacts_unchanged": true,
+  "data_manifest_sha256": "5f87cbc17af6afd4cfd8f9258bf31aa03aea1a15cf28f678c37ed04c9477d51c",
+  "training_configuration": {
+    "batch_size": 4,
+    "bucket_size": 64,
+    "context_length": 1024,
+    "eval_batches": 24,
+    "eval_every": 500,
+    "learning_rate": 0.0002,
+    "log_every": 100,
+    "memory_gib": 6.0,
+    "min_lr_ratio": 0.1,
+    "save_every": 500,
+    "seed": 43,
+    "steps": 8000,
+    "warmup_steps": 200,
+    "weight_decay": 0.01
+  },
+  "architecture": {
+    "dim": 384,
+    "hidden_dim": 1024,
+    "max_seq_len": 1024,
+    "n_heads": 6,
+    "n_kv_heads": 2,
+    "n_layers": 8,
+    "rope_theta": 10000.0,
+    "vocab_size": 4096
+  },
+  "baseline_before_any_v2_updates": {
+    "validation_loss": 6.687636111616023,
+    "boundary": "Original weights evaluated with the explicitly extended1024-token SFT architecture; not a512-context fair generation baseline."
+  },
+  "data": {
+    "train": {
+      "conversations": 24908,
+      "samples": 26314,
+      "sha256": "f7fde86735906e5d129988ecbb84277994018bfd7915edef6852d7336dbeb5ae",
+      "source_sha256": "fe7c5d5135fb81f19b55be0c8b78d3936b237f087805e3b7b73bbc8c215a4c25"
+    },
+    "valid": {
+      "conversations": 1311,
+      "samples": 1390,
+      "sha256": "51525e8927f35f0f268f50eef7a7d64b8fde46397ed3a5e297d77551026fd49f",
+      "source_sha256": "bb1d2c48f7e8cb75d0132aa0f5dd252df665c07013accae8ddc1da016d54373b"
+    }
+  },
+  "summary": {
+    "best_validation_loss": 2.9862034865382174,
+    "checkpoint": "checkpoints/step-0008000",
+    "input_tokens_seen": 11680945,
+    "mlx_active_gib": 0.15830954909324646,
+    "mlx_peak_gib": 3.3885623663663864,
+    "process_peak_rss_gib": 0.6377410888671875,
+    "session_seconds": 2064.965626917001,
+    "status": "completed",
+    "step": 8000,
+    "supervised_tokens_seen": 2494990,
+    "tokens_seen": 2494990,
+    "total_training_seconds": 2152.748027876005,
+    "training_mode": "instruction_sft",
+    "validation_loss": 2.9862034865382174
+  },
+  "latest": {
+    "checkpoint": "checkpoints/step-0008000",
+    "step": 8000
+  },
+  "best": {
+    "checkpoint": "checkpoints/step-0008000",
+    "step": 8000
+  },
+  "checkpoint_model_sha256": "efb8d54eb4f0bda52567e50e41398e9d7793a7ae3c6e2d650bf3770321187a96",
+  "checkpoint_state_sha256": "bbb4d01137ac5354648c583afb90394414f14c01a95152059d971e223690d93e",
+  "validation_history": [
+    {
+      "event": "sft_validation",
+      "step": 500,
+      "loss": 3.737187326768304
+    },
+    {
+      "event": "sft_validation",
+      "step": 1000,
+      "loss": 3.531141657533925
+    },
+    {
+      "event": "sft_validation",
+      "step": 1500,
+      "loss": 3.4139934573267046
+    },
+    {
+      "event": "sft_validation",
+      "step": 2000,
+      "loss": 3.335331831604627
+    },
+    {
+      "event": "sft_validation",
+      "step": 2500,
+      "loss": 3.26553853816522
+    },
+    {
+      "event": "sft_validation",
+      "step": 3000,
+      "loss": 3.216810496629409
+    },
+    {
+      "event": "sft_validation",
+      "step": 3500,
+      "loss": 3.1516949487285912
+    },
+    {
+      "event": "sft_validation",
+      "step": 4000,
+      "loss": 3.1368831447450503
+    },
+    {
+      "event": "sft_validation",
+      "step": 4500,
+      "loss": 3.097174568025926
+    },
+    {
+      "event": "sft_validation",
+      "step": 5000,
+      "loss": 3.0717286184400527
+    },
+    {
+      "event": "sft_validation",
+      "step": 5500,
+      "loss": 3.0446810902881527
+    },
+    {
+      "event": "sft_validation",
+      "step": 6000,
+      "loss": 3.0319400555061136
+    },
+    {
+      "event": "sft_validation",
+      "step": 6500,
+      "loss": 3.0132184284031687
+    },
+    {
+      "event": "sft_validation",
+      "step": 7000,
+      "loss": 3.00253450509453
+    },
+    {
+      "event": "sft_validation",
+      "step": 7500,
+      "loss": 2.9989774067032537
+    },
+    {
+      "event": "sft_validation",
+      "step": 8000,
+      "loss": 2.9862034865382174
+    }
+  ],
+  "training_source_sha256": {
+    "src/silivra/finetune.py": "4e5f433e8045b458034061dcbb3e5f30c2c5410d389905a79fa4f5f48bb97d0e",
+    "src/silivra/model.py": "f182e85613596a8c1212dcba4cf6f241bef700be354bd145bd95e9100af80f8e",
+    "src/silivra/instructions.py": "453adb8bd8675cbeed29acbc3c0422a03ee6fa20a9b66fdfd59838ee7bcbf5b6",
+    "src/silivra/checkpoint.py": "23113718895a67caef2c04b0d8a9b9dabaa35bd0c697ab828d95b8fd5fa1b92c",
+    "src/silivra/config.py": "350e794afeed7e39e8496ceb082fcf85beeb0059158a97896c37f725047b69fb",
+    "src/silivra/runtime.py": "8d84a786fa279efc189e52910c8715cc4854dd3540d797b37792b466843ac083",
+    "configs/assistant-v2.json": "44a0ac0296fd975eb88e5074d414baa934826d53c30ab459a2159ea9720acfad",
+    "uv.lock": "68e6134e89e38f7334b5a1e75f7b5779d34c5168ab66bf8db33149feb2e960db"
+  },
+  "hardware": {
+    "architecture": "arm64",
+    "gpu": {
+      "architecture": "applegpu_g16g",
+      "device_name": "Apple M4",
+      "max_buffer_length": 9534832640,
+      "max_recommended_working_set_size": 12713115648,
+      "memory_size": 17179869184,
+      "resource_limit": 499000
+    },
+    "macos": "27.0.1",
+    "metal_available": true,
+    "mlx": "0.32.4",
+    "platform": "darwin",
+    "python": "3.12.14",
+    "unified_memory_bytes": 17179869184
+  },
+  "verification": {
+    "local_tests": 187,
+    "local_result": "passed",
+    "linux_portable_ci": "passed",
+    "ci_url": "https://github.com/zeousky/Silivra/actions/runs/39837975331",
+    "package_build": "wheel and source distribution passed, private-artifact exclusion checked",
+    "live_network_tests": "not run; network tests use offline fixtures",
+    "native_terminal": {
+      "startup": "passed real PTY",
+      "explicit_read_tool": "passed on synthetic workspace file",
+      "explicit_memory_remember_recall": "passed in isolated test workspace",
+      "native_checkpoint_step": 8000,
+      "native_context_tokens": 1024,
+      "streaming_and_protocol_validation": "passed; greeting response was nonsensical",
+      "semantic_boundary": "CLI operation does not establish model usefulness; native greeting was not a successful conversational answer."
+    }
+  },
+  "boundaries": [
+    "MLX allocation and process RSS are separate measurements, neither is total system memory.",
+    "Loss is assistant/EOS token-weighted validation on a fixed24-batch sample; independent task accuracy is reported separately.",
+    "Checkpoints retain optimizer, schedule step, sampler, RNG, tokenizer, and data provenance; floating-point reduction rounding can differ on resume.",
+    "Weights, datasets, private memory, chat logs and local instructions remain excluded from Git.",
+    "Historical generator bytes differ from recovered source; existing dataset hashes were preserved, not regenerated."
+  ],
+  "verified_source_snapshot_commit": "e76cc1bf14092641ea9a936ffb06025b37cf7abe",
+  "source_snapshot_boundary": "Trainer started with unfinished local changes. These reviewed source bytes were later committed; the recorded trainer/model/data-loader/config hashes identify the actual code, not commit timing."
+}

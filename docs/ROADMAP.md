@@ -37,6 +37,15 @@ separate contamination checks and a recorded resource budget.
 
 ## 2. Train reliable assistant and tool behavior
 
+Progress measured on 2026-10-22: the separate assistant v2 run resumed from step
+500 and completed 8,000 updates with its original tokenizer/data/configuration.
+Instruction validation loss fell from 3.73719 to 2.98620; synthetic exact accuracy
+rose from 3/48 to 5/48. Independent accuracy stayed 0/15, and story loss worsened.
+The CLI is implemented, 187 local tests and Linux portable CI pass, and native
+checkpoint loading/streaming was demonstrated with a nonsensical greeting.
+These results do not satisfy this milestone's reliable-assistant acceptance.
+See [the complete results and failures](ASSISTANT_V2_RESULTS.md).
+
 Expand reviewed instruction data beyond the included protocol examples. Include
 grounded coding edits, tool-result interpretation, malformed/missing information,
 permission denial, prompt injection, uncertainty and source attribution. Train longer

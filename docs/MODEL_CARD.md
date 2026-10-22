@@ -2,6 +2,13 @@
 
 **Release stage:** local experimental pretraining checkpoint, version 0.1.
 
+This card describes the preserved original base. The separate
+[assistant v2 experiment](ASSISTANT_V2_RESULTS.md) completed 8,000 instruction
+updates with the same parameter/tokenizer lineage and 1,024-token context. It
+remains unreliable on independent assistant tasks. Its mixed instruction-data
+licenses and weight-distribution review are separate from this base designation;
+no v2 weights or datasets are published in the source repository.
+
 **Purpose:** a reproducible language-model training and inference foundation for Apple silicon MacBooks with 16 GB unified memory. The first experiment learns simple English story continuation. It is initialized from random parameters and uses a tokenizer trained from scratch. There is no pretrained checkpoint, distillation loss, adapter, or inherited model tokenizer.
 
 **Architecture:** causal decoder with 14,162,304 learned parameters; 8 layers; width 384; RMSNorm; RoPE; SwiGLU; 6 query/2 KV heads; tied embedding/output weights; 4,096-token byte-level BPE; 512-token configured inference window. The initial training length is 256 tokens. The original implementation uses MLX and Metal with FP32 weights and AdamW.
