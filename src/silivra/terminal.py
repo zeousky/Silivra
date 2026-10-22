@@ -624,6 +624,7 @@ def _prompt_session(app):
         event.current_buffer.insert_text("\n")
 
     return PromptSession(multiline=True, key_bindings=bindings, history=ScopedInputHistory(app.workspace, app.scope),
+                         prompt_continuation="        · ",
                          completer=Commands(), complete_while_typing=False,
                          enable_open_in_editor=False)
 
@@ -666,7 +667,7 @@ def run_terminal(*, workspace: Path, user="local", run=None, which=None, memory=
         prompt = prompt_session if prompt_session is not None else _prompt_session(app)
         while True:
             try:
-                text = prompt.prompt("silivra › ", continuation_prompt="        · ")
+                text = prompt.prompt("silivra › ")
             except KeyboardInterrupt:
                 app.write("Input cancelled.", style="dim")
                 continue

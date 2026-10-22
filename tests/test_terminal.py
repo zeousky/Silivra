@@ -11,6 +11,9 @@ import unittest
 from unittest.mock import Mock, patch
 
 from rich.console import Console
+from prompt_toolkit.application import create_app_session
+from prompt_toolkit.input import create_pipe_input
+from prompt_toolkit.output import DummyOutput
 
 from silivra.agent import AgentConfig, project_scope
 from silivra.memory import MemoryStore
@@ -348,6 +351,46 @@ class TerminalCLIIntegrationTests(unittest.TestCase):
                     self.assertRaises(SystemExit) as stopped:
                 main()
             self.assertEqual(stopped.exception.code, 1)
+
+
+class PromptToolkitIntegrationTests(unittest.TestCase):
+    """Exercise the pinned prompt API and real key bindings without a TTY/MLX."""
+
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.workspace = Path(self.temp.name)
+        self.output = io.StringIO()
+        self.console = Console(file=self.output, width=120, color_system=None)
+
+    def terminal(self, keys):
+        # A physical Enter is CR. LF is Ctrl+J, explicitly bound to insert a
+        # newline in Silivra's multiline editor rather than send a submission.
+        with create_pipe_input() as input_pipe, \
+                create_app_session(input=input_pipe, output=DummyOutput()):
+            input_pipe.send_text(keys)
+            return run_terminal(workspace=self.workspace, console=self.console,
+                                backend_factory=lambda *_, **__: self.fail("must not load MLX"))
+
+    def test_default_prompt_session_opens_help_and_exits(self):
+        self.assertEqual(self.terminal("/help\r/exit\r"), 0)
+        self.assertIn("Show commands and input controls", self.output.getvalue())
+        history = ScopedInputHistory(self.workspace, project_scope(self.workspace))
+        self.assertEqual(list(history.load_history_strings())[:2], ["/exit", "/help"])
+
+    def test_real_ctrl_j_and_alt_enter_preserve_multiline_submission(self):
+        keys = "/memory remember note First line\nSecond line\x1b\rThird line\r/exit\r"
+        self.assertEqual(self.terminal(keys), 0)
+        with MemoryStore(self.workspace / ".silivra" / "memory.sqlite") as store:
+            saved = store.list_memories(project_scope(self.workspace))
+        self.assertEqual(saved[0]["content"], "First line\nSecond line\nThird line")
+
+    def test_real_ctrl_c_cancels_input_and_keeps_terminal_open(self):
+        self.assertEqual(self.terminal("discard this input\x03/help\r/exit\r"), 0)
+        self.assertIn("Input cancelled", self.output.getvalue())
+        self.assertIn("Show commands and input controls", self.output.getvalue())
+        history = ScopedInputHistory(self.workspace, project_scope(self.workspace))
+        self.assertNotIn("discard this input", list(history.load_history_strings()))
 
 
 if __name__ == "__main__":
