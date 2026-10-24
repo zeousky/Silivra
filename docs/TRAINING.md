@@ -1,5 +1,55 @@
 # Training Silivra
 
+The bounded focused/rehearsal experiments and their rejection/promotion decisions
+are documented in [QUALITY_RESULTS.md](QUALITY_RESULTS.md). Reproduce new data
+in absent directories; never overwrite the original prepared corpus or checkpoint:
+
+```sh
+uv run python scripts/build-curriculum-v3.py \
+  --output data/assistant-v3-source --prepare data/assistant-v3 \
+  --tokenizer data/tinystories/tokenizer.json \
+  --exclude-suite examples/evaluations/quality-v1.jsonl \
+  --exclude-suite examples/evaluations/quality-v2.jsonl
+uv run python scripts/build-rehearsal.py \
+  --old data/instructions-v2 --core data/assistant-v3 \
+  --output data/assistant-v4-source --prepare data/assistant-v4 \
+  --exclude-suite examples/evaluations/assistant.jsonl \
+  --exclude-suite examples/evaluations/assistant-v2.jsonl \
+  --exclude-suite examples/evaluations/quality-v1.jsonl \
+  --exclude-suite examples/evaluations/quality-v2.jsonl
+uv run silivra finetune --data data/assistant-v4 \
+  --base runs/silivra-assistant-v2/checkpoints/step-0008000 \
+  --run runs/silivra-assistant-v4 --config configs/assistant-v4.json \
+  --max-minutes 6
+```
+
+The local measured v3 artifacts are named `data/assistant-v3-filtered`; use that
+as `--core` to reproduce the recorded v4 mix exactly. The newer quality-v2 suite
+has zero exact overlap with those earlier core artifacts. Training keeps each
+record's attribution, licensing and immutable input hashes. Resume with the same
+data/base/config and `--resume`; it restores the last complete checkpoint, not
+unsaved updates present only in the log. Raise the loop budget only deliberately.
+Compare full task generations and older language/instruction retention before
+selecting an assistant checkpoint; decreasing training loss is insufficient.
+
+With those local artifacts present, reproduce the complete bounded comparison:
+
+```sh
+uv run python scripts/compare-quality.py \
+  --before runs/silivra-assistant-v2 --after runs/silivra-assistant-v4 \
+  --data data/assistant-v4 \
+  --suite examples/evaluations/assistant.jsonl \
+  --suite examples/evaluations/assistant-v2.jsonl \
+  --suite examples/evaluations/quality-v1.jsonl \
+  --suite examples/evaluations/quality-v2.jsonl \
+  --output runs/rehearsal-comparison-repeat.json
+```
+
+The output must be new. The script verifies checkpoints, input artifacts,
+tokenizer continuity and exact prompt separation; it loads one model at a time.
+Full mixed validation loss and the original v3 subset's exact task scores are
+reported separately. Imported rehearsal text is never exported in diagnostics.
+
 Silivra keeps its own model, learned tokenizer and from-scratch MLX pretraining
 path. Instruction tuning starts from a verified local checkpoint and writes a
 separate run. Adding tools to the runtime gives the model actions it can request;

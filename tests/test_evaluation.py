@@ -4,10 +4,55 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from silivra.evaluation import case_messages, evaluate_assistant, validate_cases
+from silivra.evaluation import case_messages, evaluate_assistant, grade_action, validate_cases
 
 
 class EvaluationTests(unittest.TestCase):
+    def test_prose_alternatives_match_whole_answers_without_relaxing_exact_cases(self):
+        exact = {"id": "exact", "category": "instruction", "prompt": "Say Hello! exactly.",
+                 "tools": [], "expected": {"final": "Hello!"}}
+        prose = {**exact, "id": "prose", "accepted_final": ["Hi! How can I help?", "Café!"]}
+        validate_cases([exact, prose])
+        self.assertTrue(grade_action({"final": "Hello!"}, exact))
+        self.assertFalse(grade_action({"final": "hello!"}, exact))
+        self.assertFalse(grade_action({"final": " Hello! "}, exact))
+        self.assertTrue(grade_action({"final": "  HI!  How can I help?\n"}, prose))
+        self.assertTrue(grade_action({"final": "Cafe\u0301!"}, prose))
+        self.assertFalse(grade_action({"final": "I refuse to say Hello!"}, prose))
+        self.assertFalse(grade_action({"final": "Hi! How can I help? The answer is wrong."}, prose))
+        self.assertFalse(grade_action({"tool": "read_file", "arguments": {}}, prose))
+
+    def test_prose_alternatives_are_validated_before_inference(self):
+        class Backend:
+            def generate(self, *_):
+                raise AssertionError("Invalid alternatives must not invoke inference")
+
+        case = {"id": "prose", "category": "conversation", "prompt": "Hello!",
+                "tools": [], "expected": {"final": "Hello!"}}
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "suite.jsonl"
+            for alternatives in [[], "Hello", [""], [None], ["a"] * 33, ["x" * 64_001]]:
+                with self.subTest(alternatives=repr(alternatives)[:80]):
+                    path.write_text(json.dumps({**case, "accepted_final": alternatives}))
+                    with self.assertRaisesRegex(ValueError, "accepted_final"):
+                        evaluate_assistant(Backend(), path)
+            tool_case = {**case, "tools": [{"type": "function", "function": {
+                "name": "read_file", "parameters": {"type": "object", "properties": {}}}}],
+                         "expected": {"tool": "read_file", "arguments": {}}, "accepted_final": ["Hello!"]}
+            with self.assertRaisesRegex(ValueError, "accepted_final"):
+                validate_cases([tool_case])
+
+    def test_quality_suite_covers_eight_categories_and_only_conversation_uses_alternatives(self):
+        from collections import Counter
+        path = Path(__file__).parents[1] / "examples/evaluations/quality-v1.jsonl"
+        cases = [json.loads(line) for line in path.read_text().splitlines()]
+        validate_cases(cases)
+        self.assertEqual(Counter(case["category"] for case in cases),
+                         {name: 5 for name in ("conversation", "instruction", "reasoning", "grounding",
+                                              "python", "tools", "memory", "honesty")})
+        self.assertEqual(sum("accepted_final" in case for case in cases), 4)
+        self.assertTrue(all(case["category"] == "conversation" for case in cases if "accepted_final" in case))
+
     def test_exact_actions_and_protocol_are_graded_separately(self):
         class Backend:
             def __init__(self):

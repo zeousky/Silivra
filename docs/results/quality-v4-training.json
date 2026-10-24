@@ -1,0 +1,409 @@
+{
+  "format_version": 1,
+  "experiment": "rehearsal assistant v4; rejected for overall regression",
+  "date": "2026-10-23",
+  "run": {
+    "base_checkpoint": {
+      "finetuning_step": 8000,
+      "parent": {
+        "pretraining_step": 2500,
+        "state_sha256": "102a32044eafc06dabd8f7b482baabf80089ea5d10eb5111695419be281e1a51",
+        "tokenizer_sha256": "1640a5301686bd4970d6bd5c1b27926f71227bfd11b9e2d59375cbe33c035269",
+        "weights_sha256": "633efc5b513b7de90de6d1e55d37f45948852d1c19728078a54f7502a6a7cf40"
+      },
+      "state_sha256": "bbb4d01137ac5354648c583afb90394414f14c01a95152059d971e223690d93e",
+      "tokenizer_sha256": "1640a5301686bd4970d6bd5c1b27926f71227bfd11b9e2d59375cbe33c035269",
+      "training_mode": "instruction_sft",
+      "weights_sha256": "efb8d54eb4f0bda52567e50e41398e9d7793a7ae3c6e2d650bf3770321187a96"
+    },
+    "baseline_validation_loss": 2.646223830089426,
+    "data_manifest_sha256": "81c0a15972335b23ed84b25ca48ba30f660a6fd83b50fe652177e81b10c81eca",
+    "format_version": 1,
+    "hardware": {
+      "architecture": "arm64",
+      "gpu": {
+        "architecture": "applegpu_g16g",
+        "device_name": "Apple M4",
+        "max_buffer_length": 9534832640,
+        "max_recommended_working_set_size": 12713115648,
+        "memory_size": 17179869184,
+        "resource_limit": 499000
+      },
+      "macos": "27.0.1",
+      "metal_available": true,
+      "mlx": "0.32.4",
+      "platform": "darwin",
+      "python": "3.12.14",
+      "unified_memory_bytes": 17179869184
+    },
+    "model_config": {
+      "dim": 384,
+      "hidden_dim": 1024,
+      "max_seq_len": 1024,
+      "n_heads": 6,
+      "n_kv_heads": 2,
+      "n_layers": 8,
+      "rope_theta": 10000.0,
+      "vocab_size": 4096
+    },
+    "prompt_format": "silivra-role-json-v1",
+    "training_config": {
+      "batch_size": 4,
+      "bucket_size": 64,
+      "context_length": 1024,
+      "eval_batches": 24,
+      "eval_every": 400,
+      "learning_rate": 0.0001,
+      "log_every": 100,
+      "memory_gib": 6.0,
+      "min_lr_ratio": 0.2,
+      "save_every": 400,
+      "seed": 45,
+      "steps": 2000,
+      "warmup_steps": 80,
+      "weight_decay": 0.01
+    },
+    "training_mode": "instruction_sft"
+  },
+  "summary": {
+    "best_validation_loss": 2.7662547622706084,
+    "checkpoint": "checkpoints/step-0002000",
+    "input_tokens_seen": 2276720,
+    "mlx_active_gib": 0.15830586478114128,
+    "mlx_peak_gib": 3.3885615430772305,
+    "process_peak_rss_gib": 0.31634521484375,
+    "session_seconds": 256.66214925,
+    "status": "completed",
+    "step": 2000,
+    "supervised_tokens_seen": 405995,
+    "tokens_seen": 405995,
+    "total_training_seconds": 313.5821954170037,
+    "training_mode": "instruction_sft",
+    "validation_loss": 2.785582656452726
+  },
+  "selected_state": {
+    "base_checkpoint": {
+      "finetuning_step": 8000,
+      "parent": {
+        "pretraining_step": 2500,
+        "state_sha256": "102a32044eafc06dabd8f7b482baabf80089ea5d10eb5111695419be281e1a51",
+        "tokenizer_sha256": "1640a5301686bd4970d6bd5c1b27926f71227bfd11b9e2d59375cbe33c035269",
+        "weights_sha256": "633efc5b513b7de90de6d1e55d37f45948852d1c19728078a54f7502a6a7cf40"
+      },
+      "state_sha256": "bbb4d01137ac5354648c583afb90394414f14c01a95152059d971e223690d93e",
+      "tokenizer_sha256": "1640a5301686bd4970d6bd5c1b27926f71227bfd11b9e2d59375cbe33c035269",
+      "training_mode": "instruction_sft",
+      "weights_sha256": "efb8d54eb4f0bda52567e50e41398e9d7793a7ae3c6e2d650bf3770321187a96"
+    },
+    "best_validation_loss": 2.7662547622706084,
+    "data_manifest_sha256": "81c0a15972335b23ed84b25ca48ba30f660a6fd83b50fe652177e81b10c81eca",
+    "format_version": 2,
+    "initialization": "verified local Silivra checkpoint",
+    "input_tokens_seen": 1373578,
+    "loss": "assistant action and EOS tokens only; context and padding masked",
+    "model_config": {
+      "dim": 384,
+      "hidden_dim": 1024,
+      "max_seq_len": 1024,
+      "n_heads": 6,
+      "n_kv_heads": 2,
+      "n_layers": 8,
+      "rope_theta": 10000.0,
+      "vocab_size": 4096
+    },
+    "numpy_rng": {
+      "bit_generator": "PCG64",
+      "has_uint32": 0,
+      "state": {
+        "inc": 122620962813697476525009183845032774019,
+        "state": 75357071162655414921387586157184807221
+      },
+      "uinteger": 1508203469
+    },
+    "prompt_format": "silivra-role-json-v1",
+    "step": 1200,
+    "supervised_tokens_seen": 248470,
+    "token_count_basis": "tokens_seen = sampled assistant-action and EOS labels; input_tokens_seen = all nonpadding next-token labels",
+    "tokens_seen": 248470,
+    "training_config": {
+      "batch_size": 4,
+      "bucket_size": 64,
+      "context_length": 1024,
+      "eval_batches": 24,
+      "eval_every": 400,
+      "learning_rate": 0.0001,
+      "log_every": 100,
+      "memory_gib": 6.0,
+      "min_lr_ratio": 0.2,
+      "save_every": 400,
+      "seed": 45,
+      "steps": 2000,
+      "warmup_steps": 80,
+      "weight_decay": 0.01
+    },
+    "training_mode": "instruction_sft",
+    "training_seconds": 177.11430562500374,
+    "validation_loss": 2.7662547622706084
+  },
+  "latest_state": {
+    "base_checkpoint": {
+      "finetuning_step": 8000,
+      "parent": {
+        "pretraining_step": 2500,
+        "state_sha256": "102a32044eafc06dabd8f7b482baabf80089ea5d10eb5111695419be281e1a51",
+        "tokenizer_sha256": "1640a5301686bd4970d6bd5c1b27926f71227bfd11b9e2d59375cbe33c035269",
+        "weights_sha256": "633efc5b513b7de90de6d1e55d37f45948852d1c19728078a54f7502a6a7cf40"
+      },
+      "state_sha256": "bbb4d01137ac5354648c583afb90394414f14c01a95152059d971e223690d93e",
+      "tokenizer_sha256": "1640a5301686bd4970d6bd5c1b27926f71227bfd11b9e2d59375cbe33c035269",
+      "training_mode": "instruction_sft",
+      "weights_sha256": "efb8d54eb4f0bda52567e50e41398e9d7793a7ae3c6e2d650bf3770321187a96"
+    },
+    "best_validation_loss": 2.7662547622706084,
+    "data_manifest_sha256": "81c0a15972335b23ed84b25ca48ba30f660a6fd83b50fe652177e81b10c81eca",
+    "format_version": 2,
+    "initialization": "verified local Silivra checkpoint",
+    "input_tokens_seen": 2276720,
+    "loss": "assistant action and EOS tokens only; context and padding masked",
+    "model_config": {
+      "dim": 384,
+      "hidden_dim": 1024,
+      "max_seq_len": 1024,
+      "n_heads": 6,
+      "n_kv_heads": 2,
+      "n_layers": 8,
+      "rope_theta": 10000.0,
+      "vocab_size": 4096
+    },
+    "numpy_rng": {
+      "bit_generator": "PCG64",
+      "has_uint32": 0,
+      "state": {
+        "inc": 122620962813697476525009183845032774019,
+        "state": 196994436559392126523885935180587499893
+      },
+      "uinteger": 2652594225
+    },
+    "prompt_format": "silivra-role-json-v1",
+    "step": 2000,
+    "supervised_tokens_seen": 405995,
+    "token_count_basis": "tokens_seen = sampled assistant-action and EOS labels; input_tokens_seen = all nonpadding next-token labels",
+    "tokens_seen": 405995,
+    "training_config": {
+      "batch_size": 4,
+      "bucket_size": 64,
+      "context_length": 1024,
+      "eval_batches": 24,
+      "eval_every": 400,
+      "learning_rate": 0.0001,
+      "log_every": 100,
+      "memory_gib": 6.0,
+      "min_lr_ratio": 0.2,
+      "save_every": 400,
+      "seed": 45,
+      "steps": 2000,
+      "warmup_steps": 80,
+      "weight_decay": 0.01
+    },
+    "training_mode": "instruction_sft",
+    "training_seconds": 312.3325185000037,
+    "validation_loss": 2.785582656452726
+  },
+  "curriculum": {
+    "schema_version": 1,
+    "kind": "silivra-rehearsal-v4",
+    "seed": 20261023,
+    "generator_sha256": "4fa39745aa4304e7601a6f7d5a5e39003052af13fe7f210f27bba70b70f3476e",
+    "tokenizer_sha256": "1640a5301686bd4970d6bd5c1b27926f71227bfd11b9e2d59375cbe33c035269",
+    "transformation": {
+      "author": "Silivra project with Codex; deterministic offline selection",
+      "license": "MIT",
+      "boundary": "Transformation code is MIT; every source record retains its original license and attribution."
+    },
+    "inputs": {
+      "old_manifest_sha256": "5f87cbc17af6afd4cfd8f9258bf31aa03aea1a15cf28f678c37ed04c9477d51c",
+      "core_manifest_sha256": "00bc7ed0a340aa167676d89c171689299b6899a999784f194cc19e2a44a3e526",
+      "artifacts": {
+        "old": {
+          "train": {
+            "sha256": "f7fde86735906e5d129988ecbb84277994018bfd7915edef6852d7336dbeb5ae",
+            "source_sha256": "fe7c5d5135fb81f19b55be0c8b78d3936b237f087805e3b7b73bbc8c215a4c25"
+          },
+          "valid": {
+            "sha256": "51525e8927f35f0f268f50eef7a7d64b8fde46397ed3a5e297d77551026fd49f",
+            "source_sha256": "bb1d2c48f7e8cb75d0132aa0f5dd252df665c07013accae8ddc1da016d54373b"
+          }
+        },
+        "core": {
+          "train": {
+            "sha256": "baa27e3267df12506e8c8250b20083f4c3e4b0e184c497f8cede09b7eaf2d7ba",
+            "source_sha256": "5ee5facd1bfb1aab7b0e1750ea08927291879f5b7bbf8b451cdfef34b05ddda4"
+          },
+          "valid": {
+            "sha256": "f714b90e77f78fbac556a2ef13ede8f0cfef4406a18ba8fc8a477f6e02424938",
+            "source_sha256": "2c5bc3d5e81464d0fa55e92eeda3493b5f9a69eedf879e07958dc5819922e9af"
+          }
+        }
+      }
+    },
+    "selection": {
+      "retained_core": 2041,
+      "core_excluded": 0,
+      "retained_core_validation": 216,
+      "core_validation_excluded": 0,
+      "replay": {
+        "dolly": 1000,
+        "original": 800,
+        "story": 200
+      },
+      "old_validation": {
+        "dolly": 64,
+        "original": 51,
+        "story": 13
+      },
+      "selection": "fixed-seed shuffle; original-v2 replay round-robin across existing families",
+      "exclusion": "all diagnostic and joint-validation supervised user prefixes; replay conflicting with core prompts removed"
+    },
+    "excluded_suites": [
+      {
+        "name": "assistant.jsonl",
+        "sha256": "1b1fc9e32d9eb13fd79805365c3257118d4628c919785f466ecf92963f2fbef2",
+        "use": "user prefix exclusion only; expected answers not inspected"
+      },
+      {
+        "name": "assistant-v2.jsonl",
+        "sha256": "ace574a42db5a6161961df6e6863899b0179c43d847fbbedb6e2e57c40d7f0dc",
+        "use": "user prefix exclusion only; expected answers not inspected"
+      },
+      {
+        "name": "quality-v1.jsonl",
+        "sha256": "147fbc15e004b3cc42680ece6129068bcfb86c40ef28d9973e1008166dd9b367",
+        "use": "user prefix exclusion only; expected answers not inspected"
+      },
+      {
+        "name": "quality-v2.jsonl",
+        "sha256": "ef817d0dc7a0611ae9ea25443b78da619b24e7ba38c54b0ab77dd3dbbc186428",
+        "use": "user prefix exclusion only; expected answers not inspected"
+      }
+    ],
+    "splits": {
+      "train": {
+        "records": 4041,
+        "sha256": "3f907037e53a094bde17a0391764b18f9d81d2080afef16fa4ee048c7c8fb664",
+        "sources": [
+          {
+            "name": "Silivra focused assistant curriculum v3 (Codex-authored)",
+            "author": "Silivra project with Codex; deterministic synthetic examples",
+            "license": "MIT",
+            "url": "https://github.com/zeousky/Silivra",
+            "revision": "curriculum-v3"
+          },
+          {
+            "name": "Silivra original capability curriculum v2 (Codex-authored generators)",
+            "author": "Silivra project with Codex; deterministic synthetic data",
+            "license": "MIT",
+            "url": "https://github.com/zeousky/Silivra",
+            "revision": "curriculum-v2"
+          },
+          {
+            "name": "databricks/databricks-dolly-15k (Silivra JSON-action conversion)",
+            "author": "Databricks employees; Wikipedia editors and contributors where indicated upstream",
+            "license": "CC-BY-SA-3.0",
+            "url": "https://huggingface.co/datasets/databricks/databricks-dolly-15k/tree/bdd27f4d94b9c1f951818a7da7fd7aeea5dbff1a",
+            "revision": "bdd27f4d94b9c1f951818a7da7fd7aeea5dbff1a"
+          },
+          {
+            "name": "TinyStories original training split replay (Silivra JSON-action conversion)",
+            "author": "Ronen Eldan and Yuanzhi Li; upstream synthetic stories",
+            "license": "CDLA-Sharing-1.0",
+            "url": "https://huggingface.co/datasets/roneneldan/TinyStories/tree/f54c09fd23315a6f9c86f9dc80f725de7d8f9c64",
+            "revision": "f54c09fd23315a6f9c86f9dc80f725de7d8f9c64"
+          }
+        ],
+        "source_counts": {
+          "Silivra focused assistant curriculum v3 (Codex-authored)": 2041,
+          "Silivra original capability curriculum v2 (Codex-authored generators)": 800,
+          "databricks/databricks-dolly-15k (Silivra JSON-action conversion)": 1000,
+          "TinyStories original training split replay (Silivra JSON-action conversion)": 200
+        },
+        "supervised_tokens": 214075,
+        "max_tokens": 1024
+      },
+      "valid": {
+        "records": 344,
+        "sha256": "9c46a090bc845e1d3c173e7bb197db11c1912a477b09c9a3b42c5a8c13fbc513",
+        "sources": [
+          {
+            "name": "Silivra focused assistant curriculum v3 (Codex-authored)",
+            "author": "Silivra project with Codex; deterministic synthetic examples",
+            "license": "MIT",
+            "url": "https://github.com/zeousky/Silivra",
+            "revision": "curriculum-v3"
+          },
+          {
+            "name": "TinyStories original training split replay (Silivra JSON-action conversion)",
+            "author": "Ronen Eldan and Yuanzhi Li; upstream synthetic stories",
+            "license": "CDLA-Sharing-1.0",
+            "url": "https://huggingface.co/datasets/roneneldan/TinyStories/tree/f54c09fd23315a6f9c86f9dc80f725de7d8f9c64",
+            "revision": "f54c09fd23315a6f9c86f9dc80f725de7d8f9c64"
+          },
+          {
+            "name": "Silivra original capability curriculum v2 (Codex-authored generators)",
+            "author": "Silivra project with Codex; deterministic synthetic data",
+            "license": "MIT",
+            "url": "https://github.com/zeousky/Silivra",
+            "revision": "curriculum-v2"
+          },
+          {
+            "name": "databricks/databricks-dolly-15k (Silivra JSON-action conversion)",
+            "author": "Databricks employees; Wikipedia editors and contributors where indicated upstream",
+            "license": "CC-BY-SA-3.0",
+            "url": "https://huggingface.co/datasets/databricks/databricks-dolly-15k/tree/bdd27f4d94b9c1f951818a7da7fd7aeea5dbff1a",
+            "revision": "bdd27f4d94b9c1f951818a7da7fd7aeea5dbff1a"
+          }
+        ],
+        "source_counts": {
+          "Silivra focused assistant curriculum v3 (Codex-authored)": 216,
+          "TinyStories original training split replay (Silivra JSON-action conversion)": 13,
+          "Silivra original capability curriculum v2 (Codex-authored generators)": 51,
+          "databricks/databricks-dolly-15k (Silivra JSON-action conversion)": 64
+        },
+        "supervised_tokens": 13220,
+        "max_tokens": 969
+      }
+    },
+    "evaluation_boundary": "Reuses development diagnostics for exclusion; joint loss validation is narrow and not a fresh independent benchmark."
+  },
+  "predeclared_sources_and_gate": {
+    "purpose": "Rehearsal experiment from immutable native v2 after rejecting forgetting in v3; no pretrained assets.",
+    "adoption_gate": {
+      "quality_v1_minimum": 3,
+      "quality_v2_minimum": "at least fixed native v2 baseline, not inspected for training targets",
+      "old_independent_minimum": 0,
+      "prior_instruction_loss_max": 3.1355136608651284,
+      "story_loss_max": 3.2197603166103366,
+      "native_greeting_probe": "coherent hi + how are you"
+    },
+    "data": {
+      "training_records": 4041,
+      "validation_records": 344
+    },
+    "source_sha256": {
+      "scripts/build-rehearsal.py": "4fa39745aa4304e7601a6f7d5a5e39003052af13fe7f210f27bba70b70f3476e",
+      "configs/assistant-v4.json": "55d3b924291f3aab00577b1b7e587ed9562becf69b8adf86166ab3bb37b71959",
+      "src/silivra/finetune.py": "4e5f433e8045b458034061dcbb3e5f30c2c5410d389905a79fa4f5f48bb97d0e",
+      "src/silivra/model.py": "f182e85613596a8c1212dcba4cf6f241bef700be354bd145bd95e9100af80f8e",
+      "data/assistant-v4/manifest.json": "81c0a15972335b23ed84b25ca48ba30f660a6fd83b50fe652177e81b10c81eca",
+      "examples/evaluations/assistant.jsonl": "1b1fc9e32d9eb13fd79805365c3257118d4628c919785f466ecf92963f2fbef2",
+      "examples/evaluations/assistant-v2.jsonl": "ace574a42db5a6161961df6e6863899b0179c43d847fbbedb6e2e57c40d7f0dc",
+      "examples/evaluations/quality-v1.jsonl": "147fbc15e004b3cc42680ece6129068bcfb86c40ef28d9973e1008166dd9b367",
+      "examples/evaluations/quality-v2.jsonl": "ef817d0dc7a0611ae9ea25443b78da619b24e7ba38c54b0ab77dd3dbbc186428"
+    }
+  },
+  "interruption": {
+    "last_complete_step": 400,
+    "unsaved_log_reached_step": 700,
+    "resume_completed_step": 2000,
+    "boundary": "Original metrics preserved; replayed unsaved updates can differ by floating-point rounding. Saved cumulative counters/time exclude lost unsaved updates."
+  }
+}

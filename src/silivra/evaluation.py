@@ -4,9 +4,30 @@ from collections import Counter
 import hashlib
 import json
 from pathlib import Path
+import unicodedata
 
 from silivra.agent import POLICY, parse_action
 from silivra.instructions import validate_record
+
+
+def _normalized_final(text: str) -> str:
+    """Whole-answer matching only; never infer meaning from keyword presence."""
+    return " ".join(unicodedata.normalize("NFC", text).casefold().split())
+
+
+def grade_action(action: dict, case: dict) -> bool:
+    """Keep exact grading by default, with explicit finite prose alternatives.
+
+    This is not a semantic judge. A case may opt into case/whitespace-insensitive
+    whole-answer alternatives for short conversational prose; code, tool calls,
+    and literal instruction tasks continue to use exact parsed actions.
+    """
+    if "accepted_final" not in case:
+        return action == case["expected"]
+    if set(action) != {"final"}:
+        return False
+    candidates = [case["expected"]["final"], *case["accepted_final"]]
+    return _normalized_final(action["final"]) in {_normalized_final(text) for text in candidates}
 
 
 def case_messages(case: dict) -> list[dict]:
@@ -22,7 +43,7 @@ def validate_cases(cases: list[dict]) -> None:
     ids = set()
     for case in cases:
         common = {"id", "category", "tools", "expected"}
-        if (not isinstance(case, dict) or set(case) not in (common | {"prompt"}, common | {"messages"})
+        if (not isinstance(case, dict) or set(case) - {"accepted_final"} not in (common | {"prompt"}, common | {"messages"})
                 or not all(isinstance(case[k], str) and case[k].strip() for k in ("id", "category"))
                 or not isinstance(case["tools"], list) or not isinstance(case["expected"], dict)):
             raise ValueError("Invalid evaluation case fields.")
@@ -53,6 +74,15 @@ def validate_cases(cases: list[dict]) -> None:
             parse_action(json.dumps({"tool": function["name"], "arguments": {}}))
             names.add(function["name"])
         parse_action(json.dumps(case["expected"]))
+        if "accepted_final" in case:
+            alternatives = case["accepted_final"]
+            if (set(case["expected"]) != {"final"} or not isinstance(alternatives, list)
+                    or not 1 <= len(alternatives) <= 32
+                    or any(not isinstance(text, str) or not text.strip() or len(text) > 64_000
+                           for text in alternatives)):
+                raise ValueError("accepted_final needs 1–32 nonempty final-answer alternatives.")
+            for text in alternatives:
+                parse_action(json.dumps({"final": text}))
         if "tool" in case["expected"] and case["expected"]["tool"] not in names:
             raise ValueError("Expected tool action is not present in the case schemas.")
 
@@ -77,7 +107,7 @@ def evaluate_assistant(backend, suite: Path) -> dict:
                 outcome["raw_truncated"] = True
             action = parse_action(raw)
             outcome["valid_action"] = True
-            outcome["passed"] = action == case["expected"]
+            outcome["passed"] = grade_action(action, case)
         except (ValueError, RuntimeError) as error:
             outcome["error"] = str(error)
         results.append(outcome)
@@ -91,5 +121,7 @@ def evaluate_assistant(backend, suite: Path) -> dict:
                                        "valid_actions": sum(item["valid_action"] for item in results if item["category"] == category),
                                        "passed": sum(item["passed"] for item in results if item["category"] == category)}
                            for category, count in sorted(categories.items())},
-            "grading": "exact parsed JSON action; original small diagnostic suite, not a general intelligence benchmark",
+            "grading": ("exact parsed JSON action; explicit accepted_final cases use finite whole-answer "
+                        "alternatives with Unicode case/whitespace normalization; "
+                        "original small diagnostic suite, not a general intelligence benchmark"),
             "tools_executed": False, "results": results}

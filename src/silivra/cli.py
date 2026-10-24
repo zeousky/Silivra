@@ -7,7 +7,7 @@ from pathlib import Path
 
 
 def parser():
-    root = argparse.ArgumentParser(description="Silivra: from-scratch AI training and a local assistant runtime.")
+    root = argparse.ArgumentParser(description="Silivra: a local assistant with explicit model selection and original AI training.")
     from silivra import __version__
     root.add_argument("--version", action="version", version=f"Silivra {__version__}")
     root.add_argument("--workspace", dest="startup_workspace", type=Path, default=Path.cwd(), help="Workspace for the interactive terminal")
@@ -73,15 +73,24 @@ def _assistant_parsers(sub):
     tool.add_argument("--arguments", default="{}", help="One JSON object")
     workspace(tool, permissions=True)
 
-    chat = sub.add_parser("chat", help="Experimental own-checkpoint assistant with bounded JSON tool actions")
+    setup = sub.add_parser("setup-assistant", help="Download a pinned local model profile and optionally select it for chat",
+                           description="Set up a separate local pretrained model. Selects calculate when the saved tool selection is empty; preserves custom selections. Use --no-select to prepare a trial without changing chat preferences.")
+    setup.add_argument("--profile", choices=("qwen3-8b", "qwen3.5-9b"), default="qwen3-8b",
+                       help="Pinned model profile (default: qwen3-8b)")
+    setup.add_argument("--output", type=Path, help="Separate model directory (default: the selected profile's run directory under WORKSPACE)")
+    setup.add_argument("--no-select", action="store_true", help="Download and verify only; leave saved model and tool preferences untouched")
+    workspace(setup)
+    setup.add_argument("--user", default="local", help="Local user scope label")
+
+    chat = sub.add_parser("chat", help="Local assistant using the selected model and bounded JSON tool actions")
     chat.add_argument("prompt", nargs="?", help="Omit for an interactive session; /exit quits and /new starts a session")
     chat.add_argument("--run", type=Path, default=None, help="Run/checkpoint; interactive mode also remembers /model")
     chat.add_argument("--which", choices=("latest", "best"), default=None)
     chat.add_argument("--session", help="Resume a session in this user/project scope")
-    chat.add_argument("--tool", dest="selected_tools", action="append", help="Expose selected enabled tools; repeat as needed (default: none)")
+    chat.add_argument("--tool", dest="selected_tools", action="append", help="Expose selected tools; repeat (one-shot default: calculate for pretrained, none for original; interactive: saved selection)")
     chat.add_argument("--all-tools", action="store_true", help="Expose every enabled tool; needs a sufficiently long-context checkpoint")
-    chat.add_argument("--no-tools", action="store_true")
-    chat.add_argument("--max-new-tokens", type=int, help="Output reservation (interactive: saved preference; one-shot default: 96)")
+    chat.add_argument("--no-tools", action="store_true", help="Expose no model tools, including the pretrained calculator default")
+    chat.add_argument("--max-new-tokens", type=int, help="Output reservation (default: 768 pretrained / 96 original; interactive preferences apply)")
     chat.add_argument("--max-steps", type=int, help="Turn action limit (interactive: saved preference; one-shot default: 6)")
     chat.add_argument("--max-seconds", type=float, help="Turn time budget (interactive: saved preference; one-shot default: 120)")
     chat.add_argument("--history-messages", type=int, help="Previous messages (interactive: saved preference; one-shot default: 8)")
@@ -139,6 +148,31 @@ def _assistant_parsers(sub):
 
 
 def _assistant_command(args):
+    if args.command == "setup-assistant":
+        from dataclasses import replace
+        from silivra.agent import project_scope
+        from silivra.provision import model_profile, setup_pretrained
+        from silivra.settings import load_settings, save_settings
+        workspace = args.workspace.expanduser().resolve(strict=True)
+        output = args.output or Path(model_profile(args.profile)["run"])
+        output = output.expanduser()
+        # The provisioner checks links before touching the destination. Do not
+        # resolve them away here and bypass that check.
+        output = (workspace / output).absolute() if not output.is_absolute() else output.absolute()
+        if not args.no_select:
+            scope = project_scope(workspace, args.user)
+            settings_path = workspace / ".silivra" / "config.json"
+            settings = load_settings(settings_path, scope)
+        result = setup_pretrained(output, profile=args.profile)
+        if args.no_select:
+            return {**result, "prepared_model": str(output), "selected": False,
+                    "inference": "local; original Silivra checkpoints preserved"}
+        selected_tools = ["calculate"] if settings.selected_tools == [] else settings.selected_tools
+        save_settings(settings_path, scope,
+                      replace(settings, model_run=str(output), which="best", max_new_tokens=768,
+                              selected_tools=selected_tools))
+        return {**result, "selected": True, "selected_model": str(output), "selected_tools": selected_tools,
+                "inference": "local; original Silivra checkpoints preserved"}
     if args.command in ("tools", "tool"):
         from silivra.tools import ToolRegistry
         registry = ToolRegistry(args.workspace, allow_write=args.allow_write,
@@ -196,13 +230,13 @@ def _assistant_command(args):
                     json.dump(store.export(scope), output, indent=2, ensure_ascii=False)
                     output.write("\n")
                 return {"export": str(args.output)}
-            from silivra.agent import Agent, AgentConfig, MLXBackend
+            from silivra.agent import Agent, AgentConfig
             from silivra.tools import ToolRegistry
             if sum((bool(args.no_tools), bool(args.selected_tools), bool(args.all_tools))) > 1:
                 raise ValueError("Choose --no-tools, --all-tools, or --tool selections.")
             tools = ToolRegistry(args.workspace, allow_write=args.allow_write,
                                  allow_exec=args.allow_exec, allow_network=args.allow_network)
-            from silivra.terminal import default_model_run
+            from silivra.terminal import _backend, default_model_run, default_output_tokens, model_description
             if args.prompt is None and not sys.stdin.isatty():
                 args.prompt = sys.stdin.read(32_001)
             if args.prompt is not None and (not args.prompt.strip() or len(args.prompt) > 32_000):
@@ -211,12 +245,32 @@ def _assistant_command(args):
                                  max_seconds=args.max_seconds if args.max_seconds is not None else 120,
                                  history_messages=args.history_messages if args.history_messages is not None else 8,
                                  memory_chars=args.memory_chars if args.memory_chars is not None else 1500)
-            backend = MLXBackend(args.run or default_model_run(args.workspace), which=args.which or "best",
-                                 max_new_tokens=args.max_new_tokens if args.max_new_tokens is not None else 96)
+            run = args.run
+            if run is None:
+                from silivra.settings import load_settings
+                try:
+                    saved_run = load_settings(args.workspace / ".silivra" / "config.json", scope).model_run
+                except (OSError, ValueError) as error:
+                    saved_run = None
+                    print(f"Preferences could not be loaded: {error}", file=sys.stderr)
+                run = Path(saved_run).expanduser() if saved_run else default_model_run(args.workspace)
+                if not run.is_absolute():
+                    run = args.workspace / run
+            backend = _backend(run, which=args.which or "best",
+                               max_new_tokens=args.max_new_tokens if args.max_new_tokens is not None else default_output_tokens(run))
+            from silivra.pretrained import is_pretrained_run
+            if args.all_tools:
+                selected_tools = None
+            elif args.no_tools:
+                selected_tools = []
+            elif args.selected_tools is not None:
+                selected_tools = args.selected_tools
+            else:
+                selected_tools = ["calculate"] if is_pretrained_run(run) else []
             agent = Agent(backend, tools, store, scope,
                           config=config,
-                          tool_names=None if args.all_tools else (args.selected_tools or []))
-            print("Experimental local checkpoint: tool-following ability must be evaluated separately.", file=sys.stderr)
+                          tool_names=selected_tools)
+            print(model_description(run) + "; tool permissions remain explicit.", file=sys.stderr)
             session = args.session
             while True:
                 try:
@@ -311,7 +365,7 @@ def main():
         elif args.command == "export":
             from silivra.export import export_model
             result = export_model(args.run, args.output, which=args.which, archive=args.archive)
-        elif args.command in ("chat", "tools", "tool", "memory", "prepare-instructions", "finetune", "evaluate-assistant"):
+        elif args.command in ("setup-assistant", "chat", "tools", "tool", "memory", "prepare-instructions", "finetune", "evaluate-assistant"):
             result = _assistant_command(args)
             if result is None:
                 return

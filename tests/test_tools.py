@@ -28,7 +28,7 @@ class ToolTests(unittest.TestCase):
 
     def test_only_explicitly_enabled_tools_are_advertised_and_executed(self):
         names = {item["function"]["name"] for item in self.tools.schemas()}
-        self.assertEqual(names, {"list_files", "read_file", "search_files"})
+        self.assertEqual(names, {"calculate", "list_files", "read_file", "search_files"})
         for name, args in (("write_file", {"path": "new.py", "content": "x"}),
                            ("run_command", {"argv": [sys.executable]}),
                            ("web_search", {"query": "python"}),
@@ -37,7 +37,7 @@ class ToolTests(unittest.TestCase):
                 result = self.tools.execute(name, args)
                 self.assertEqual(result["error"]["code"], "permission_denied")
         enabled = ToolRegistry(self.root, allow_write=True, allow_exec=True, allow_network=True)
-        self.assertEqual(len(enabled.schemas()), 7)
+        self.assertEqual(len(enabled.schemas()), 8)
         schemas = enabled.schemas()
         schemas[0]["function"]["parameters"]["properties"].clear()
         self.assertTrue(enabled.schemas()[0]["function"]["parameters"]["properties"])
@@ -50,6 +50,23 @@ class ToolTests(unittest.TestCase):
                            ("search_files", {"query": ""})):
             with self.subTest(name=name, args=args):
                 self.assertFalse(self.tools.execute(name, args)["ok"])
+
+    def test_calculate_is_pure_available_and_semantically_validated(self):
+        result = self.success("calculate", {"expression": "0.1 + 0.2"})
+        self.assertEqual(result["result"], "0.3")
+        self.assertFalse(result["rounded"])
+        schema = next(item["function"] for item in self.tools.schemas()
+                      if item["function"]["name"] == "calculate")
+        self.assertEqual(schema["parameters"]["properties"]["expression"]["maxLength"], 512)
+        for arguments in ({}, {"expression": 1}, {"expression": " "},
+                          {"expression": "1" * 513}, {"expression": "1", "path": "app.py"}):
+            with self.subTest(arguments=arguments):
+                self.assertFalse(self.tools.execute("calculate", arguments)["ok"])
+        self.assertEqual(self.tools.execute("calculate", {"expression": "1 / 0"})["error"]["code"],
+                         "division_by_zero")
+        self.assertEqual(self.tools.execute("calculate", {"expression": "open('app.py')"})["error"]["code"],
+                         "invalid_expression")
+        self.assertEqual((self.root / "app.py").read_text(), "print('Hello')\n# second line\n")
 
     def test_read_pagination_hash_and_literal_search(self):
         result = self.success("read_file", {"path": "app.py", "start_line": 2, "max_lines": 1})

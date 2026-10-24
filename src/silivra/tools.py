@@ -19,6 +19,7 @@ import subprocess
 import time
 import uuid
 
+from .arithmetic import CalculationError, calculate
 from .web import WebError, web_fetch, web_search
 
 
@@ -73,6 +74,8 @@ def _schema(name, description, properties, required=()):
 
 _PATH = {"type": "string", "description": "Relative path inside the workspace; symlinks and sensitive paths are blocked."}
 _SCHEMAS = [
+    _schema("calculate", "Evaluate pure bounded arithmetic with + - * / // %, unary signs and parentheses. Exact rational operations; decimal output at 50 significant digits reports whether rounded. No code, names, powers or network.", {
+        "expression": {"type": "string", "minLength": 1, "maxLength": 512}}, ("expression",)),
     _schema("list_files", "List workspace files while excluding secrets, dependencies, and symlinks.", {
         "path": _PATH, "recursive": {"type": "boolean"},
         "limit": {"type": "integer", "minimum": 1, "maximum": 1000}}),
@@ -112,7 +115,7 @@ class ToolRegistry:
 
     def schemas(self) -> list[dict]:
         import copy
-        names = {"list_files", "read_file", "search_files"}
+        names = {"calculate", "list_files", "read_file", "search_files"}
         if self.allow_write:
             names.add("write_file")
         if self.allow_exec:
@@ -150,6 +153,13 @@ class ToolRegistry:
         except (OSError, UnicodeError):
             # OS errors can include absolute paths, environment values, or user data.
             return {"ok": False, "error": {"code": "filesystem_error", "message": "File or command could not be accessed safely."}}
+
+    def _calculate(self, expression):
+        _string(expression, "expression", maximum=512)
+        try:
+            return calculate(expression)
+        except CalculationError as error:
+            raise ToolError(error.code, str(error)) from None
 
     def _parts(self, path: str, *, root=True) -> tuple[str, ...]:
         _string(path, "path")

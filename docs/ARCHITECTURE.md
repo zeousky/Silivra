@@ -4,6 +4,64 @@ Silivra is one AI project with two connected layers: an original language model
 and an assistant system that can give that model access to tools and memory.
 Improving the system and training better weights are separate engineering tasks.
 
+The optional practical assistant uses an explicitly identified external model:
+Qwen3-8B (8,190,735,360 parameters), quantized to 4 bits by MLX Community.
+It does not alter the original Silivra model/tokenizer lineage. The native training,
+checkpoint, loss evaluation and export code remain specific to that original lineage.
+External inference results must be attributed separately.
+
+## External local assistant backend
+
+`provision.py` implements the explicit `setup-assistant` download. A fixed allowlist
+pins the upstream model/tokenizer revision, original model revision, license, file
+sizes and SHA-256 digests. Setup bounds total bytes and session time, resumes partial
+transfers, preserves unrelated existing files, and writes the selection marker only
+after all artifacts verify. Model files stay under ignored `runs/`.
+
+`pretrained.py` implements the same `generate`/`context_usage` backend contract using
+MLX-LM. It requires local verified files, disables remote code, and never falls back
+to downloading or hosted inference. The original `MLXBackend` remains selectable.
+The Qwen chat template is used with thinking disabled and an 8,192-token runtime
+limit. Tool schemas remain inside Silivra's strict JSON protocol; tool observations
+are quoted as untrusted data rather than translated into permission grants.
+Accounting and generation use the same chat-template tokens and reserve the complete
+output budget. Streaming retains cancellation, strict final parsing and capability
+checks. An 8 GiB MLX memory guideline is advisory; this is not an OS memory cap.
+
+`structured.py` masks token scores through an Outlines-core ByteLevel automaton.
+Each generation gets fresh state while immutable vocabularies/compiled grammars
+are cached. The grammar permits exactly one string-final or an enabled tool action,
+with required fields, declared keys and argument types. Complete actions admit only
+EOS, including MLX-LM's one-token lookahead. Numeric ranges, string lengths/patterns,
+array counts, paths and permissions remain explicit runtime checks; deferred schema
+constraints are recorded rather than silently claimed as grammar guarantees.
+The full result still passes the original strict parser. A token-limited incomplete
+action stops as `output_budget`; its draft is rejected and no partial tool runs.
+
+`prompt_cache.py` owns one backend-local exact input prefix, at most 1,024 tokens
+and 256 MiB of actual KV allocations. It verifies all layer offsets and actual trim
+results, accounting for MLX-LM's decoding lookahead. Preparation consumes stored
+state before inference; only a validated complete action can commit a new input
+prefix. Cancelled, malformed and output-limited generations cannot commit. Generated
+answers and lookahead are trimmed away, and at least one prompt token is always
+recomputed. Admission counts the full request, policy and evidence even on a cache
+hit. Changed tool/user content reuses only exactly matching tokens; no KV state is
+persisted or treated as durable memory.
+
+`arithmetic.py` provides a stateless `calculate` tool. It interprets numeric AST
+nodes with exact fractions and bounded decimal rendering; no Python code is
+compiled or executed. Only literals, parentheses, unary signs and `+ - * / // %`
+are supported. Expression length, AST size, nesting, operation count and rational
+size/magnitude are bounded. Fifty-digit decimal results identify rounding explicitly.
+The tool grants no filesystem, network or command capability. It is selected by
+default for pretrained one-shot chat and an empty-selection assistant setup;
+explicit `--no-tools` and saved interactive selections retain their meaning.
+
+The terminal identifies the external model. A successful setup selects it in the
+current user/project's private preferences; absent an explicit selection, a complete
+installed 8B run is preferred over the original research checkpoint. No model is
+downloaded on ordinary chat startup. See [provenance and measurements](PRETRAINED_ASSISTANT.md).
+
 ## Model and learning
 
 `model.py` implements the decoder in MLX; `data.py` prepares reproducible text
@@ -50,6 +108,14 @@ it reports an error instead of dropping policy or the latest request. A 512-toke
 checkpoint needs focused tool selections and short conversations. Longer context
 requires training and evaluation; changing a configuration alone is insufficient.
 
+Completed conversation turns retain the user/assistant/tool roles used in training.
+Replay validates each assistant action and its matching observation, never adds a
+system role, and never executes a historical tool request. Interrupted, malformed,
+and partial turns at the edge of a transcript window are omitted. Context trimming
+removes whole older turns, preserving the relationship between tool actions and
+their results. Tool observations remain escaped, untrusted data; historical actions
+cannot change the current permission grants or available tools.
+
 Malformed outputs stop the turn visibly. There is no hidden hosted-model fallback,
 automatic JSON-to-shell conversion, or heuristic that pretends the base model
 has learned tool selection. The direct `tool` CLI works independently of that skill.
@@ -65,7 +131,7 @@ the runtime and permission checks. Permission grants last only for the process.
 Native generation supports Unicode-safe text deltas and cooperative cancellation
 before prefill and between tokens. Final-answer text stays visibly provisional until
 the entire strict JSON action validates. The runtime checks cancellation and turn
-budgets before tool effects. It can trim older optional history and lower-ranked
+budgets before tool effects. It can trim complete older optional turns and lower-ranked
 memory to fit actual tokenizer limits, and reports those omissions. It retains the
 system policy, current request, tool definitions and current-turn tool evidence;
 if those cannot fit, it stops with a context-budget error.
@@ -78,7 +144,7 @@ describes the supported controls and operating boundaries.
 ## Tools and external data
 
 `tools.py` exposes typed schemas and validates arguments again at execution.
-Read/list/literal-search tools are enabled by default. Writes, command execution,
+Pure arithmetic and read/list/literal-search tools are available by default. Writes, command execution,
 and network calls each require an explicit startup flag. File operations walk
 directory descriptors, reject symlinks and hardlinks, block sensitive paths,
 and restrict reads to bounded UTF-8 files inside the workspace. Replacements

@@ -1,0 +1,308 @@
+{
+  "format_version": 1,
+  "experiment": "focused assistant v3; rejected for overall regression",
+  "date": "2026-10-22",
+  "run": {
+    "base_checkpoint": {
+      "finetuning_step": 8000,
+      "parent": {
+        "pretraining_step": 2500,
+        "state_sha256": "102a32044eafc06dabd8f7b482baabf80089ea5d10eb5111695419be281e1a51",
+        "tokenizer_sha256": "1640a5301686bd4970d6bd5c1b27926f71227bfd11b9e2d59375cbe33c035269",
+        "weights_sha256": "633efc5b513b7de90de6d1e55d37f45948852d1c19728078a54f7502a6a7cf40"
+      },
+      "state_sha256": "bbb4d01137ac5354648c583afb90394414f14c01a95152059d971e223690d93e",
+      "tokenizer_sha256": "1640a5301686bd4970d6bd5c1b27926f71227bfd11b9e2d59375cbe33c035269",
+      "training_mode": "instruction_sft",
+      "weights_sha256": "efb8d54eb4f0bda52567e50e41398e9d7793a7ae3c6e2d650bf3770321187a96"
+    },
+    "baseline_validation_loss": 1.1025407605581155,
+    "data_manifest_sha256": "00bc7ed0a340aa167676d89c171689299b6899a999784f194cc19e2a44a3e526",
+    "format_version": 1,
+    "hardware": {
+      "architecture": "arm64",
+      "gpu": {
+        "architecture": "applegpu_g16g",
+        "device_name": "Apple M4",
+        "max_buffer_length": 9534832640,
+        "max_recommended_working_set_size": 12713115648,
+        "memory_size": 17179869184,
+        "resource_limit": 499000
+      },
+      "macos": "27.0.1",
+      "metal_available": true,
+      "mlx": "0.32.4",
+      "platform": "darwin",
+      "python": "3.12.14",
+      "unified_memory_bytes": 17179869184
+    },
+    "model_config": {
+      "dim": 384,
+      "hidden_dim": 1024,
+      "max_seq_len": 1024,
+      "n_heads": 6,
+      "n_kv_heads": 2,
+      "n_layers": 8,
+      "rope_theta": 10000.0,
+      "vocab_size": 4096
+    },
+    "prompt_format": "silivra-role-json-v1",
+    "training_config": {
+      "batch_size": 8,
+      "bucket_size": 64,
+      "context_length": 1024,
+      "eval_batches": 16,
+      "eval_every": 400,
+      "learning_rate": 0.00025,
+      "log_every": 100,
+      "memory_gib": 6.0,
+      "min_lr_ratio": 0.2,
+      "save_every": 400,
+      "seed": 44,
+      "steps": 2000,
+      "warmup_steps": 80,
+      "weight_decay": 0.01
+    },
+    "training_mode": "instruction_sft"
+  },
+  "summary": {
+    "best_validation_loss": 0.9138437835204655,
+    "checkpoint": "checkpoints/step-0002000",
+    "input_tokens_seen": 3096872,
+    "mlx_active_gib": 0.15829763934016228,
+    "mlx_peak_gib": 1.4699706137180328,
+    "process_peak_rss_gib": 0.2450714111328125,
+    "session_seconds": 278.9951038750005,
+    "status": "completed",
+    "step": 2000,
+    "supervised_tokens_seen": 220648,
+    "tokens_seen": 220648,
+    "total_training_seconds": 278.99510441599705,
+    "training_mode": "instruction_sft",
+    "validation_loss": 0.9927933335776242
+  },
+  "selected_state": {
+    "base_checkpoint": {
+      "finetuning_step": 8000,
+      "parent": {
+        "pretraining_step": 2500,
+        "state_sha256": "102a32044eafc06dabd8f7b482baabf80089ea5d10eb5111695419be281e1a51",
+        "tokenizer_sha256": "1640a5301686bd4970d6bd5c1b27926f71227bfd11b9e2d59375cbe33c035269",
+        "weights_sha256": "633efc5b513b7de90de6d1e55d37f45948852d1c19728078a54f7502a6a7cf40"
+      },
+      "state_sha256": "bbb4d01137ac5354648c583afb90394414f14c01a95152059d971e223690d93e",
+      "tokenizer_sha256": "1640a5301686bd4970d6bd5c1b27926f71227bfd11b9e2d59375cbe33c035269",
+      "training_mode": "instruction_sft",
+      "weights_sha256": "efb8d54eb4f0bda52567e50e41398e9d7793a7ae3c6e2d650bf3770321187a96"
+    },
+    "best_validation_loss": 0.9138437835204655,
+    "data_manifest_sha256": "00bc7ed0a340aa167676d89c171689299b6899a999784f194cc19e2a44a3e526",
+    "format_version": 2,
+    "initialization": "verified local Silivra checkpoint",
+    "input_tokens_seen": 1858265,
+    "loss": "assistant action and EOS tokens only; context and padding masked",
+    "model_config": {
+      "dim": 384,
+      "hidden_dim": 1024,
+      "max_seq_len": 1024,
+      "n_heads": 6,
+      "n_kv_heads": 2,
+      "n_layers": 8,
+      "rope_theta": 10000.0,
+      "vocab_size": 4096
+    },
+    "numpy_rng": {
+      "bit_generator": "PCG64",
+      "has_uint32": 0,
+      "state": {
+        "inc": 762441968459946881146668352658223677,
+        "state": 77143175882001856043965796135002309297
+      },
+      "uinteger": 4142917967
+    },
+    "prompt_format": "silivra-role-json-v1",
+    "step": 1200,
+    "supervised_tokens_seen": 132322,
+    "token_count_basis": "tokens_seen = sampled assistant-action and EOS labels; input_tokens_seen = all nonpadding next-token labels",
+    "tokens_seen": 132322,
+    "training_config": {
+      "batch_size": 8,
+      "bucket_size": 64,
+      "context_length": 1024,
+      "eval_batches": 16,
+      "eval_every": 400,
+      "learning_rate": 0.00025,
+      "log_every": 100,
+      "memory_gib": 6.0,
+      "min_lr_ratio": 0.2,
+      "save_every": 400,
+      "seed": 44,
+      "steps": 2000,
+      "warmup_steps": 80,
+      "weight_decay": 0.01
+    },
+    "training_mode": "instruction_sft",
+    "training_seconds": 150.33227841599728,
+    "validation_loss": 0.9138437835204655
+  },
+  "latest_state": {
+    "base_checkpoint": {
+      "finetuning_step": 8000,
+      "parent": {
+        "pretraining_step": 2500,
+        "state_sha256": "102a32044eafc06dabd8f7b482baabf80089ea5d10eb5111695419be281e1a51",
+        "tokenizer_sha256": "1640a5301686bd4970d6bd5c1b27926f71227bfd11b9e2d59375cbe33c035269",
+        "weights_sha256": "633efc5b513b7de90de6d1e55d37f45948852d1c19728078a54f7502a6a7cf40"
+      },
+      "state_sha256": "bbb4d01137ac5354648c583afb90394414f14c01a95152059d971e223690d93e",
+      "tokenizer_sha256": "1640a5301686bd4970d6bd5c1b27926f71227bfd11b9e2d59375cbe33c035269",
+      "training_mode": "instruction_sft",
+      "weights_sha256": "efb8d54eb4f0bda52567e50e41398e9d7793a7ae3c6e2d650bf3770321187a96"
+    },
+    "best_validation_loss": 0.9138437835204655,
+    "data_manifest_sha256": "00bc7ed0a340aa167676d89c171689299b6899a999784f194cc19e2a44a3e526",
+    "format_version": 2,
+    "initialization": "verified local Silivra checkpoint",
+    "input_tokens_seen": 3096872,
+    "loss": "assistant action and EOS tokens only; context and padding masked",
+    "model_config": {
+      "dim": 384,
+      "hidden_dim": 1024,
+      "max_seq_len": 1024,
+      "n_heads": 6,
+      "n_kv_heads": 2,
+      "n_layers": 8,
+      "rope_theta": 10000.0,
+      "vocab_size": 4096
+    },
+    "numpy_rng": {
+      "bit_generator": "PCG64",
+      "has_uint32": 0,
+      "state": {
+        "inc": 762441968459946881146668352658223677,
+        "state": 1914238772746175635485088167524996657
+      },
+      "uinteger": 113949933
+    },
+    "prompt_format": "silivra-role-json-v1",
+    "step": 2000,
+    "supervised_tokens_seen": 220648,
+    "token_count_basis": "tokens_seen = sampled assistant-action and EOS labels; input_tokens_seen = all nonpadding next-token labels",
+    "tokens_seen": 220648,
+    "training_config": {
+      "batch_size": 8,
+      "bucket_size": 64,
+      "context_length": 1024,
+      "eval_batches": 16,
+      "eval_every": 400,
+      "learning_rate": 0.00025,
+      "log_every": 100,
+      "memory_gib": 6.0,
+      "min_lr_ratio": 0.2,
+      "save_every": 400,
+      "seed": 44,
+      "steps": 2000,
+      "warmup_steps": 80,
+      "weight_decay": 0.01
+    },
+    "training_mode": "instruction_sft",
+    "training_seconds": 278.09238837500016,
+    "validation_loss": 0.9927933335776242
+  },
+  "curriculum": {
+    "schema_version": 1,
+    "kind": "silivra-focused-curriculum-v3",
+    "seed": 20261022,
+    "source": {
+      "name": "Silivra focused assistant curriculum v3 (Codex-authored)",
+      "author": "Silivra project with Codex; deterministic synthetic examples",
+      "license": "MIT",
+      "url": "https://github.com/zeousky/Silivra",
+      "revision": "curriculum-v3"
+    },
+    "generator_sha256": "1aa73f569817c736a5c0d296c6107b900be61c4bb0e17d1cec014a1666834814",
+    "prompt_exclusion_sources": [
+      {
+        "name": "quality-v1.jsonl",
+        "sha256": "147fbc15e004b3cc42680ece6129068bcfb86c40ef28d9973e1008166dd9b367",
+        "use": "user prompt exclusion only; expected answers not inspected"
+      }
+    ],
+    "tokenizer_sha256": "1640a5301686bd4970d6bd5c1b27926f71227bfd11b9e2d59375cbe33c035269",
+    "max_seq_len": 1024,
+    "splitting": "reserved digit pairs and disjoint copied words/names; conversation paraphrases held out",
+    "boundary": "synthetic narrow skills, shared templates; no general intelligence claim; no imported corpus or private chats",
+    "splits": {
+      "train": {
+        "sha256": "5ee5facd1bfb1aab7b0e1750ea08927291879f5b7bbf8b451cdfef34b05ddda4",
+        "records": 2041,
+        "families": {
+          "comparison": 340,
+          "python": 170,
+          "grounding": 400,
+          "addition": 425,
+          "conversation": 226,
+          "copy": 480
+        },
+        "supervised_tokens": 29308,
+        "max_tokens": 238
+      },
+      "valid": {
+        "sha256": "2c5bc3d5e81464d0fa55e92eeda3493b5f9a69eedf879e07958dc5819922e9af",
+        "records": 216,
+        "families": {
+          "grounding": 64,
+          "python": 15,
+          "copy": 64,
+          "addition": 30,
+          "comparison": 30,
+          "conversation": 13
+        },
+        "supervised_tokens": 2864,
+        "max_tokens": 236
+      }
+    }
+  },
+  "predeclared_sources": {
+    "purpose": "Bounded original-model-only focused assistant experiment; evaluation fixtures excluded by user-prefix check; no claim of general capability.",
+    "max_loop_minutes": 6,
+    "base_hashes": {
+      "state.json": "bbb4d01137ac5354648c583afb90394414f14c01a95152059d971e223690d93e",
+      "tokenizer.json": "1640a5301686bd4970d6bd5c1b27926f71227bfd11b9e2d59375cbe33c035269",
+      "model.safetensors": "efb8d54eb4f0bda52567e50e41398e9d7793a7ae3c6e2d650bf3770321187a96"
+    },
+    "sources": {
+      "scripts/build-curriculum-v3.py": "1aa73f569817c736a5c0d296c6107b900be61c4bb0e17d1cec014a1666834814",
+      "configs/assistant-v3.json": "1ee361eff2a39298179bac19942b9a86d9978f515a7b868f218f0fd4a5b30f74",
+      "src/silivra/finetune.py": "4e5f433e8045b458034061dcbb3e5f30c2c5410d389905a79fa4f5f48bb97d0e",
+      "src/silivra/model.py": "f182e85613596a8c1212dcba4cf6f241bef700be354bd145bd95e9100af80f8e",
+      "data/assistant-v3-filtered/manifest.json": "00bc7ed0a340aa167676d89c171689299b6899a999784f194cc19e2a44a3e526",
+      "examples/evaluations/assistant.jsonl": "1b1fc9e32d9eb13fd79805365c3257118d4628c919785f466ecf92963f2fbef2",
+      "examples/evaluations/assistant-v2.jsonl": "ace574a42db5a6161961df6e6863899b0179c43d847fbbedb6e2e57c40d7f0dc",
+      "examples/evaluations/quality-v1.jsonl": "147fbc15e004b3cc42680ece6129068bcfb86c40ef28d9973e1008166dd9b367"
+    },
+    "baseline_quality": {
+      "passed": 3,
+      "cases": 40,
+      "valid_actions": 35
+    },
+    "baseline_tests": 187
+  },
+  "dialogue_probe": {
+    "description": "Synthetic two-turn native Agent workflow probe; no private transcript ingestion or tools",
+    "checkpoint": "step-0001200",
+    "answers": [
+      {
+        "prompt": "hi",
+        "answer": "Hello! How can I help you?",
+        "status": "completed"
+      },
+      {
+        "prompt": "how are you",
+        "answer": "I'm here and ready to help. How can I help you?",
+        "status": "completed"
+      }
+    ]
+  },
+  "source_checkpoint_reverified": true
+}

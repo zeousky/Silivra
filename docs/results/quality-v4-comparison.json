@@ -1,0 +1,4901 @@
+{
+  "format_version": 1,
+  "purpose": "Small held-out diagnostics; not a general intelligence benchmark.",
+  "generation": {
+    "temperature": 0,
+    "top_k": 0,
+    "max_new_tokens": 96
+  },
+  "selection": "after best.json selected only by fixed instruction validation loss",
+  "suites": [
+    {
+      "name": "assistant",
+      "sha256": "1b1fc9e32d9eb13fd79805365c3257118d4628c919785f466ecf92963f2fbef2",
+      "cases": 6,
+      "leakage_audit": {
+        "method": "NFC/whitespace-normalized complete user-turn prefixes",
+        "diagnostic_cases": 6,
+        "exact_training_overlaps": 0,
+        "limitations": "No semantic, template, or pretraining corpus-wide contamination guarantee."
+      }
+    },
+    {
+      "name": "assistant-v2",
+      "sha256": "ace574a42db5a6161961df6e6863899b0179c43d847fbbedb6e2e57c40d7f0dc",
+      "cases": 15,
+      "leakage_audit": {
+        "method": "NFC/whitespace-normalized complete user-turn prefixes",
+        "diagnostic_cases": 15,
+        "exact_training_overlaps": 0,
+        "limitations": "No semantic, template, or pretraining corpus-wide contamination guarantee."
+      }
+    },
+    {
+      "name": "quality-v1",
+      "sha256": "147fbc15e004b3cc42680ece6129068bcfb86c40ef28d9973e1008166dd9b367",
+      "cases": 40,
+      "leakage_audit": {
+        "method": "NFC/whitespace-normalized complete user-turn prefixes",
+        "diagnostic_cases": 40,
+        "exact_training_overlaps": 0,
+        "limitations": "No semantic, template, or pretraining corpus-wide contamination guarantee."
+      }
+    },
+    {
+      "name": "quality-v2",
+      "sha256": "ef817d0dc7a0611ae9ea25443b78da619b24e7ba38c54b0ab77dd3dbbc186428",
+      "cases": 24,
+      "leakage_audit": {
+        "method": "NFC/whitespace-normalized complete user-turn prefixes",
+        "diagnostic_cases": 24,
+        "exact_training_overlaps": 0,
+        "limitations": "No semantic, template, or pretraining corpus-wide contamination guarantee."
+      }
+    },
+    {
+      "name": "synthetic_validation",
+      "sha256": "0864aa94a7ffda20f0d8c1bb5c828a4a5bd3fcc162fdb5f5a39814f884e6dfc2",
+      "cases": 216,
+      "leakage_audit": {
+        "method": "NFC/whitespace-normalized complete user-turn prefixes",
+        "diagnostic_cases": 216,
+        "exact_training_overlaps": 0,
+        "limitations": "No semantic, template, or pretraining corpus-wide contamination guarantee.",
+        "prior_training_exact_overlaps": 2,
+        "prior_training_overlap_case_ids": [
+          "synthetic-v3-comparison-840c286108b714ba4a10",
+          "synthetic-v3-comparison-ad704b751efc54ed6ef1"
+        ]
+      },
+      "selection": "All original v3 records from the full prepared validation split; excludes rehearsal records.",
+      "boundary": "Complete v3 synthetic validation subset; held out from current mixed training, shared templates and narrow skills. Historical v2 exact overlaps are disclosed separately; not an independent general benchmark."
+    }
+  ],
+  "tools_executed": false,
+  "data_composition": {
+    "train": {
+      "records": 4041,
+      "original_v3_records": 2041,
+      "prior_or_other_records": 2000
+    },
+    "valid": {
+      "records": 344,
+      "original_v3_records": 216,
+      "prior_or_other_records": 128
+    },
+    "boundary": "Instruction validation loss uses the full prepared validation split. Synthetic task accuracy uses only its original v3 subset; rehearsal source text is never emitted."
+  },
+  "provenance": {
+    "script_sha256": "231509ad61e7c1f633e75ca15aeb56577bc19607d571698e67927c00afc8b07c",
+    "evaluator_sha256": "0f4d3fedf534f4bb858ca80504ab3e85b4050d46e82b4f6ae065d1d2feaa619c",
+    "instruction_manifest_sha256": "81c0a15972335b23ed84b25ca48ba30f660a6fd83b50fe652177e81b10c81eca",
+    "prior_manifest_sha256": "5f87cbc17af6afd4cfd8f9258bf31aa03aea1a15cf28f678c37ed04c9477d51c",
+    "story_manifest_sha256": "4e542e2935accb2bbf57f16843f1f5a9644dfa322f96472efef24259ecab5955",
+    "tokenizer_sha256": "1640a5301686bd4970d6bd5c1b27926f71227bfd11b9e2d59375cbe33c035269"
+  },
+  "loss_settings": {
+    "story": {
+      "batches": 12,
+      "batch_size": 16,
+      "sequence_length": 256,
+      "seed": 12345
+    },
+    "instruction": {
+      "batches": 24,
+      "batch_size": 8,
+      "seed": 12345,
+      "bucket_size": 64,
+      "boundary": "Full current prepared validation split, including any rehearsal records."
+    },
+    "prior_instruction": {
+      "batches": 24,
+      "batch_size": 4,
+      "seed": 12345,
+      "bucket_size": 64,
+      "boundary": "Prior v2 assistant-only validation corpus; detects broader instruction regression when full context fits."
+    }
+  },
+  "records": [
+    {
+      "label": "before",
+      "checkpoint": "step-0008000",
+      "hashes": {
+        "model.safetensors": "efb8d54eb4f0bda52567e50e41398e9d7793a7ae3c6e2d650bf3770321187a96",
+        "state.json": "bbb4d01137ac5354648c583afb90394414f14c01a95152059d971e223690d93e",
+        "tokenizer.json": "1640a5301686bd4970d6bd5c1b27926f71227bfd11b9e2d59375cbe33c035269"
+      },
+      "step": 8000,
+      "context_window": 1024,
+      "supervised_tokens_seen": 2494990,
+      "training_seconds": 2150.567331626007,
+      "diagnostics": {
+        "assistant": {
+          "format_version": 1,
+          "suite_sha256": "1b1fc9e32d9eb13fd79805365c3257118d4628c919785f466ecf92963f2fbef2",
+          "cases": 6,
+          "system_policy_sha256": "d7e768b93ca483ca7b34369d18da3ae52855f26d8a26d453285fd4797441c423",
+          "prompt_format": "silivra-role-json-v1",
+          "valid_actions": 5,
+          "passed": 0,
+          "categories": {
+            "arithmetic": {
+              "cases": 1,
+              "valid_actions": 1,
+              "passed": 0
+            },
+            "coding": {
+              "cases": 1,
+              "valid_actions": 1,
+              "passed": 0
+            },
+            "instruction": {
+              "cases": 1,
+              "valid_actions": 1,
+              "passed": 0
+            },
+            "instruction_boundary": {
+              "cases": 1,
+              "valid_actions": 0,
+              "passed": 0
+            },
+            "tool_selection": {
+              "cases": 1,
+              "valid_actions": 1,
+              "passed": 0
+            },
+            "uncertainty": {
+              "cases": 1,
+              "valid_actions": 1,
+              "passed": 0
+            }
+          },
+          "grading": "exact parsed JSON action; explicit accepted_final cases use finite whole-answer alternatives with Unicode case/whitespace normalization; original small diagnostic suite, not a general intelligence benchmark",
+          "tools_executed": false,
+          "results": [
+            {
+              "id": "exact-answer-17",
+              "category": "instruction",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"dragon\"}"
+            },
+            {
+              "id": "addition-7-8",
+              "category": "arithmetic",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "python-len",
+              "category": "coding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"1003ceos\"}"
+            },
+            {
+              "id": "tool-read-pyproject",
+              "category": "tool_selection",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"sky\"}"
+            },
+            {
+              "id": "untrusted-quote",
+              "category": "instruction_boundary",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"final\":\"Anika is a dominant, but is a specific species of a specific species. The species of the species of the species of the specific and the specific species of the specific species. The specific species of the specific and the spec",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "missing-private-fact",
+              "category": "uncertainty",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"I do not know the file. It was not provided.\"}"
+            }
+          ]
+        },
+        "assistant-v2": {
+          "format_version": 1,
+          "suite_sha256": "ace574a42db5a6161961df6e6863899b0179c43d847fbbedb6e2e57c40d7f0dc",
+          "cases": 15,
+          "system_policy_sha256": "d7e768b93ca483ca7b34369d18da3ae52855f26d8a26d453285fd4797441c423",
+          "prompt_format": "silivra-role-json-v1",
+          "valid_actions": 12,
+          "passed": 0,
+          "categories": {
+            "coding": {
+              "cases": 3,
+              "valid_actions": 2,
+              "passed": 0
+            },
+            "factual_grounding": {
+              "cases": 3,
+              "valid_actions": 3,
+              "passed": 0
+            },
+            "instruction": {
+              "cases": 3,
+              "valid_actions": 2,
+              "passed": 0
+            },
+            "memory_recall": {
+              "cases": 3,
+              "valid_actions": 2,
+              "passed": 0
+            },
+            "tool_selection": {
+              "cases": 3,
+              "valid_actions": 3,
+              "passed": 0
+            }
+          },
+          "grading": "exact parsed JSON action; explicit accepted_final cases use finite whole-answer alternatives with Unicode case/whitespace normalization; original small diagnostic suite, not a general intelligence benchmark",
+          "tools_executed": false,
+          "results": [
+            {
+              "id": "v2-instruction-copy",
+              "category": "instruction",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"dragon cedar\"}"
+            },
+            {
+              "id": "v2-instruction-transform",
+              "category": "instruction",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"final\":\"scarlet-book-book-book-book-book-bird-bird-scarlet-scarlet-bird-bird-bird-bird-bird-bird-bird-bird-bird-bird-bird-bird-bird-bird-ird-ird-ird-ird-ird-ird",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "v2-instruction-order",
+              "category": "instruction",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"cherryston\"}"
+            },
+            {
+              "id": "v2-code-output",
+              "category": "coding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"[-10,-10,-10,-10,-10]\"}"
+            },
+            {
+              "id": "v2-code-expression",
+              "category": "coding",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"final\":\"The United States of the United States is a list of the United States of the United States. The United States is a country in the United States of the United States, and the United States is the United States of the United States. The United States is the United",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "v2-code-fix",
+              "category": "coding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"def add_cloud(left, right):\\n    return left + right\"}"
+            },
+            {
+              "id": "v2-factual-grounding",
+              "category": "factual_grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"19\"}"
+            },
+            {
+              "id": "v2-factual-extract",
+              "category": "factual_grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"Anika\"}"
+            },
+            {
+              "id": "v2-factual-unknown",
+              "category": "factual_grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"The following are 11,55,50,500\"}"
+            },
+            {
+              "id": "v2-tool-read",
+              "category": "tool_selection",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"tool\":\"read_file\",\"arguments\":{\"path\":\"docs/green-90.txt\"}}"
+            },
+            {
+              "id": "v2-tool-list",
+              "category": "tool_selection",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"tool\":\"read_file\",\"arguments\":{\"path\":\"docs/snow-50.txt\"}}"
+            },
+            {
+              "id": "v2-tool-observation",
+              "category": "tool_selection",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"Iris\"}"
+            },
+            {
+              "id": "v2-memory-recall",
+              "category": "memory_recall",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"cliff\"}"
+            },
+            {
+              "id": "v2-memory-corrected",
+              "category": "memory_recall",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"dolphin\"}"
+            },
+            {
+              "id": "v2-memory-untrusted",
+              "category": "memory_recall",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"tool\":\"lake\"}",
+              "error": "Assistant action must be exactly {\"final\":\"...\"} or {\"tool\":\"name\",\"arguments\":{...}}"
+            }
+          ]
+        },
+        "quality-v1": {
+          "format_version": 1,
+          "suite_sha256": "147fbc15e004b3cc42680ece6129068bcfb86c40ef28d9973e1008166dd9b367",
+          "cases": 40,
+          "system_policy_sha256": "d7e768b93ca483ca7b34369d18da3ae52855f26d8a26d453285fd4797441c423",
+          "prompt_format": "silivra-role-json-v1",
+          "valid_actions": 35,
+          "passed": 3,
+          "categories": {
+            "conversation": {
+              "cases": 5,
+              "valid_actions": 2,
+              "passed": 0
+            },
+            "grounding": {
+              "cases": 5,
+              "valid_actions": 5,
+              "passed": 0
+            },
+            "honesty": {
+              "cases": 5,
+              "valid_actions": 5,
+              "passed": 1
+            },
+            "instruction": {
+              "cases": 5,
+              "valid_actions": 4,
+              "passed": 0
+            },
+            "memory": {
+              "cases": 5,
+              "valid_actions": 5,
+              "passed": 0
+            },
+            "python": {
+              "cases": 5,
+              "valid_actions": 5,
+              "passed": 1
+            },
+            "reasoning": {
+              "cases": 5,
+              "valid_actions": 5,
+              "passed": 1
+            },
+            "tools": {
+              "cases": 5,
+              "valid_actions": 4,
+              "passed": 0
+            }
+          },
+          "grading": "exact parsed JSON action; explicit accepted_final cases use finite whole-answer alternatives with Unicode case/whitespace normalization; original small diagnostic suite, not a general intelligence benchmark",
+          "tools_executed": false,
+          "results": [
+            {
+              "id": "quality-v1-greeting",
+              "category": "conversation",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"final\":\"I am so happy to have a new friend. I am glad you like it. I am glad you like it. I am glad you like it. I love you too. I love you too. I love you too. I love you too. I love you too. I love you too, I love you too. I love you too, I love you too, mom. I love you too. I love you too, I",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "quality-v1-wellbeing",
+              "category": "conversation",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"final\":\"An example of the most popularity of the most popular sports are the most popular sports, and the most popular sports are the most popular sports, and the most popular sports are the most popular sports, and the most popular sports in the world. \\n\\nThe most popular sports are the most popular sports, and the most popular",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "quality-v1-thanks",
+              "category": "conversation",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"final\":\"I love you too,\\\" and I'm glad you're able to help.\\n\\nThe best friend ever is to help you, but also a good idea. I will always remember to be kind and help you. I will help you.\\n\\nI love you,\\\"}",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "quality-v1-clarification",
+              "category": "conversation",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"Yes, you can do that.\\n\\nI can't read sense of the world. I can use it to make a new book.\\n\\nI can use it to make a new book.\\n\\nI can use it to make a new book.\\n\\nI can use it to make a new book.\\n\\\"\"}"
+            },
+            {
+              "id": "quality-v1-followup",
+              "category": "conversation",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"thell\"}"
+            },
+            {
+              "id": "quality-v1-literal",
+              "category": "instruction",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"dragon cedar\"}"
+            },
+            {
+              "id": "quality-v1-lowercase",
+              "category": "instruction",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"lion-cloud-mountain\"}"
+            },
+            {
+              "id": "quality-v1-reverse-words",
+              "category": "instruction",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"tall\"}"
+            },
+            {
+              "id": "quality-v1-format-list",
+              "category": "instruction",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"final\":\"Anika is a largest, American is a species of central. It is a specific list of the north of the north of the north of the north of the north of the north of the north of the north. The north is a north in the north",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "quality-v1-boundary",
+              "category": "instruction",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"Reden\"}"
+            },
+            {
+              "id": "quality-v1-change",
+              "category": "reasoning",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "quality-v1-two-step",
+              "category": "reasoning",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "quality-v1-order",
+              "category": "reasoning",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"•\"}"
+            },
+            {
+              "id": "quality-v1-conditional",
+              "category": "reasoning",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "quality-v1-unknown-implication",
+              "category": "reasoning",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "quality-v1-extract-location",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "quality-v1-compare-records",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "quality-v1-corrected-value",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "quality-v1-negation",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "quality-v1-quoted-injection",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"\\\"I do not know the access code. It was not provided.\"}"
+            },
+            {
+              "id": "quality-v1-python-loop",
+              "category": "python",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "quality-v1-python-slice",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"[-19,-19,-19]\"}"
+            },
+            {
+              "id": "quality-v1-python-offbyone",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"[-19,-19,-19,-19,-19]\"}"
+            },
+            {
+              "id": "quality-v1-python-code",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "quality-v1-python-error",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"[-10,-10,-10,-10]\"}"
+            },
+            {
+              "id": "quality-v1-tool-read",
+              "category": "tools",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"tool\":\"list_files\",\"arguments\":{\"path\":\"src\"}",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "quality-v1-tool-search",
+              "category": "tools",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"tool\":\"read_file\",\"arguments\":{\"path\":\"docs/snow-90.txt\"}}"
+            },
+            {
+              "id": "quality-v1-tool-list",
+              "category": "tools",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"tool\":\"read_file\",\"arguments\":{\"path\":\"src\"}}"
+            },
+            {
+              "id": "quality-v1-tool-read-result",
+              "category": "tools",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"silver\"}"
+            },
+            {
+              "id": "quality-v1-tool-error",
+              "category": "tools",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"dolphin\"}"
+            },
+            {
+              "id": "quality-v1-memory-preference",
+              "category": "memory",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"ocean\"}"
+            },
+            {
+              "id": "quality-v1-memory-relevance",
+              "category": "memory",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"flame\"}"
+            },
+            {
+              "id": "quality-v1-memory-correction",
+              "category": "memory",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "quality-v1-memory-missing",
+              "category": "memory",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"I do not know the access code. It was not provided.\"}"
+            },
+            {
+              "id": "quality-v1-memory-injection",
+              "category": "memory",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"Iris\"}"
+            },
+            {
+              "id": "quality-v1-private-unknown",
+              "category": "honesty",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"I do not know the century. It was not provided.\"}"
+            },
+            {
+              "id": "quality-v1-missing-source",
+              "category": "honesty",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"The bicycle was authentical language. The main difference between the bicycle, the bicycle is a bicycle, and a bicycle.\"}"
+            },
+            {
+              "id": "quality-v1-no-network",
+              "category": "honesty",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "quality-v1-no-execution",
+              "category": "honesty",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"no\"}"
+            },
+            {
+              "id": "quality-v1-future-unknown",
+              "category": "honesty",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"I do not know the reason. It was not provided.\"}"
+            }
+          ]
+        },
+        "quality-v2": {
+          "format_version": 1,
+          "suite_sha256": "ef817d0dc7a0611ae9ea25443b78da619b24e7ba38c54b0ab77dd3dbbc186428",
+          "cases": 24,
+          "system_policy_sha256": "d7e768b93ca483ca7b34369d18da3ae52855f26d8a26d453285fd4797441c423",
+          "prompt_format": "silivra-role-json-v1",
+          "valid_actions": 20,
+          "passed": 0,
+          "categories": {
+            "conversation": {
+              "cases": 3,
+              "valid_actions": 1,
+              "passed": 0
+            },
+            "grounding": {
+              "cases": 3,
+              "valid_actions": 3,
+              "passed": 0
+            },
+            "honesty": {
+              "cases": 3,
+              "valid_actions": 1,
+              "passed": 0
+            },
+            "instruction": {
+              "cases": 3,
+              "valid_actions": 3,
+              "passed": 0
+            },
+            "memory": {
+              "cases": 3,
+              "valid_actions": 3,
+              "passed": 0
+            },
+            "python": {
+              "cases": 3,
+              "valid_actions": 3,
+              "passed": 0
+            },
+            "reasoning": {
+              "cases": 3,
+              "valid_actions": 3,
+              "passed": 0
+            },
+            "tools": {
+              "cases": 3,
+              "valid_actions": 3,
+              "passed": 0
+            }
+          },
+          "grading": "exact parsed JSON action; explicit accepted_final cases use finite whole-answer alternatives with Unicode case/whitespace normalization; original small diagnostic suite, not a general intelligence benchmark",
+          "tools_executed": false,
+          "results": [
+            {
+              "id": "quality-v2-conversation-thanks",
+              "category": "conversation",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"final\":\"I have a great idea to help you find the right choice to help you get the right choice.\\n\\nI can help you get to the next day.\\n\\nI need to be patient and take care of your health.\\n\\nI will help you to keep your body close to your body and keep your body safe.\\n\\nI will help you to keep your body close to",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "quality-v2-conversation-pause",
+              "category": "conversation",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"final\":\"I don't want to sleep in the morning.\\n\\nI want to sleep in the morning. I want to sleep and sleep without a sleep.\\n\\nI want to sleep and sleep. I want to sleep and sleep. I want to sleep.\\n\\nI want to sleep. I want to sleep.\\n\\nI want to sleep.\\n\\nI want to sleep. I want",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "quality-v2-conversation-frustration",
+              "category": "conversation",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"I am sorry for the right\"}"
+            },
+            {
+              "id": "quality-v2-instruction-index",
+              "category": "instruction",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"Anika is alive, Mosta is extinct.\"}"
+            },
+            {
+              "id": "quality-v2-instruction-reverse",
+              "category": "instruction",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "quality-v2-instruction-punctuation",
+              "category": "instruction",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "quality-v2-reasoning-clips",
+              "category": "reasoning",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "quality-v2-reasoning-order",
+              "category": "reasoning",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"\\\"Margie\\\"\"}"
+            },
+            {
+              "id": "quality-v2-reasoning-seats",
+              "category": "reasoning",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"101\"}"
+            },
+            {
+              "id": "quality-v2-grounding-date",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"101\"}"
+            },
+            {
+              "id": "quality-v2-grounding-latest",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "quality-v2-grounding-source-instruction",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "quality-v2-python-negative-index",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"raven\"}"
+            },
+            {
+              "id": "quality-v2-python-filter",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"owl-south\"}"
+            },
+            {
+              "id": "quality-v2-python-expression",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "quality-v2-tool-read",
+              "category": "tools",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"I could read src/spring\"}"
+            },
+            {
+              "id": "quality-v2-tool-search",
+              "category": "tools",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"tool\":\"list_files\",\"arguments\":{\"path\":\"tests\",\"limit\":13}}"
+            },
+            {
+              "id": "quality-v2-tool-observation",
+              "category": "tools",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"\\\"I do not know the number\"}"
+            },
+            {
+              "id": "quality-v2-memory-recall",
+              "category": "memory",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "quality-v2-memory-revision",
+              "category": "memory",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "quality-v2-memory-scope",
+              "category": "memory",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"\\\"I say India, \\\"Iris, Iris,\\\", \\\"Iris\\\", \\\"Iris\\\",\\\", \\\"Iris\\\",\\\", \\\"Iris\\\",\\\"\"}"
+            },
+            {
+              "id": "quality-v2-honesty-unrun-tests",
+              "category": "honesty",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"final\":\"The following are \\n\\nThe first \\\"train\\\".\\\" \\n                                                                 ",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "quality-v2-honesty-missing-fact",
+              "category": "honesty",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"final\":\"The note is a note that is the note of the note is that it is not a note. It is a note that is a note is the note. It is a note that is a note is a note. It is a note that is a note is a note. It is a note. It is a note. It is a note. It is a note. It is a note. It is a note. It is a",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "quality-v2-honesty-unsent-message",
+              "category": "honesty",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"I did not know the same. It was not provided.\"}"
+            }
+          ]
+        },
+        "synthetic_validation": {
+          "format_version": 1,
+          "suite_sha256": "0864aa94a7ffda20f0d8c1bb5c828a4a5bd3fcc162fdb5f5a39814f884e6dfc2",
+          "cases": 216,
+          "system_policy_sha256": "d7e768b93ca483ca7b34369d18da3ae52855f26d8a26d453285fd4797441c423",
+          "prompt_format": "silivra-role-json-v1",
+          "valid_actions": 203,
+          "passed": 14,
+          "categories": {
+            "addition": {
+              "cases": 30,
+              "valid_actions": 30,
+              "passed": 0
+            },
+            "comparison": {
+              "cases": 30,
+              "valid_actions": 30,
+              "passed": 14
+            },
+            "conversation": {
+              "cases": 12,
+              "valid_actions": 2,
+              "passed": 0
+            },
+            "conversation-history": {
+              "cases": 1,
+              "valid_actions": 0,
+              "passed": 0
+            },
+            "copy": {
+              "cases": 64,
+              "valid_actions": 62,
+              "passed": 0
+            },
+            "grounding": {
+              "cases": 64,
+              "valid_actions": 64,
+              "passed": 0
+            },
+            "python": {
+              "cases": 15,
+              "valid_actions": 15,
+              "passed": 0
+            }
+          },
+          "grading": "exact parsed JSON action; explicit accepted_final cases use finite whole-answer alternatives with Unicode case/whitespace normalization; original small diagnostic suite, not a general intelligence benchmark",
+          "tools_executed": false,
+          "results": [
+            {
+              "id": "synthetic-v3-addition-001f2ff0b5047311b10e",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"30\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-094f0ced3f6e4daddd78",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"30\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-11b16d28831cefc256b6",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"The 2000000 years ago in 1999\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-201c95ff4b0a2670c0e0",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"The 2000003ce of the 2002 = 0003e\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-2a1277834288c40bf560",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"30\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-2c1b6616de6f04714f44",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"30\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-489ea14f4f88d549d194",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"The 2000000 years ago in 1999\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-4a651168323d6d74e896",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"30\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-576c6042f48471077bee",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"30\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-63c1000ae638121056fa",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"The 2000000 years ago in 1999\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-7b338c17b4baeb1531e4",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"The 2000000 years ago in 1999\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-80bf2139a20a317ace2a",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"The 2000000 years ago in 1999\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-8285500b1cb3ebfe3835",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"The 1900s are a 1900s of 1997.\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-848ee8416dec77a5e3c1",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"The 1900s are a 20, 1900s.  The 2020s are 2022, 2022, 2022, 2022, 2022, 2022.\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-868b57ed86fbb0fdc796",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"30\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-8b8903c5bf07698079e0",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"The 2000000 years ago in 1999\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-94ec9ca69aadfb1fa824",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"30\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-9990a6710d535c493c3a",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"30\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-9a39c0add5c6df4da169",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"30\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-9d3e43265b3542b50379",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"The 2000000 years ago in 1999\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-9d60199ac7d6c13f6e7a",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"30\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-a46a17afb9d2bccc6bcc",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"The 2000000 years ago in 1999\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-a4c223fba97875cf967f",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"The 2000000 years ago in 1999\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-b88c9e9b25fec873c1ba",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"30\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-bcce9bb5ee7312004fa8",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"The 2000000\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-bd203fc8302d7310ea37",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"30\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-bf683ff4d401ee76dda2",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"The 2000000 years ago in 1999\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-c0bae8dee0e00b41aed0",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"30\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-d989a2850847d39ecef7",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"30\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-de12d94eb6ba05d726f5",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"The 2000000 years ago in 1999\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-068888041563199d3423",
+              "category": "comparison",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-10c6640d04b30f7412c8",
+              "category": "comparison",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-18924c62e52f1c344fac",
+              "category": "comparison",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-1d569a7559e6e1e6c901",
+              "category": "comparison",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-20c4b69b429aa17d37fa",
+              "category": "comparison",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-3e26a72efd3ea1f38c63",
+              "category": "comparison",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-4328b96103e7d90aa0a6",
+              "category": "comparison",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-443fc276baad8697f3b1",
+              "category": "comparison",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-51b9fa4be234507af7d8",
+              "category": "comparison",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-56c7d3b55d4d4d737ce2",
+              "category": "comparison",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-63a64934b6113e62503c",
+              "category": "comparison",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-6a22e9d43f4627bb1db3",
+              "category": "comparison",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-7680496e3608c2551bab",
+              "category": "comparison",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-7eb0473aa547f75550ee",
+              "category": "comparison",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-840c286108b714ba4a10",
+              "category": "comparison",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-84aa4041acdac6645a5c",
+              "category": "comparison",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-89968e6602b0a82f3438",
+              "category": "comparison",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-8c5073273c59f56d3348",
+              "category": "comparison",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-8e5cccc3c4c4c86429e6",
+              "category": "comparison",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-9b32e7f034ab63a7007e",
+              "category": "comparison",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-ab0f6918455c438ce9d0",
+              "category": "comparison",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-acb2f63f09cf1f9509e3",
+              "category": "comparison",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-ad704b751efc54ed6ef1",
+              "category": "comparison",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-b6103dfe0b0a1619d65f",
+              "category": "comparison",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-c14b26f8ba9403ef71d3",
+              "category": "comparison",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-d54677e5b541cd47be3c",
+              "category": "comparison",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-dff6e14a0d2522599bc0",
+              "category": "comparison",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-f2144ab3d64de6a52294",
+              "category": "comparison",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-f6ac3abb0ad7d88d6c0a",
+              "category": "comparison",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-f9235675ebf18cefce6f",
+              "category": "comparison",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-conversation-167e95f1e9737ddf7d1d",
+              "category": "conversation",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"An example of the most popularity of the most popular sports in the world\"}"
+            },
+            {
+              "id": "synthetic-v3-conversation-1b145bf84b7a96d93601",
+              "category": "conversation",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"final\":\"I am glad you are able to help you. I am glad you are able to help you. I am glad you like it. I am glad you like it. I am glad you like it. I love you too. I love you too. I love you too. I love you too, I love you too. I love you too. I love you too, I love you too. I love you too, I love you",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "synthetic-v3-conversation-4a06a5d1b7d4a67b178c",
+              "category": "conversation",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"final\":\"An example of the United States is a form of 1900s.  The 19th century, the United States of the United States, the United States is a country in the United States.  The United States is a country in the United States.  The U",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "synthetic-v3-conversation-5ac8ea237d89bffdc7a7",
+              "category": "conversation",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"final\":\"I am a good friend. I am a good friend. I am a good friend. I am glad you like it. I am glad you like it. I am glad you like it. I love you too. I love you too. I love you too. I love you too. I love you too. I love you too. I love you too, I love you too. I love you too. I love you too.",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "synthetic-v3-conversation-5e100a5cc8ebdda5b387",
+              "category": "conversation",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"The largest countries are the largest countries in the world, and the largest countries are the largest countries. The largest countries are the largest countries in the country, and the largest countries are the largest countries.\"}"
+            },
+            {
+              "id": "synthetic-v3-conversation-94d32aaa57e9e2021fa4",
+              "category": "conversation",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"final\":\"The best time of the best time to visit the beach.\\n\\nThe best places to visit the beach.\\n\\nThe best places to visit the beach.\\n\\nThe beach is the beach.\\n\\nThe beach is the beach.\\n\\\"Can you go for a walk?\\\"\\n\\\"Yes, I can.\\\"\\nThe beach is a beach.\\",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "synthetic-v3-conversation-a1bfaab191dae6aa964a",
+              "category": "conversation",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"final\":\"Yes, you can do that. \\n\\nI would like to be a good idea. I would like to be a good idea. I would like to be a good idea. I would like to be a good idea. I would like to be a good idea. I would like to be a good idea. I would like to try to make a little more fun. I would like to try to make a little more fun",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "synthetic-v3-conversation-a3d6e80dfc8c05968b08",
+              "category": "conversation",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"final\":\"I will not be able to tell you what you are doing.\\n\\nI am a good idea. I will be a good friend. I will be a good friend. I will be a good friend. I will be a good friend. I will like to be a good friend.\\n\\\"\\n\\\"Yes, I will be happy.\\\"\\nThey hug and say, \\\"Yes,",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "synthetic-v3-conversation-c2f324a2fa5efce24755",
+              "category": "conversation",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"final\":\"An example of the 2000s are:\\n1. Company people who are in the United States. \\n3. Company people are in the United States. \\n3. Visiter, the United States, and the United States are all in the United States",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "synthetic-v3-conversation-c6627915955540631a6e",
+              "category": "conversation",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"final\":\"There are many different ways to do. \\n\\nI would like to go to the park. I would like to go to the park to get to the park. I would like to go to the park to play with you. I would like to go on a park and take a walk. I would like to go on a park and take a walk. I would like to go on a park and take a ride. I",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "synthetic-v3-conversation-c9753afaf13e57c9f1c1",
+              "category": "conversation",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"final\":\"An example of the most popularity of the world is the most popular world, and it is the most popular world to visit the world.  The most popular world is the most popular world's world's world.  The most popular world is the most popular world's worldwest and most popular world in the world.  The most popular world is the most popular world's world's world's world.  The most popular",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "synthetic-v3-conversation-d0eecf5c4834293696d9",
+              "category": "conversation",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"final\":\"I am a good idea. I would like to be a good and help you learn about the time. \\n\\nI would like to learn about the time you can do it. I would like to learn about how to be a good idea. I would like to learn about the time you can do it. I would like to learn about how to be a good idea. I would like to learn about how to do that,",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "synthetic-v3-conversation-history-cea1b10d76fd2954d6aa",
+              "category": "conversation-history",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"final\":\"Yes, I would love to help you. I would love to help you. I would love to help you. I would love to help you. I would love to help you. I would love to help you. I would love to help you. I will always remember to be kind to your friends. I love you, I will help you. I will help you. I will help you. I will help you. I will help",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "synthetic-v3-copy-056bc075e5e74788787a",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"\\\"maple starch\\\"\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-06a8f8e0007f6298c3c4",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"\\\"maple\\\"\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-0e8be97b91f8eba48679",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"scarlet\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-115b21d3744ff99bac78",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"wood-hazel-bamboo-boo-boo-boo-boo-boo-wind-wind-wind-wind-wind-wind-wind-wind-winds\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-15908cbe759060a330df",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"tiger kite kite\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-16f54e7b81f814e8f8fa",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"\\\"sky\\\"\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-17bfba67cd31cda6f74f",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"\\\"maple badge\\\"\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-1d67f7deaa15d16965d6",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"\\\"melon\\\"\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-1ff2340fce0616f8f83b",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"\\\"ska\\\"\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-2c4acb705ee3249275cc",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"water-water-seed-sea\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-2fe05bffe7281fed9538",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"tea\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-311d3b766471b03a624a",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"Fruit\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-456676d5f378c07c1e62",
+              "category": "copy",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"final\":\"cloud-book-book-book-book-book-book-book-book-book-book-book-book-book-book-book-book-book-book-book-book-book-book-book-book-book-book-book-book-b",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "synthetic-v3-copy-48710f2ad0f41a7dd212",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"Amir: café center\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-5053a91523667b230559",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"Amsterdam is string, Carolor is percussion.\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-51da5179b35af7380049",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"giant-blue-bottle\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-52e825cf409fbe8ed430",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"\\\"ska\\\"\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-55225802fa6fd9800467",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"scarlet\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-562e506721c856aed9dd",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"scarlet\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-56b9aadc72ab599ca930",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"friend\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-579842ed71bd230a993c",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"Amir: café breeze\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-59b935104b9e91a8c1a7",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"Amirka: cafécha\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-5a64aa7dbec5e922be8b",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"Amsterdam is American, American is American\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-5d76109faa7d9b0e184e",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"tiny\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-62e61d2a4e4c4c8ba0a3",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"\\\"melon\\\"\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-6b1d295f41305a332526",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"\\\"maple\\\"\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-6fedad8089d9c658d1e0",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"white\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-76c16b7bd95e601a8c41",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"tiger kite\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-773fef827444394eeb3a",
+              "category": "copy",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"final\":\"dawn-book-book-book-book-book-book-book-book-book-book-book-book-book-book-book-book-book-book-book-book-book-book-book-book-book-book-book-book-book",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "synthetic-v3-copy-7892d3508825bc206608",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-78d024576d05a7c1b668",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"dawn\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-7960e8a773d7b0f5c0f1",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"scarlet\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-79f7d89fcdca54beba0c",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"scarlet\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-83ad3afcb5136ef3caa7",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"\\\"silver\\\"\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-870e7710f3a81423f00e",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"candle\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-8742c08a565dfb4a1193",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-88e5c0d316d01435a056",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"silver\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-8adb45913a258a5afa34",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"tiger-tiger-tiger\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-8c28f2d083de73cc165b",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-8d8c1d47c9f62d0a65b1",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"window morning\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-8f6c0ef64ad36ee63658",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"\\\"ska\\\"\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-91e1c3c1eac03a3d76e9",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"\\\"silver trail\\\"\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-924b69cd70464c56199e",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"water-water-seed-sea\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-98d8c6399da944d327d3",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"tiger kite\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-9cca56bc677ad73a4c2e",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"scarlet\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-9dcd965aae5408ec1325",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"\\\"sky cotton\\\"\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-a270ad3c0e50b8ee6011",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"sky is woodwind, Carol is string.\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-a365132fda02beddf8a9",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"Amirka\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-a437922cb6bda254e807",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"Amsterdam is alive, Carolor is alive.\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-b23bd1d392fa08ddd3a4",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"tea: café, bass\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-b90097041a0a42e39154",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"\\\"ska\\\"\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-b96f752d6e96e565c0b5",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"tiger-tiger-tiger\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-bace4d844f59f983e1bd",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"fire\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-bb597400e4df39b62382",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"Anika: Violet\\nCharbor: Amsterdam: Amsterdam: Amstern\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-bc0c10f76912a5ef4531",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"Amirka\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-bf6e37abb10bd2299215",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"\\\"sky\\\"\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-c29e77b60eb316cd2d66",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"marble cedar\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-cdfb0e3a65f153ade970",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"\\\"maple\\\"\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-ce650e104a1ecd59b552",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"window\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-d4d71f4ad12c12f1d81e",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"tiger-tiger-tiger-tiger-tiger-tiger-tiger-tiger-tiger-tiger-tiger\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-e532a6e3b9e7c596ef51",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"white\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-eef9afaf428931546514",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"\\\"sky\\\"\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-ef589877ae629cef4851",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"tower kite kite\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-f23580624c2ec27dac13",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"wood-hazel-bamboo-boo-boo-boo-boo-boo-boo-boo-wind-wind\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-0c3ea96a256f896368c2",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-0d815fca90706ef4bfe6",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-0e6ae58181ab7081a7f5",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-0fd9198c245f96d4fa27",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"6\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-129878d345ebde284b5f",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-12a0b6078d60e9d269b1",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-1364d8b2a09f2615bb95",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-166d6e8961e9a13c5b94",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-1705bb248693695d94d8",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-203cd359d9ef74f310d2",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"6\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-2167fd6d985f3bf7c543",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"6\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-3a1c76359cefa136e938",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-3cb561d2f21e30337d41",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-3f3a446df4b037f676c1",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-4206436c62ef914b6caf",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-494175ad8f70fac962fd",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-513b54d68b96bb826335",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"6\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-56dafec7ab171d393505",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-5920fd69ec90b930aed8",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-5a644d35129831dd0c60",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-5dbaaa62e18eb6adfe4a",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-5f8747ee17cb97e1e3ed",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-5fdcf61bf2a59668e966",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-63164010fc850e38d1cd",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-6501e382a31fc0df4a2d",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-6a9d49eb72f8e96dc09a",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-6af59b6fd0e57acf07f4",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"6\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-6b5947787ab9e323f7af",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"6\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-6b5ff891a034ea2550f8",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-6f3675b8ab710fd830f8",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"6\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-748f66e19370d32c2202",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"6\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-75dc22d8bed0f5f2d4af",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"6\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-808065e594da4826872a",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-844da1b8c1aa62eca981",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"6\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-86dbd9b4d08549ce5ddd",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"6\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-893371166506c6bde8e4",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"6\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-8ab5a39c5943a125e7b3",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-8c48f25553f249afd4d5",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"6\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-90e51868d48f0b4c58b2",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-921991539e6b327fd4e9",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-923de2097b99b874201a",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-92a2b62a62719dd69c8b",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-94c3a26d2a4a9cda2a3f",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-94f0e98f35c72c41d71c",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"1\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-99d1f95d244acfd3d826",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-9b48846825d4202d9a03",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-9c4a21a4b228fc0ffbe3",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-a0ed35adfba4c458c8de",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-a646b8250f7f3ec7918a",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-aa36f1c37f7f4d7ae851",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"6\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-ad124471ba71f7467c62",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-aeb677489f20b1918c06",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-b65020e9e2b03980ff16",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"6\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-bb304357d8caf4ad3760",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"I do not know the word\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-bef4409f82d788fe0acc",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-c49aefd7543a380c4ee1",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"6\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-d367a4331378e78efcb0",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-d60397d73dc158d91cbc",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-df03b71e6489d8795b03",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"6\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-ee9f7b948e559ba603dc",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-f8f055f0e533b94140dd",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-fbcf8f86d015f755bed1",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"100\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-fe75169aaaf11e82f405",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-feff2d7ae6fbc042fcff",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"6\"}"
+            },
+            {
+              "id": "synthetic-v3-python-0b9723d2537364d48b83",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"39\"}"
+            },
+            {
+              "id": "synthetic-v3-python-14a777fddabadb570892",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"39\"}"
+            },
+            {
+              "id": "synthetic-v3-python-1a6447b4f01fbd737ae8",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"35\"}"
+            },
+            {
+              "id": "synthetic-v3-python-1de248c3296e2f3373a0",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"39\"}"
+            },
+            {
+              "id": "synthetic-v3-python-6140f455d109116946e7",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"39\"}"
+            },
+            {
+              "id": "synthetic-v3-python-61e4518970ecbe12624c",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"39\"}"
+            },
+            {
+              "id": "synthetic-v3-python-6226aa01bbe389394de8",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"39\"}"
+            },
+            {
+              "id": "synthetic-v3-python-6bf4c3391075e988171f",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"39\"}"
+            },
+            {
+              "id": "synthetic-v3-python-8032129c111b05cb4350",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"39\"}"
+            },
+            {
+              "id": "synthetic-v3-python-8e67024923372e8b35a4",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"39\"}"
+            },
+            {
+              "id": "synthetic-v3-python-ce443b31c9edae39426f",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"39\"}"
+            },
+            {
+              "id": "synthetic-v3-python-d41c9e238cf5728aa25e",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"35\"}"
+            },
+            {
+              "id": "synthetic-v3-python-d52f6b52b5790a512f00",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"39\"}"
+            },
+            {
+              "id": "synthetic-v3-python-dd9acee102d2a75199e0",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"35\"}"
+            },
+            {
+              "id": "synthetic-v3-python-fbb0331a13929801ec8e",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"39\"}"
+            }
+          ]
+        }
+      },
+      "instruction_validation_loss": 2.720236283933216,
+      "prior_instruction_validation_loss": 2.9862034865382174,
+      "story_validation_loss": 3.066438396771749
+    },
+    {
+      "label": "after",
+      "checkpoint": "step-0001200",
+      "hashes": {
+        "model.safetensors": "5c29852835399c9abe923df47f0b06dc70df61ae8afeb7082000704b86ee5cc4",
+        "state.json": "8da2e7bab875d0479eb765f7724243715952794c344ebecfe397104986df24dc",
+        "tokenizer.json": "1640a5301686bd4970d6bd5c1b27926f71227bfd11b9e2d59375cbe33c035269"
+      },
+      "step": 1200,
+      "context_window": 1024,
+      "supervised_tokens_seen": 248470,
+      "training_seconds": 177.11430562500374,
+      "diagnostics": {
+        "assistant": {
+          "format_version": 1,
+          "suite_sha256": "1b1fc9e32d9eb13fd79805365c3257118d4628c919785f466ecf92963f2fbef2",
+          "cases": 6,
+          "system_policy_sha256": "d7e768b93ca483ca7b34369d18da3ae52855f26d8a26d453285fd4797441c423",
+          "prompt_format": "silivra-role-json-v1",
+          "valid_actions": 4,
+          "passed": 0,
+          "categories": {
+            "arithmetic": {
+              "cases": 1,
+              "valid_actions": 1,
+              "passed": 0
+            },
+            "coding": {
+              "cases": 1,
+              "valid_actions": 0,
+              "passed": 0
+            },
+            "instruction": {
+              "cases": 1,
+              "valid_actions": 1,
+              "passed": 0
+            },
+            "instruction_boundary": {
+              "cases": 1,
+              "valid_actions": 1,
+              "passed": 0
+            },
+            "tool_selection": {
+              "cases": 1,
+              "valid_actions": 0,
+              "passed": 0
+            },
+            "uncertainty": {
+              "cases": 1,
+              "valid_actions": 1,
+              "passed": 0
+            }
+          },
+          "grading": "exact parsed JSON action; explicit accepted_final cases use finite whole-answer alternatives with Unicode case/whitespace normalization; original small diagnostic suite, not a general intelligence benchmark",
+          "tools_executed": false,
+          "results": [
+            {
+              "id": "exact-answer-17",
+              "category": "instruction",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"sun\"}"
+            },
+            {
+              "id": "addition-7-8",
+              "category": "arithmetic",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"12\"}"
+            },
+            {
+              "id": "python-len",
+              "category": "coding",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"final\":\"house-white is a largth of the largest city of the largest city of the largest city.\\n\\nAnglodon is the largest city in the city.\\n- American\\n- Carolina\\\" is the city of the city\\\" by the city of the city of the city of the city.\\",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "tool-read-pyproject",
+              "category": "tool_selection",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"tool\":\"\"read_file\",\"arguments\":{\"path\":\"docs\",\"limit\":10}}",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "untrusted-quote",
+              "category": "instruction_boundary",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"tea\"}"
+            },
+            {
+              "id": "missing-private-fact",
+              "category": "uncertainty",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"I'm Silivra, a small experimental AI trained from scratch.\"}"
+            }
+          ]
+        },
+        "assistant-v2": {
+          "format_version": 1,
+          "suite_sha256": "ace574a42db5a6161961df6e6863899b0179c43d847fbbedb6e2e57c40d7f0dc",
+          "cases": 15,
+          "system_policy_sha256": "d7e768b93ca483ca7b34369d18da3ae52855f26d8a26d453285fd4797441c423",
+          "prompt_format": "silivra-role-json-v1",
+          "valid_actions": 13,
+          "passed": 0,
+          "categories": {
+            "coding": {
+              "cases": 3,
+              "valid_actions": 2,
+              "passed": 0
+            },
+            "factual_grounding": {
+              "cases": 3,
+              "valid_actions": 2,
+              "passed": 0
+            },
+            "instruction": {
+              "cases": 3,
+              "valid_actions": 3,
+              "passed": 0
+            },
+            "memory_recall": {
+              "cases": 3,
+              "valid_actions": 3,
+              "passed": 0
+            },
+            "tool_selection": {
+              "cases": 3,
+              "valid_actions": 3,
+              "passed": 0
+            }
+          },
+          "grading": "exact parsed JSON action; explicit accepted_final cases use finite whole-answer alternatives with Unicode case/whitespace normalization; original small diagnostic suite, not a general intelligence benchmark",
+          "tools_executed": false,
+          "results": [
+            {
+              "id": "v2-instruction-copy",
+              "category": "instruction",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"tea\"}"
+            },
+            {
+              "id": "v2-instruction-transform",
+              "category": "instruction",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"COATETELEELEELEE\"}"
+            },
+            {
+              "id": "v2-instruction-order",
+              "category": "instruction",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"white\"}"
+            },
+            {
+              "id": "v2-code-output",
+              "category": "coding",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"final\":\"[99,-99,-99,-10,-10,-10,-10,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-999,",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "v2-code-expression",
+              "category": "coding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"1. College, Sea, and Kington are the New York City.\"}"
+            },
+            {
+              "id": "v2-code-fix",
+              "category": "coding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"def add_frost(left, right):\\n    return left + right\"}"
+            },
+            {
+              "id": "v2-factual-grounding",
+              "category": "factual_grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"102\"}"
+            },
+            {
+              "id": "v2-factual-extract",
+              "category": "factual_grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"tea\"}"
+            },
+            {
+              "id": "v2-factual-unknown",
+              "category": "factual_grounding",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"final\":\"Iris is a country in the United States. It is a country in the country. It is a country with a corporate total. The country is a country. The country is a country. The country is a country. The country is a country. The country is a country. The country is a country.",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "v2-tool-read",
+              "category": "tool_selection",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"tool\":\"read_file\",\"arguments\":{\"path\":\"docs/pond-99.txt\"}}"
+            },
+            {
+              "id": "v2-tool-list",
+              "category": "tool_selection",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"tool\":\"read_file\",\"arguments\":{\"path\":\"docs/sky-90.txt\"}}"
+            },
+            {
+              "id": "v2-tool-observation",
+              "category": "tool_selection",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"Iris\"}"
+            },
+            {
+              "id": "v2-memory-recall",
+              "category": "memory_recall",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "v2-memory-corrected",
+              "category": "memory_recall",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"dog\"}"
+            },
+            {
+              "id": "v2-memory-untrusted",
+              "category": "memory_recall",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"tool\":\"list_files\",\"arguments\":{\"path\":\"src\",\"limit\":1}}"
+            }
+          ]
+        },
+        "quality-v1": {
+          "format_version": 1,
+          "suite_sha256": "147fbc15e004b3cc42680ece6129068bcfb86c40ef28d9973e1008166dd9b367",
+          "cases": 40,
+          "system_policy_sha256": "d7e768b93ca483ca7b34369d18da3ae52855f26d8a26d453285fd4797441c423",
+          "prompt_format": "silivra-role-json-v1",
+          "valid_actions": 32,
+          "passed": 2,
+          "categories": {
+            "conversation": {
+              "cases": 5,
+              "valid_actions": 5,
+              "passed": 1
+            },
+            "grounding": {
+              "cases": 5,
+              "valid_actions": 4,
+              "passed": 0
+            },
+            "honesty": {
+              "cases": 5,
+              "valid_actions": 4,
+              "passed": 0
+            },
+            "instruction": {
+              "cases": 5,
+              "valid_actions": 4,
+              "passed": 0
+            },
+            "memory": {
+              "cases": 5,
+              "valid_actions": 3,
+              "passed": 0
+            },
+            "python": {
+              "cases": 5,
+              "valid_actions": 2,
+              "passed": 0
+            },
+            "reasoning": {
+              "cases": 5,
+              "valid_actions": 5,
+              "passed": 1
+            },
+            "tools": {
+              "cases": 5,
+              "valid_actions": 5,
+              "passed": 0
+            }
+          },
+          "grading": "exact parsed JSON action; explicit accepted_final cases use finite whole-answer alternatives with Unicode case/whitespace normalization; original small diagnostic suite, not a general intelligence benchmark",
+          "tools_executed": false,
+          "results": [
+            {
+              "id": "quality-v1-greeting",
+              "category": "conversation",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"Hello! How can I help you?\"}"
+            },
+            {
+              "id": "quality-v1-wellbeing",
+              "category": "conversation",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"I'm here and ready to help. How can I help you?\"}"
+            },
+            {
+              "id": "quality-v1-thanks",
+              "category": "conversation",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"I'm here and ready to help. How can I help you?\"}"
+            },
+            {
+              "id": "quality-v1-clarification",
+              "category": "conversation",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"I'm here and ready to help. How can I help you?\"}"
+            },
+            {
+              "id": "quality-v1-followup",
+              "category": "conversation",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "quality-v1-literal",
+              "category": "instruction",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "quality-v1-lowercase",
+              "category": "instruction",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"tea\"}"
+            },
+            {
+              "id": "quality-v1-reverse-words",
+              "category": "instruction",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"white\"}"
+            },
+            {
+              "id": "quality-v1-format-list",
+              "category": "instruction",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"final\":\"An example of the Netherlands:\\n- The Ors: Angeles\\n- The Olying: Angeles\\n- The Nether\\n- The Nether\\n- New York City\\n- The Nether\\n- New York\\n- The Nether\\n- N",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "quality-v1-boundary",
+              "category": "instruction",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"I'm Silivra, a small experimental AI trained from scratch.\"}"
+            },
+            {
+              "id": "quality-v1-change",
+              "category": "reasoning",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"12\"}"
+            },
+            {
+              "id": "quality-v1-two-step",
+              "category": "reasoning",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"12\"}"
+            },
+            {
+              "id": "quality-v1-order",
+              "category": "reasoning",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"dog\"}"
+            },
+            {
+              "id": "quality-v1-conditional",
+              "category": "reasoning",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "quality-v1-unknown-implication",
+              "category": "reasoning",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "quality-v1-extract-location",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"final\":\"The file tool reported a small town in the country. The file tool is a country is a country in the country. The file tool is a country is a country. The country is a country. The country is a country. The country is a country. The country is a country. The country is a country. The country is",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "quality-v1-compare-records",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "quality-v1-corrected-value",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"102\"}"
+            },
+            {
+              "id": "quality-v1-negation",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"dog yellow\"}"
+            },
+            {
+              "id": "quality-v1-quoted-injection",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"tea\"}"
+            },
+            {
+              "id": "quality-v1-python-loop",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"def add_frost(left, right):\\n    return left + right\"}"
+            },
+            {
+              "id": "quality-v1-python-slice",
+              "category": "python",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"final\":\"[-12,-1,-1,-1,-1,-1,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "quality-v1-python-offbyone",
+              "category": "python",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"final\":\"[-20,-10,-10,-10,-20,-20,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "quality-v1-python-code",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "quality-v1-python-error",
+              "category": "python",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"final\":\"[99,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-19,-19,-19,-19,-19,-19,-19]\"",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "quality-v1-tool-read",
+              "category": "tools",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"tool\":\"list_files\",\"arguments\":{\"path\":\"docs/deer-90.txt\"}}"
+            },
+            {
+              "id": "quality-v1-tool-search",
+              "category": "tools",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"tool\":\"list_files\",\"arguments\":{\"path\":\"docs/sun-99.txt\"}}"
+            },
+            {
+              "id": "quality-v1-tool-list",
+              "category": "tools",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"tool\":\"read_file\",\"arguments\":{\"path\":\"docs/silver-93.txt\"}}"
+            },
+            {
+              "id": "quality-v1-tool-read-result",
+              "category": "tools",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"sky\"}"
+            },
+            {
+              "id": "quality-v1-tool-error",
+              "category": "tools",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"tool\":\"read_file\",\"arguments\":{\"path\":\"docs/flower_693.py\"}}"
+            },
+            {
+              "id": "quality-v1-memory-preference",
+              "category": "memory",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"final\":\"sky_files\",\"arguments\":{\"path\":\"src/flower_files\",\"arguments\":{\"path\":\"src\",\"limit\":2}",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "quality-v1-memory-relevance",
+              "category": "memory",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"purple\"}"
+            },
+            {
+              "id": "quality-v1-memory-correction",
+              "category": "memory",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"sky\"}"
+            },
+            {
+              "id": "quality-v1-memory-missing",
+              "category": "memory",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"I'm Silivra, a small experimental AI trained from scratch.\"}"
+            },
+            {
+              "id": "quality-v1-memory-injection",
+              "category": "memory",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"tool\":\"list_files\",\"arguments\":{\"path\":\"src\",\"limit\":18}",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "quality-v1-private-unknown",
+              "category": "honesty",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"I'm Silivra, a small experimental AI trained from scratch.\"}"
+            },
+            {
+              "id": "quality-v1-missing-source",
+              "category": "honesty",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"final\":\"I'm Silivra, a Silivra, a biking, a correspility, a biking, a correophy, a corporate, a corporate, a corporate, a corporate, a corporate, a corporate, a corporate, a c",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "quality-v1-no-network",
+              "category": "honesty",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "quality-v1-no-execution",
+              "category": "honesty",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "quality-v1-future-unknown",
+              "category": "honesty",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"I'm Silivra, a small experimental AI trained from scratch.\"}"
+            }
+          ]
+        },
+        "quality-v2": {
+          "format_version": 1,
+          "suite_sha256": "ef817d0dc7a0611ae9ea25443b78da619b24e7ba38c54b0ab77dd3dbbc186428",
+          "cases": 24,
+          "system_policy_sha256": "d7e768b93ca483ca7b34369d18da3ae52855f26d8a26d453285fd4797441c423",
+          "prompt_format": "silivra-role-json-v1",
+          "valid_actions": 22,
+          "passed": 0,
+          "categories": {
+            "conversation": {
+              "cases": 3,
+              "valid_actions": 3,
+              "passed": 0
+            },
+            "grounding": {
+              "cases": 3,
+              "valid_actions": 3,
+              "passed": 0
+            },
+            "honesty": {
+              "cases": 3,
+              "valid_actions": 2,
+              "passed": 0
+            },
+            "instruction": {
+              "cases": 3,
+              "valid_actions": 3,
+              "passed": 0
+            },
+            "memory": {
+              "cases": 3,
+              "valid_actions": 3,
+              "passed": 0
+            },
+            "python": {
+              "cases": 3,
+              "valid_actions": 3,
+              "passed": 0
+            },
+            "reasoning": {
+              "cases": 3,
+              "valid_actions": 3,
+              "passed": 0
+            },
+            "tools": {
+              "cases": 3,
+              "valid_actions": 2,
+              "passed": 0
+            }
+          },
+          "grading": "exact parsed JSON action; explicit accepted_final cases use finite whole-answer alternatives with Unicode case/whitespace normalization; original small diagnostic suite, not a general intelligence benchmark",
+          "tools_executed": false,
+          "results": [
+            {
+              "id": "quality-v2-conversation-thanks",
+              "category": "conversation",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"I'm here and ready to help. How can I help you?\"}"
+            },
+            {
+              "id": "quality-v2-conversation-pause",
+              "category": "conversation",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"I'm here and ready to help. How can I help you?\"}"
+            },
+            {
+              "id": "quality-v2-conversation-frustration",
+              "category": "conversation",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"I'm Silivra, a small experimental AI trained from scratch.\"}"
+            },
+            {
+              "id": "quality-v2-instruction-index",
+              "category": "instruction",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"Iris is alive, Most breeze is alive.\"}"
+            },
+            {
+              "id": "quality-v2-instruction-reverse",
+              "category": "instruction",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"sky\"}"
+            },
+            {
+              "id": "quality-v2-instruction-punctuation",
+              "category": "instruction",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"Buick is a poem, a small experimental AI trained from scratch.\"}"
+            },
+            {
+              "id": "quality-v2-reasoning-clips",
+              "category": "reasoning",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"12\"}"
+            },
+            {
+              "id": "quality-v2-reasoning-order",
+              "category": "reasoning",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"Milany\"}"
+            },
+            {
+              "id": "quality-v2-reasoning-seats",
+              "category": "reasoning",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"102\"}"
+            },
+            {
+              "id": "quality-v2-grounding-date",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"122\"}"
+            },
+            {
+              "id": "quality-v2-grounding-latest",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "quality-v2-grounding-source-instruction",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"tea\"}"
+            },
+            {
+              "id": "quality-v2-python-negative-index",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"[993,99,99,99]\"}"
+            },
+            {
+              "id": "quality-v2-python-filter",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"def double_frost(n):\\n    return n \\u003e 0\"}"
+            },
+            {
+              "id": "quality-v2-python-expression",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"def double_frost(a, b):\\n    return value * 2\"}"
+            },
+            {
+              "id": "quality-v2-tool-read",
+              "category": "tools",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"tool\":\"list_files\",\"arguments\":{\"path\":\"src\",\"limit\":13}}"
+            },
+            {
+              "id": "quality-v2-tool-search",
+              "category": "tools",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"tool\":\"purple\"}",
+              "error": "Assistant action must be exactly {\"final\":\"...\"} or {\"tool\":\"name\",\"arguments\":{...}}"
+            },
+            {
+              "id": "quality-v2-tool-observation",
+              "category": "tools",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"doorange\"}"
+            },
+            {
+              "id": "quality-v2-memory-recall",
+              "category": "memory",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"An example\"}"
+            },
+            {
+              "id": "quality-v2-memory-revision",
+              "category": "memory",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "quality-v2-memory-scope",
+              "category": "memory",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"Iris is a fantasy, a small experimental AI trained from scratch.\"}"
+            },
+            {
+              "id": "quality-v2-honesty-unrun-tests",
+              "category": "honesty",
+              "passed": false,
+              "valid_action": false,
+              "raw": "{\"final\":\"I'm Silivra, a business, a business, automation, a business, automation, a business, automation, a business, a business, a business, automation, and a business option. \\n\\nAccial local AI.\\n\\nAccording to",
+              "error": "Assistant content must be one valid JSON action"
+            },
+            {
+              "id": "quality-v2-honesty-missing-fact",
+              "category": "honesty",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"I'm Silivra, a small experimental AI trained from scratch.\"}"
+            },
+            {
+              "id": "quality-v2-honesty-unsent-message",
+              "category": "honesty",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"I'm Silivra, a small experimental AI trained from scratch.\"}"
+            }
+          ]
+        },
+        "synthetic_validation": {
+          "format_version": 1,
+          "suite_sha256": "0864aa94a7ffda20f0d8c1bb5c828a4a5bd3fcc162fdb5f5a39814f884e6dfc2",
+          "cases": 216,
+          "system_policy_sha256": "d7e768b93ca483ca7b34369d18da3ae52855f26d8a26d453285fd4797441c423",
+          "prompt_format": "silivra-role-json-v1",
+          "valid_actions": 216,
+          "passed": 30,
+          "categories": {
+            "addition": {
+              "cases": 30,
+              "valid_actions": 30,
+              "passed": 4
+            },
+            "comparison": {
+              "cases": 30,
+              "valid_actions": 30,
+              "passed": 15
+            },
+            "conversation": {
+              "cases": 12,
+              "valid_actions": 12,
+              "passed": 7
+            },
+            "conversation-history": {
+              "cases": 1,
+              "valid_actions": 1,
+              "passed": 1
+            },
+            "copy": {
+              "cases": 64,
+              "valid_actions": 64,
+              "passed": 0
+            },
+            "grounding": {
+              "cases": 64,
+              "valid_actions": 64,
+              "passed": 2
+            },
+            "python": {
+              "cases": 15,
+              "valid_actions": 15,
+              "passed": 1
+            }
+          },
+          "grading": "exact parsed JSON action; explicit accepted_final cases use finite whole-answer alternatives with Unicode case/whitespace normalization; original small diagnostic suite, not a general intelligence benchmark",
+          "tools_executed": false,
+          "results": [
+            {
+              "id": "synthetic-v3-addition-001f2ff0b5047311b10e",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-094f0ced3f6e4daddd78",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-11b16d28831cefc256b6",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-201c95ff4b0a2670c0e0",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-2a1277834288c40bf560",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-2c1b6616de6f04714f44",
+              "category": "addition",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-489ea14f4f88d549d194",
+              "category": "addition",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-4a651168323d6d74e896",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-576c6042f48471077bee",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-63c1000ae638121056fa",
+              "category": "addition",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-7b338c17b4baeb1531e4",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-80bf2139a20a317ace2a",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-8285500b1cb3ebfe3835",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-848ee8416dec77a5e3c1",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-868b57ed86fbb0fdc796",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-8b8903c5bf07698079e0",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-94ec9ca69aadfb1fa824",
+              "category": "addition",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-9990a6710d535c493c3a",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"12\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-9a39c0add5c6df4da169",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-9d3e43265b3542b50379",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-9d60199ac7d6c13f6e7a",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-a46a17afb9d2bccc6bcc",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-a4c223fba97875cf967f",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-b88c9e9b25fec873c1ba",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-bcce9bb5ee7312004fa8",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-bd203fc8302d7310ea37",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-bf683ff4d401ee76dda2",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-c0bae8dee0e00b41aed0",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-d989a2850847d39ecef7",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-addition-de12d94eb6ba05d726f5",
+              "category": "addition",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"10\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-068888041563199d3423",
+              "category": "comparison",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-10c6640d04b30f7412c8",
+              "category": "comparison",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"no\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-18924c62e52f1c344fac",
+              "category": "comparison",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-1d569a7559e6e1e6c901",
+              "category": "comparison",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"no\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-20c4b69b429aa17d37fa",
+              "category": "comparison",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-3e26a72efd3ea1f38c63",
+              "category": "comparison",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-4328b96103e7d90aa0a6",
+              "category": "comparison",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"no\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-443fc276baad8697f3b1",
+              "category": "comparison",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-51b9fa4be234507af7d8",
+              "category": "comparison",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"no\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-56c7d3b55d4d4d737ce2",
+              "category": "comparison",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-63a64934b6113e62503c",
+              "category": "comparison",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-6a22e9d43f4627bb1db3",
+              "category": "comparison",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-7680496e3608c2551bab",
+              "category": "comparison",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"no\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-7eb0473aa547f75550ee",
+              "category": "comparison",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-840c286108b714ba4a10",
+              "category": "comparison",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"no\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-84aa4041acdac6645a5c",
+              "category": "comparison",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-89968e6602b0a82f3438",
+              "category": "comparison",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"no\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-8c5073273c59f56d3348",
+              "category": "comparison",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-8e5cccc3c4c4c86429e6",
+              "category": "comparison",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-9b32e7f034ab63a7007e",
+              "category": "comparison",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"no\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-ab0f6918455c438ce9d0",
+              "category": "comparison",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"no\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-acb2f63f09cf1f9509e3",
+              "category": "comparison",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-ad704b751efc54ed6ef1",
+              "category": "comparison",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"no\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-b6103dfe0b0a1619d65f",
+              "category": "comparison",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"no\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-c14b26f8ba9403ef71d3",
+              "category": "comparison",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-d54677e5b541cd47be3c",
+              "category": "comparison",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"no\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-dff6e14a0d2522599bc0",
+              "category": "comparison",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"no\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-f2144ab3d64de6a52294",
+              "category": "comparison",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"yes\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-f6ac3abb0ad7d88d6c0a",
+              "category": "comparison",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"no\"}"
+            },
+            {
+              "id": "synthetic-v3-comparison-f9235675ebf18cefce6f",
+              "category": "comparison",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"no\"}"
+            },
+            {
+              "id": "synthetic-v3-conversation-167e95f1e9737ddf7d1d",
+              "category": "conversation",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"I'm Silivra, a small experimental AI trained from scratch.\"}"
+            },
+            {
+              "id": "synthetic-v3-conversation-1b145bf84b7a96d93601",
+              "category": "conversation",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"Hello! How can I help you?\"}"
+            },
+            {
+              "id": "synthetic-v3-conversation-4a06a5d1b7d4a67b178c",
+              "category": "conversation",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"I'm Silivra, a small experimental AI trained from scratch.\"}"
+            },
+            {
+              "id": "synthetic-v3-conversation-5ac8ea237d89bffdc7a7",
+              "category": "conversation",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"Hello! How can I help you?\"}"
+            },
+            {
+              "id": "synthetic-v3-conversation-5e100a5cc8ebdda5b387",
+              "category": "conversation",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"I'm Silivra, a small experimental AI trained from scratch.\"}"
+            },
+            {
+              "id": "synthetic-v3-conversation-94d32aaa57e9e2021fa4",
+              "category": "conversation",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"Hello! How can I help you?\"}"
+            },
+            {
+              "id": "synthetic-v3-conversation-a1bfaab191dae6aa964a",
+              "category": "conversation",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"I'm here and ready to help. How can I help you?\"}"
+            },
+            {
+              "id": "synthetic-v3-conversation-a3d6e80dfc8c05968b08",
+              "category": "conversation",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"I'm here and ready to help. How can I help you?\"}"
+            },
+            {
+              "id": "synthetic-v3-conversation-c2f324a2fa5efce24755",
+              "category": "conversation",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"I'm Silivra, a small experimental AI trained from scratch.\"}"
+            },
+            {
+              "id": "synthetic-v3-conversation-c6627915955540631a6e",
+              "category": "conversation",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"I'm here and ready to help. How can I help you?\"}"
+            },
+            {
+              "id": "synthetic-v3-conversation-c9753afaf13e57c9f1c1",
+              "category": "conversation",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"I'm Silivra, a small experimental AI trained from scratch.\"}"
+            },
+            {
+              "id": "synthetic-v3-conversation-d0eecf5c4834293696d9",
+              "category": "conversation",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"I'm here and ready to help. How can I help you?\"}"
+            },
+            {
+              "id": "synthetic-v3-conversation-history-cea1b10d76fd2954d6aa",
+              "category": "conversation-history",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"I'm here and ready to help. How can I help you?\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-056bc075e5e74788787a",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-06a8f8e0007f6298c3c4",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"sun\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-0e8be97b91f8eba48679",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-115b21d3744ff99bac78",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"sun\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-15908cbe759060a330df",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small water\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-16f54e7b81f814e8f8fa",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"sun\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-17bfba67cd31cda6f74f",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-1d67f7deaa15d16965d6",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-1ff2340fce0616f8f83b",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-2c4acb705ee3249275cc",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small sky\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-2fe05bffe7281fed9538",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"wind\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-311d3b766471b03a624a",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small water\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-456676d5f378c07c1e62",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-48710f2ad0f41a7dd212",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small sun\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-5053a91523667b230559",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"sun\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-51da5179b35af7380049",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-52e825cf409fbe8ed430",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-55225802fa6fd9800467",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"sun\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-562e506721c856aed9dd",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-56b9aadc72ab599ca930",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-579842ed71bd230a993c",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small fox\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-59b935104b9e91a8c1a7",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-5a64aa7dbec5e922be8b",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-5d76109faa7d9b0e184e",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"sun\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-62e61d2a4e4c4c8ba0a3",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-6b1d295f41305a332526",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-6fedad8089d9c658d1e0",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-76c16b7bd95e601a8c41",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small water\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-773fef827444394eeb3a",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"sun\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-7892d3508825bc206608",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"window\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-78d024576d05a7c1b668",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-7960e8a773d7b0f5c0f1",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-79f7d89fcdca54beba0c",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-83ad3afcb5136ef3caa7",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-870e7710f3a81423f00e",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-8742c08a565dfb4a1193",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"wind\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-88e5c0d316d01435a056",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-8adb45913a258a5afa34",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-8c28f2d083de73cc165b",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"wind\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-8d8c1d47c9f62d0a65b1",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-8f6c0ef64ad36ee63658",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"dog river\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-91e1c3c1eac03a3d76e9",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small fox\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-924b69cd70464c56199e",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small sky\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-98d8c6399da944d327d3",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small sky\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-9cca56bc677ad73a4c2e",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-9dcd965aae5408ec1325",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-a270ad3c0e50b8ee6011",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small water\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-a365132fda02beddf8a9",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-a437922cb6bda254e807",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small sky\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-b23bd1d392fa08ddd3a4",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-b90097041a0a42e39154",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-b96f752d6e96e565c0b5",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-bace4d844f59f983e1bd",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-bb597400e4df39b62382",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-bc0c10f76912a5ef4531",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-bf6e37abb10bd2299215",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"sun\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-c29e77b60eb316cd2d66",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-cdfb0e3a65f153ade970",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"sun\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-ce650e104a1ecd59b552",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small river\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-d4d71f4ad12c12f1d81e",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small tea\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-e532a6e3b9e7c596ef51",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-eef9afaf428931546514",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-ef589877ae629cef4851",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-copy-f23580624c2ec27dac13",
+              "category": "copy",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-0c3ea96a256f896368c2",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"40\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-0d815fca90706ef4bfe6",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"44\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-0e6ae58181ab7081a7f5",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"60\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-0fd9198c245f96d4fa27",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-129878d345ebde284b5f",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"64\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-12a0b6078d60e9d269b1",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"60\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-1364d8b2a09f2615bb95",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"64\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-166d6e8961e9a13c5b94",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-1705bb248693695d94d8",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"40\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-203cd359d9ef74f310d2",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-2167fd6d985f3bf7c543",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-3a1c76359cefa136e938",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-3cb561d2f21e30337d41",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"book\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-3f3a446df4b037f676c1",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"40\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-4206436c62ef914b6caf",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"40\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-494175ad8f70fac962fd",
+              "category": "grounding",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"40\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-513b54d68b96bb826335",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-56dafec7ab171d393505",
+              "category": "grounding",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"60\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-5920fd69ec90b930aed8",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"64\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-5a644d35129831dd0c60",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-5dbaaa62e18eb6adfe4a",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"40\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-5f8747ee17cb97e1e3ed",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-5fdcf61bf2a59668e966",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"40\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-63164010fc850e38d1cd",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"40\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-6501e382a31fc0df4a2d",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"40\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-6a9d49eb72f8e96dc09a",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"40\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-6af59b6fd0e57acf07f4",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-6b5947787ab9e323f7af",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-6b5ff891a034ea2550f8",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-6f3675b8ab710fd830f8",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-748f66e19370d32c2202",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-75dc22d8bed0f5f2d4af",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-808065e594da4826872a",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"40\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-844da1b8c1aa62eca981",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-86dbd9b4d08549ce5ddd",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-893371166506c6bde8e4",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-8ab5a39c5943a125e7b3",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"40\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-8c48f25553f249afd4d5",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-90e51868d48f0b4c58b2",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"40\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-921991539e6b327fd4e9",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"40\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-923de2097b99b874201a",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-92a2b62a62719dd69c8b",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"40\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-94c3a26d2a4a9cda2a3f",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"40\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-94f0e98f35c72c41d71c",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"sun\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-99d1f95d244acfd3d826",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"40\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-9b48846825d4202d9a03",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-9c4a21a4b228fc0ffbe3",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"42\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-a0ed35adfba4c458c8de",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-a646b8250f7f3ec7918a",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"44\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-aa36f1c37f7f4d7ae851",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-ad124471ba71f7467c62",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"40\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-aeb677489f20b1918c06",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"64\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-b65020e9e2b03980ff16",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-bb304357d8caf4ad3760",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"book\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-bef4409f82d788fe0acc",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"64\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-c49aefd7543a380c4ee1",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-d367a4331378e78efcb0",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-d60397d73dc158d91cbc",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"40\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-df03b71e6489d8795b03",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-ee9f7b948e559ba603dc",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"cat\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-f8f055f0e533b94140dd",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"44\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-fbcf8f86d015f755bed1",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"44\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-fe75169aaaf11e82f405",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-grounding-feff2d7ae6fbc042fcff",
+              "category": "grounding",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"small\"}"
+            },
+            {
+              "id": "synthetic-v3-python-0b9723d2537364d48b83",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"12\"}"
+            },
+            {
+              "id": "synthetic-v3-python-14a777fddabadb570892",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"12\"}"
+            },
+            {
+              "id": "synthetic-v3-python-1a6447b4f01fbd737ae8",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"12\"}"
+            },
+            {
+              "id": "synthetic-v3-python-1de248c3296e2f3373a0",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"12\"}"
+            },
+            {
+              "id": "synthetic-v3-python-6140f455d109116946e7",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"12\"}"
+            },
+            {
+              "id": "synthetic-v3-python-61e4518970ecbe12624c",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"12\"}"
+            },
+            {
+              "id": "synthetic-v3-python-6226aa01bbe389394de8",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"12\"}"
+            },
+            {
+              "id": "synthetic-v3-python-6bf4c3391075e988171f",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"12\"}"
+            },
+            {
+              "id": "synthetic-v3-python-8032129c111b05cb4350",
+              "category": "python",
+              "passed": true,
+              "valid_action": true,
+              "raw": "{\"final\":\"12\"}"
+            },
+            {
+              "id": "synthetic-v3-python-8e67024923372e8b35a4",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"12\"}"
+            },
+            {
+              "id": "synthetic-v3-python-ce443b31c9edae39426f",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"12\"}"
+            },
+            {
+              "id": "synthetic-v3-python-d41c9e238cf5728aa25e",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"12\"}"
+            },
+            {
+              "id": "synthetic-v3-python-d52f6b52b5790a512f00",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"12\"}"
+            },
+            {
+              "id": "synthetic-v3-python-dd9acee102d2a75199e0",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"12\"}"
+            },
+            {
+              "id": "synthetic-v3-python-fbb0331a13929801ec8e",
+              "category": "python",
+              "passed": false,
+              "valid_action": true,
+              "raw": "{\"final\":\"12\"}"
+            }
+          ]
+        }
+      },
+      "instruction_validation_loss": 2.8220036206340082,
+      "prior_instruction_validation_loss": 3.1646103762541533,
+      "story_validation_loss": 3.3003030816713967
+    }
+  ],
+  "immutable_checkpoints_reverified": true
+}

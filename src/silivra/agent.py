@@ -29,6 +29,10 @@ class GenerationCancelled(RuntimeError):
     """A cooperative cancellation interrupted model inference."""
 
 
+class GenerationBudgetError(RuntimeError):
+    """Generation exhausted its output budget before completing an action."""
+
+
 def parse_action(text: str) -> dict:
     """Accept exactly one action, never extract executable JSON from prose."""
     if not isinstance(text, str) or len(text) > 64_000:
@@ -172,6 +176,62 @@ def build_system_prompt(tools: list[dict]) -> str:
     return POLICY + " Tools: " + json.dumps(specs, separators=(",", ":"))
 
 
+def _completed_history_turns(history: list[dict]) -> list[list[dict]]:
+    """Replay only complete user/action/observation turns in training format.
+
+    A bounded transcript tail can begin in the middle of a tool call or end
+    after an interrupted turn. Neither becomes a synthetic user instruction.
+    Roles are allowlisted, assistant actions are parsed again, and tool names
+    come only from their immediately preceding validated action. Stored state
+    never introduces a system message or enables a tool.
+    """
+    from silivra.instructions import format_prompt
+
+    turns, current = [], []
+    expected, pending_tool, valid = "user", None, True
+
+    def finish():
+        if not current or not valid or expected != "user":
+            return
+        try:
+            # Validate UTF-8/size constraints too: old or redacted records must
+            # not make a valid current request impossible to format.
+            format_prompt(current, add_assistant_prefix=False)
+        except (ValueError, UnicodeError):
+            return
+        turns.append(current)
+
+    for item in history:
+        role, content = item.get("role"), item.get("content")
+        if role == "user":
+            finish()
+            current = [{"role": "user", "content": content}]
+            expected, pending_tool, valid = "assistant", None, True
+            continue
+        if not current or not valid:
+            continue
+        if role == "assistant" and expected == "assistant":
+            if item.get("metadata", {}).get("turn_status"):
+                valid = False
+                continue
+            try:
+                action = parse_action(content)
+            except ValueError:
+                valid = False
+                continue
+            current.append({"role": "assistant", "content": json.dumps(
+                action, ensure_ascii=False, separators=(",", ":"))})
+            pending_tool = action.get("tool")
+            expected = "tool" if pending_tool else "user"
+        elif role == "tool" and expected == "tool":
+            current.append({"role": "tool", "name": pending_tool, "content": content})
+            expected, pending_tool = "assistant", None
+        else:
+            valid = False
+    finish()
+    return turns
+
+
 class Agent:
     def __init__(self, backend: Backend, tools, memory, scope: str, *, config=None, tool_names=None):
         self.backend, self.tools, self.memory, self.scope = backend, tools, memory, scope
@@ -203,13 +263,9 @@ class Agent:
             if json.loads(context)["memories"]:
                 optional_memory = {"role": "user", "content": "Retrieved memory data: " + context}
                 messages.append(optional_memory)
-        for item in history:
-            # History is provided as data, never replayed as a new system policy
-            # or as an executable tool request. This also tolerates interrupted turns.
-            payload = {"past_role": item["role"], "content": item["content"]}
-            message = {"role": "user", "content": "Past conversation data: " + json.dumps(payload, ensure_ascii=False)}
-            optional_history.append(message)
-            messages.append(message)
+        optional_history = _completed_history_turns(history)
+        for turn in optional_history:
+            messages.extend(turn)
         messages.append({"role": "user", "content": prompt})
         self.memory.add_message(self.scope, session, "user", prompt)
         events = []
@@ -273,6 +329,8 @@ class Agent:
                 return stop("context_budget", str(error))
             except GenerationCancelled:
                 return stop(interruption() or "cancelled")
+            except GenerationBudgetError as error:
+                return stop("output_budget", str(error))
             except (ValueError, RuntimeError, OSError, TypeError) as error:
                 return stop("backend_error", str(error))
             # A generation that overruns its budget may not start a side effect.
@@ -343,8 +401,8 @@ class Agent:
             # checkpoint's token budget. Optional history must satisfy both.
             if len(messages) > 128 and history:
                 oldest = history.pop(0)
-                messages[:] = [item for item in messages if item is not oldest]
-                dropped_history += 1
+                messages[:] = [item for item in messages if not any(item is old for old in oldest)]
+                dropped_history += len(oldest)
                 continue
             # Accounting is a backend operation too: preserve policy, the
             # latest request, and schema constraints across backend adapters.
@@ -353,8 +411,8 @@ class Agent:
                 return {**info, "history_dropped": dropped_history, "memories_dropped": dropped_memories}
             if history:
                 oldest = history.pop(0)
-                messages[:] = [item for item in messages if item is not oldest]
-                dropped_history += 1
+                messages[:] = [item for item in messages if not any(item is old for old in oldest)]
+                dropped_history += len(oldest)
                 continue
             if memory_message is not None and any(item is memory_message for item in messages):
                 envelope = json.loads(memory_message["content"].removeprefix("Retrieved memory data: "))

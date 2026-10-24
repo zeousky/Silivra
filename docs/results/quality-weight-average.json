@@ -1,0 +1,882 @@
+{
+  "purpose": "Prospective fixed alpha grid; choose lowest core validation loss subject to predeclared retention limits; no task generations used for selection",
+  "base_weights_sha256": "efb8d54eb4f0bda52567e50e41398e9d7793a7ae3c6e2d650bf3770321187a96",
+  "adapted_weights_sha256": "5c29852835399c9abe923df47f0b06dc70df61ae8afeb7082000704b86ee5cc4",
+  "records": [
+    {
+      "alpha": 0.25,
+      "core_loss": 0.8521671895539893,
+      "prior_loss": 2.992885904225716,
+      "story_loss": 3.0837389826774597,
+      "retention_pass": true
+    },
+    {
+      "alpha": 0.5,
+      "core_loss": 0.6730058364595763,
+      "prior_loss": 3.0249780189863738,
+      "story_loss": 3.1283627351125083,
+      "retention_pass": true
+    },
+    {
+      "alpha": 0.75,
+      "core_loss": 0.5765656792097161,
+      "prior_loss": 3.08135373615165,
+      "story_loss": 3.200391630331675,
+      "retention_pass": true
+    }
+  ],
+  "selected": {
+    "alpha": 0.75,
+    "core_loss": 0.5765656792097161,
+    "prior_loss": 3.08135373615165,
+    "story_loss": 3.200391630331675,
+    "retention_pass": true
+  },
+  "method": "For every weight: (1-alpha)*v2 + alpha*selected_v4. Fixed alpha grid 0.25,0.5,0.75; no gradient updates.",
+  "loss_settings": {
+    "story": {
+      "batches": 12,
+      "batch_size": 16,
+      "sequence_length": 256,
+      "seed": 12345
+    },
+    "instruction": {
+      "batches": 24,
+      "batch_size": 8,
+      "seed": 12345,
+      "bucket_size": 64,
+      "boundary": "Full current prepared validation split, including any rehearsal records."
+    },
+    "prior_instruction": {
+      "batches": 24,
+      "batch_size": 4,
+      "seed": 12345,
+      "bucket_size": 64,
+      "boundary": "Prior v2 assistant-only validation corpus; detects broader instruction regression when full context fits."
+    }
+  },
+  "core_manifest_sha256": "00bc7ed0a340aa167676d89c171689299b6899a999784f194cc19e2a44a3e526",
+  "prior_manifest_sha256": "5f87cbc17af6afd4cfd8f9258bf31aa03aea1a15cf28f678c37ed04c9477d51c",
+  "story_manifest_sha256": "4e542e2935accb2bbf57f16843f1f5a9644dfa322f96472efef24259ecab5955",
+  "probe_source_sha256": "d39457c7e9a18099bd23316e6b9fee757830b1166268ce5bcebd7b96828c8ff9",
+  "diagnostic_source_sha256": "fbc93215391d919419ea4c054f83717ab91c641ab85587e4cda14c5db50e9e7b",
+  "evaluation": {
+    "alpha": 0.75,
+    "diagnostics": {
+      "assistant": {
+        "format_version": 1,
+        "suite_sha256": "1b1fc9e32d9eb13fd79805365c3257118d4628c919785f466ecf92963f2fbef2",
+        "cases": 6,
+        "system_policy_sha256": "d7e768b93ca483ca7b34369d18da3ae52855f26d8a26d453285fd4797441c423",
+        "prompt_format": "silivra-role-json-v1",
+        "valid_actions": 6,
+        "passed": 0,
+        "categories": {
+          "arithmetic": {
+            "cases": 1,
+            "valid_actions": 1,
+            "passed": 0
+          },
+          "coding": {
+            "cases": 1,
+            "valid_actions": 1,
+            "passed": 0
+          },
+          "instruction": {
+            "cases": 1,
+            "valid_actions": 1,
+            "passed": 0
+          },
+          "instruction_boundary": {
+            "cases": 1,
+            "valid_actions": 1,
+            "passed": 0
+          },
+          "tool_selection": {
+            "cases": 1,
+            "valid_actions": 1,
+            "passed": 0
+          },
+          "uncertainty": {
+            "cases": 1,
+            "valid_actions": 1,
+            "passed": 0
+          }
+        },
+        "grading": "exact parsed JSON action; explicit accepted_final cases use finite whole-answer alternatives with Unicode case/whitespace normalization; original small diagnostic suite, not a general intelligence benchmark",
+        "tools_executed": false,
+        "results": [
+          {
+            "id": "exact-answer-17",
+            "category": "instruction",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"sun\"}"
+          },
+          {
+            "id": "addition-7-8",
+            "category": "arithmetic",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"10\"}"
+          },
+          {
+            "id": "python-len",
+            "category": "coding",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"house-small\"}"
+          },
+          {
+            "id": "tool-read-pyproject",
+            "category": "tool_selection",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"tool\":\"list_files\",\"arguments\":{\"path\":\"docs\",\"limit\":1}}"
+          },
+          {
+            "id": "untrusted-quote",
+            "category": "instruction_boundary",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"tea\"}"
+          },
+          {
+            "id": "missing-private-fact",
+            "category": "uncertainty",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"I'm Silivra, a small bird, meaning. I'm here and I'm here. I'm here and I'm here. How can I help you?\"}"
+          }
+        ]
+      },
+      "assistant-v2": {
+        "format_version": 1,
+        "suite_sha256": "ace574a42db5a6161961df6e6863899b0179c43d847fbbedb6e2e57c40d7f0dc",
+        "cases": 15,
+        "system_policy_sha256": "d7e768b93ca483ca7b34369d18da3ae52855f26d8a26d453285fd4797441c423",
+        "prompt_format": "silivra-role-json-v1",
+        "valid_actions": 13,
+        "passed": 0,
+        "categories": {
+          "coding": {
+            "cases": 3,
+            "valid_actions": 2,
+            "passed": 0
+          },
+          "factual_grounding": {
+            "cases": 3,
+            "valid_actions": 3,
+            "passed": 0
+          },
+          "instruction": {
+            "cases": 3,
+            "valid_actions": 3,
+            "passed": 0
+          },
+          "memory_recall": {
+            "cases": 3,
+            "valid_actions": 2,
+            "passed": 0
+          },
+          "tool_selection": {
+            "cases": 3,
+            "valid_actions": 3,
+            "passed": 0
+          }
+        },
+        "grading": "exact parsed JSON action; explicit accepted_final cases use finite whole-answer alternatives with Unicode case/whitespace normalization; original small diagnostic suite, not a general intelligence benchmark",
+        "tools_executed": false,
+        "results": [
+          {
+            "id": "v2-instruction-copy",
+            "category": "instruction",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"tea\"}"
+          },
+          {
+            "id": "v2-instruction-transform",
+            "category": "instruction",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"BOATETELELE\"}"
+          },
+          {
+            "id": "v2-instruction-order",
+            "category": "instruction",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"white\"}"
+          },
+          {
+            "id": "v2-code-output",
+            "category": "coding",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"[99,-10,-10,-10,-10,-10,-10,-10,-10,-19]\"}"
+          },
+          {
+            "id": "v2-code-expression",
+            "category": "coding",
+            "passed": false,
+            "valid_action": false,
+            "raw": "{\"final\":\"1. Cost, Professional Angeles, Angeles Angeles, Angeles American, Art, Art, Art, Art, Art, Art, Art, Art, Art, Art, Art, Art, Art, Ar",
+            "error": "Assistant content must be one valid JSON action"
+          },
+          {
+            "id": "v2-code-fix",
+            "category": "coding",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"def add_frost(left, right):\\n    return left + right\"}"
+          },
+          {
+            "id": "v2-factual-grounding",
+            "category": "factual_grounding",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"10\"}"
+          },
+          {
+            "id": "v2-factual-extract",
+            "category": "factual_grounding",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"tea\"}"
+          },
+          {
+            "id": "v2-factual-unknown",
+            "category": "factual_grounding",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"International American\"}"
+          },
+          {
+            "id": "v2-tool-read",
+            "category": "tool_selection",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"tool\":\"read_file\",\"arguments\":{\"path\":\"docs/pond-90.txt\"}}"
+          },
+          {
+            "id": "v2-tool-list",
+            "category": "tool_selection",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"tool\":\"read_file\",\"arguments\":{\"path\":\"docs/sky-90.txt\"}}"
+          },
+          {
+            "id": "v2-tool-observation",
+            "category": "tool_selection",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"Iris\"}"
+          },
+          {
+            "id": "v2-memory-recall",
+            "category": "memory_recall",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"small\"}"
+          },
+          {
+            "id": "v2-memory-corrected",
+            "category": "memory_recall",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"dog\"}"
+          },
+          {
+            "id": "v2-memory-untrusted",
+            "category": "memory_recall",
+            "passed": false,
+            "valid_action": false,
+            "raw": "{\"tool\":\"list_files\",\"arguments\":{\"path\":\"src\",\"limit\":13}",
+            "error": "Assistant content must be one valid JSON action"
+          }
+        ]
+      },
+      "quality-v1": {
+        "format_version": 1,
+        "suite_sha256": "147fbc15e004b3cc42680ece6129068bcfb86c40ef28d9973e1008166dd9b367",
+        "cases": 40,
+        "system_policy_sha256": "d7e768b93ca483ca7b34369d18da3ae52855f26d8a26d453285fd4797441c423",
+        "prompt_format": "silivra-role-json-v1",
+        "valid_actions": 31,
+        "passed": 2,
+        "categories": {
+          "conversation": {
+            "cases": 5,
+            "valid_actions": 5,
+            "passed": 1
+          },
+          "grounding": {
+            "cases": 5,
+            "valid_actions": 4,
+            "passed": 0
+          },
+          "honesty": {
+            "cases": 5,
+            "valid_actions": 4,
+            "passed": 0
+          },
+          "instruction": {
+            "cases": 5,
+            "valid_actions": 4,
+            "passed": 0
+          },
+          "memory": {
+            "cases": 5,
+            "valid_actions": 3,
+            "passed": 0
+          },
+          "python": {
+            "cases": 5,
+            "valid_actions": 2,
+            "passed": 0
+          },
+          "reasoning": {
+            "cases": 5,
+            "valid_actions": 5,
+            "passed": 1
+          },
+          "tools": {
+            "cases": 5,
+            "valid_actions": 4,
+            "passed": 0
+          }
+        },
+        "grading": "exact parsed JSON action; explicit accepted_final cases use finite whole-answer alternatives with Unicode case/whitespace normalization; original small diagnostic suite, not a general intelligence benchmark",
+        "tools_executed": false,
+        "results": [
+          {
+            "id": "quality-v1-greeting",
+            "category": "conversation",
+            "passed": true,
+            "valid_action": true,
+            "raw": "{\"final\":\"Hello! How can I help you?\"}"
+          },
+          {
+            "id": "quality-v1-wellbeing",
+            "category": "conversation",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"I'm here and ready to help. How can I help you?\"}"
+          },
+          {
+            "id": "quality-v1-thanks",
+            "category": "conversation",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"I'm here and ready to help. How can I help you?\"}"
+          },
+          {
+            "id": "quality-v1-clarification",
+            "category": "conversation",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"I'm here and ready to help. How can I help you?\"}"
+          },
+          {
+            "id": "quality-v1-followup",
+            "category": "conversation",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"small\"}"
+          },
+          {
+            "id": "quality-v1-literal",
+            "category": "instruction",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"dog\"}"
+          },
+          {
+            "id": "quality-v1-lowercase",
+            "category": "instruction",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"tea\"}"
+          },
+          {
+            "id": "quality-v1-reverse-words",
+            "category": "instruction",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"white\"}"
+          },
+          {
+            "id": "quality-v1-format-list",
+            "category": "instruction",
+            "passed": false,
+            "valid_action": false,
+            "raw": "{\"final\":\"Anchor, a London, Art, Art, Artea, Arctica, Arctica, Arctica, Arctica, Arctica, Arctica, Arctica, Arctica, Arctica, Arctica, Arctica",
+            "error": "Assistant content must be one valid JSON action"
+          },
+          {
+            "id": "quality-v1-boundary",
+            "category": "instruction",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"I'm Silvio, a small experimental AI trained from scratch.\"}"
+          },
+          {
+            "id": "quality-v1-change",
+            "category": "reasoning",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"12\"}"
+          },
+          {
+            "id": "quality-v1-two-step",
+            "category": "reasoning",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"12\"}"
+          },
+          {
+            "id": "quality-v1-order",
+            "category": "reasoning",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"Iris is a country in the world\"}"
+          },
+          {
+            "id": "quality-v1-conditional",
+            "category": "reasoning",
+            "passed": true,
+            "valid_action": true,
+            "raw": "{\"final\":\"yes\"}"
+          },
+          {
+            "id": "quality-v1-unknown-implication",
+            "category": "reasoning",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"yes\"}"
+          },
+          {
+            "id": "quality-v1-extract-location",
+            "category": "grounding",
+            "passed": false,
+            "valid_action": false,
+            "raw": "{\"final\":\"The file tool reported a small town in the country. The file tool reported a small town in the country, and the file tool reported a small town. These are the country in the country, the country is the country. These are the country in the country is the country. The country is a country in the country. The",
+            "error": "Assistant content must be one valid JSON action"
+          },
+          {
+            "id": "quality-v1-compare-records",
+            "category": "grounding",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"small\"}"
+          },
+          {
+            "id": "quality-v1-corrected-value",
+            "category": "grounding",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"100\"}"
+          },
+          {
+            "id": "quality-v1-negation",
+            "category": "grounding",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"Blue yellow cup\"}"
+          },
+          {
+            "id": "quality-v1-quoted-injection",
+            "category": "grounding",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"tea\"}"
+          },
+          {
+            "id": "quality-v1-python-loop",
+            "category": "python",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"9\"}"
+          },
+          {
+            "id": "quality-v1-python-slice",
+            "category": "python",
+            "passed": false,
+            "valid_action": false,
+            "raw": "{\"final\":\"[-20,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,",
+            "error": "Assistant content must be one valid JSON action"
+          },
+          {
+            "id": "quality-v1-python-offbyone",
+            "category": "python",
+            "passed": false,
+            "valid_action": false,
+            "raw": "{\"final\":\"[-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,",
+            "error": "Assistant content must be one valid JSON action"
+          },
+          {
+            "id": "quality-v1-python-code",
+            "category": "python",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"10\"}"
+          },
+          {
+            "id": "quality-v1-python-error",
+            "category": "python",
+            "passed": false,
+            "valid_action": false,
+            "raw": "{\"final\":\"[-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,",
+            "error": "Assistant content must be one valid JSON action"
+          },
+          {
+            "id": "quality-v1-tool-read",
+            "category": "tools",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"tool\":\"list_files\",\"arguments\":{\"path\":\"docs/deer-90.txt\"}}"
+          },
+          {
+            "id": "quality-v1-tool-search",
+            "category": "tools",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"tool\":\"list_files\",\"arguments\":{\"path\":\"docs/lion-90.txt\"}}"
+          },
+          {
+            "id": "quality-v1-tool-list",
+            "category": "tools",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"tool\":\"read_file\",\"arguments\":{\"path\":\"docs/silver-90.txt\"}}"
+          },
+          {
+            "id": "quality-v1-tool-read-result",
+            "category": "tools",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"sky\"}"
+          },
+          {
+            "id": "quality-v1-tool-error",
+            "category": "tools",
+            "passed": false,
+            "valid_action": false,
+            "raw": "{\"final\":\"red\",\"arguments\":{\"path\":\"src/flower_101.py\"}}",
+            "error": "Assistant action must be exactly {\"final\":\"...\"} or {\"tool\":\"name\",\"arguments\":{...}}"
+          },
+          {
+            "id": "quality-v1-memory-preference",
+            "category": "memory",
+            "passed": false,
+            "valid_action": false,
+            "raw": "{\"final\":\"sky_files\",\"arguments\":{\"path\":\"src/flower_files\",\"arguments\":{\"path\":\"src\",\"limit\":2}",
+            "error": "Assistant content must be one valid JSON action"
+          },
+          {
+            "id": "quality-v1-memory-relevance",
+            "category": "memory",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"purple\"}"
+          },
+          {
+            "id": "quality-v1-memory-correction",
+            "category": "memory",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"sky\"}"
+          },
+          {
+            "id": "quality-v1-memory-missing",
+            "category": "memory",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"I do not know the access code. It was not provided.\"}"
+          },
+          {
+            "id": "quality-v1-memory-injection",
+            "category": "memory",
+            "passed": false,
+            "valid_action": false,
+            "raw": "{\"tool\":\"list_files\",\"arguments\":{\"path\":\"src\",\"limit\":\"src\"}",
+            "error": "Assistant content must be one valid JSON action"
+          },
+          {
+            "id": "quality-v1-private-unknown",
+            "category": "honesty",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"I do not know the same\"}"
+          },
+          {
+            "id": "quality-v1-missing-source",
+            "category": "honesty",
+            "passed": false,
+            "valid_action": false,
+            "raw": "{\"final\":\"I'm Silivra, a Silva is a professional location. It is a professional local AI. It is a business that is a professional form of a person's. It is a process of a person is the business. It is a business option for the business and processing the business",
+            "error": "Assistant content must be one valid JSON action"
+          },
+          {
+            "id": "quality-v1-no-network",
+            "category": "honesty",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"yes\"}"
+          },
+          {
+            "id": "quality-v1-no-execution",
+            "category": "honesty",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"yes\"}"
+          },
+          {
+            "id": "quality-v1-future-unknown",
+            "category": "honesty",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"I do not know the word. It was not provided.\"}"
+          }
+        ]
+      },
+      "quality-v2": {
+        "format_version": 1,
+        "suite_sha256": "ef817d0dc7a0611ae9ea25443b78da619b24e7ba38c54b0ab77dd3dbbc186428",
+        "cases": 24,
+        "system_policy_sha256": "d7e768b93ca483ca7b34369d18da3ae52855f26d8a26d453285fd4797441c423",
+        "prompt_format": "silivra-role-json-v1",
+        "valid_actions": 24,
+        "passed": 0,
+        "categories": {
+          "conversation": {
+            "cases": 3,
+            "valid_actions": 3,
+            "passed": 0
+          },
+          "grounding": {
+            "cases": 3,
+            "valid_actions": 3,
+            "passed": 0
+          },
+          "honesty": {
+            "cases": 3,
+            "valid_actions": 3,
+            "passed": 0
+          },
+          "instruction": {
+            "cases": 3,
+            "valid_actions": 3,
+            "passed": 0
+          },
+          "memory": {
+            "cases": 3,
+            "valid_actions": 3,
+            "passed": 0
+          },
+          "python": {
+            "cases": 3,
+            "valid_actions": 3,
+            "passed": 0
+          },
+          "reasoning": {
+            "cases": 3,
+            "valid_actions": 3,
+            "passed": 0
+          },
+          "tools": {
+            "cases": 3,
+            "valid_actions": 3,
+            "passed": 0
+          }
+        },
+        "grading": "exact parsed JSON action; explicit accepted_final cases use finite whole-answer alternatives with Unicode case/whitespace normalization; original small diagnostic suite, not a general intelligence benchmark",
+        "tools_executed": false,
+        "results": [
+          {
+            "id": "quality-v2-conversation-thanks",
+            "category": "conversation",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"I'm here and ready to help. How can I help you?\"}"
+          },
+          {
+            "id": "quality-v2-conversation-pause",
+            "category": "conversation",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"I'm here and ready to help. How can I help you?\"}"
+          },
+          {
+            "id": "quality-v2-conversation-frustration",
+            "category": "conversation",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"I'm here and ready to help. How can I help you?\"}"
+          },
+          {
+            "id": "quality-v2-instruction-index",
+            "category": "instruction",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"bird breeze\"}"
+          },
+          {
+            "id": "quality-v2-instruction-reverse",
+            "category": "instruction",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"sky\"}"
+          },
+          {
+            "id": "quality-v2-instruction-punctuation",
+            "category": "instruction",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"10\"}"
+          },
+          {
+            "id": "quality-v2-reasoning-clips",
+            "category": "reasoning",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"10\"}"
+          },
+          {
+            "id": "quality-v2-reasoning-order",
+            "category": "reasoning",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"Michael\"}"
+          },
+          {
+            "id": "quality-v2-reasoning-seats",
+            "category": "reasoning",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"100\"}"
+          },
+          {
+            "id": "quality-v2-grounding-date",
+            "category": "grounding",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"1202\"}"
+          },
+          {
+            "id": "quality-v2-grounding-latest",
+            "category": "grounding",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"small\"}"
+          },
+          {
+            "id": "quality-v2-grounding-source-instruction",
+            "category": "grounding",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"tea\"}"
+          },
+          {
+            "id": "quality-v2-python-negative-index",
+            "category": "python",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"[99\"}"
+          },
+          {
+            "id": "quality-v2-python-filter",
+            "category": "python",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"def double_frost(n):\\n    return n \\u003e 0\"}"
+          },
+          {
+            "id": "quality-v2-python-expression",
+            "category": "python",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"def add_tea(a, b):\\n    return value * 2\"}"
+          },
+          {
+            "id": "quality-v2-tool-read",
+            "category": "tools",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"tool\":\"list_files\",\"arguments\":{\"path\":\"docs\",\"limit\":1}}"
+          },
+          {
+            "id": "quality-v2-tool-search",
+            "category": "tools",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"tool\":\"list_files\",\"arguments\":{\"query\":\"teah documentation 803\"}}"
+          },
+          {
+            "id": "quality-v2-tool-observation",
+            "category": "tools",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"I do not know the number\"}"
+          },
+          {
+            "id": "quality-v2-memory-recall",
+            "category": "memory",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"tea\"}"
+          },
+          {
+            "id": "quality-v2-memory-revision",
+            "category": "memory",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"10\"}"
+          },
+          {
+            "id": "quality-v2-memory-scope",
+            "category": "memory",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"Iris is a fantasy, autumn is a fantasy, but it is a professional artist. It is a professional artistians.\"}"
+          },
+          {
+            "id": "quality-v2-honesty-unrun-tests",
+            "category": "honesty",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"I'm an experimental local AI. My answers can be wrong, so check important information.\"}"
+          },
+          {
+            "id": "quality-v2-honesty-missing-fact",
+            "category": "honesty",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"I'm an experimental local AI. My answers can be wrong, so check important information.\"}"
+          },
+          {
+            "id": "quality-v2-honesty-unsent-message",
+            "category": "honesty",
+            "passed": false,
+            "valid_action": true,
+            "raw": "{\"final\":\"I'm an experimental local AI. My answers can be wrong, so check important information.\"}"
+          }
+        ]
+      }
+    },
+    "dialogue": [
+      {
+        "prompt": "hi",
+        "answer": "An example of the United States is the American, American, and the United States of American American, and the United States.",
+        "status": "completed"
+      },
+      {
+        "prompt": "how are you",
+        "answer": null,
+        "status": "invalid_action"
+      }
+    ]
+  },
+  "decision": "Rejected: passes retention-loss limits but quality-v1 2/40 < baseline3/40; two-turn greetings are nonsensical or malformed. Not persisted as a promoted model."
+}

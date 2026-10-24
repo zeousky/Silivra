@@ -1,0 +1,532 @@
+{
+  "format_version": 1,
+  "date_utc": "2026-10-24T12:57:36.478553+00:00",
+  "purpose": "Small practical held-out diagnostic, not a general intelligence benchmark",
+  "training": "None. Explicit pretrained inference; original Silivra checkpoints unchanged.",
+  "contamination_boundary": "Original synthetic tasks withheld from Silivra training. Upstream pretrained training data cannot be audited for overlap.",
+  "execution": "Local model, real temporary read-only tools and scoped memory; no network, eval, exec, or shell",
+  "generation": {
+    "temperature": 0,
+    "max_new_tokens": 256,
+    "max_steps_per_turn": 5,
+    "max_seconds_per_turn": 180
+  },
+  "provenance": {
+    "suite_sha256": "5d5dabc08c11aa193d5b8c2ebd9af393fb9a8363dc486146f8c415dacaecefef",
+    "script_sha256": "14af65dd523f8e4ed79716478b16dfbbc825c06982bc55a4b1cc1f0b77eba70a",
+    "backend_sha256": "3973aa183f8c55af1d6555946e636e89c7a631bcdb8b9605d0b43e64f2c1d60a",
+    "structured_sha256": "331ee5c19af3e2f017ae6ee5b20d721daadb5c605b6368cd5b59bb74084f4b5d",
+    "prompt_cache_sha256": "22422a6871c53af913a6c4ae6d75cf504ed3adf01095ecebada2a04831a3fa61",
+    "tools_sha256": "29b427cac841c8b71263e9c31a09ab8351a404dd906a317cc89a0d1a7878d29e",
+    "arithmetic_sha256": "011828f429f88bc4cbfedbe9841926042f22cc2e5b1c8370978989a5b6a06785",
+    "agent_sha256": "ef4da85dc95dadaa4ac4847f75a6ea7841497b13fc3ebba84ab5070602e507d7"
+  },
+  "model_load_and_verification_seconds": 3.220593,
+  "records": [
+    {
+      "id": "calculator-parentheses",
+      "category": "calculator",
+      "prompts": [
+        "Calculate (84 * 17 - 93) / 5 using calculate. Reply with only the result."
+      ],
+      "passed": true,
+      "grading_reason": "Final content and required observations passed",
+      "seconds": 6.402212,
+      "turns": [
+        {
+          "status": "completed",
+          "answer": "267",
+          "steps": 2,
+          "events": [
+            {
+              "action": {
+                "tool": "calculate",
+                "arguments": {
+                  "expression": "((84 * 17) - 93) / 5"
+                }
+              },
+              "observation": {
+                "ok": true,
+                "result": {
+                  "expression": "((84 * 17) - 93) / 5",
+                  "result": "267",
+                  "rounded": false,
+                  "precision_digits": 50
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "generations": [
+        {
+          "raw_output": "{\"tool\":\"calculate\",\"arguments\":{\"expression\":\"((84 * 17) - 93) / 5\"}}",
+          "seconds": 5.24237,
+          "metrics": {
+            "prompt_tokens": 610,
+            "generated_tokens": 27,
+            "prefill_tokens": 610,
+            "cached_prompt_tokens": 0,
+            "cache_retained": true,
+            "cache_retained_tokens": 609,
+            "total_seconds": 5.239207291997445,
+            "time_to_first_token_seconds": 4.027170792000106,
+            "tokens_per_second": 5.15345137063784,
+            "decode_tokens_per_second": 22.63130794256875,
+            "finish_reason": "stop",
+            "structured_decoding": "json-action-shape-v1",
+            "runtime_constraint_count": 2,
+            "context_window": 8192,
+            "mlx_active_gib": 4.398935325443745,
+            "mlx_peak_gib": 4.72439244017005,
+            "process_peak_rss_gib": 4.361968994140625
+          }
+        },
+        {
+          "raw_output": "{\"final\":\"267\"}",
+          "seconds": 1.140877,
+          "metrics": {
+            "prompt_tokens": 711,
+            "generated_tokens": 8,
+            "prefill_tokens": 105,
+            "cached_prompt_tokens": 606,
+            "cache_retained": true,
+            "cache_retained_tokens": 710,
+            "total_seconds": 1.1379309160001867,
+            "time_to_first_token_seconds": 0.7960211249992426,
+            "tokens_per_second": 7.030303762305627,
+            "decode_tokens_per_second": 24.743664680938856,
+            "finish_reason": "stop",
+            "structured_decoding": "json-action-shape-v1",
+            "runtime_constraint_count": 2,
+            "context_window": 8192,
+            "mlx_active_gib": 4.39817238599062,
+            "mlx_peak_gib": 4.72439244017005,
+            "process_peak_rss_gib": 4.361968994140625
+          }
+        }
+      ]
+    },
+    {
+      "id": "calculator-decimal",
+      "category": "calculator",
+      "prompts": [
+        "Use calculate to add 0.1 and 0.2. Reply with only the decimal result."
+      ],
+      "passed": true,
+      "grading_reason": "Final content and required observations passed",
+      "seconds": 2.106515,
+      "turns": [
+        {
+          "status": "completed",
+          "answer": "0.3",
+          "steps": 2,
+          "events": [
+            {
+              "action": {
+                "tool": "calculate",
+                "arguments": {
+                  "expression": "0.1 + 0.2"
+                }
+              },
+              "observation": {
+                "ok": true,
+                "result": {
+                  "expression": "0.1 + 0.2",
+                  "result": "0.3",
+                  "rounded": false,
+                  "precision_digits": 50
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "generations": [
+        {
+          "raw_output": "{\"tool\":\"calculate\",\"arguments\":{\"expression\":\"0.1 + 0.2\"}}",
+          "seconds": 1.128952,
+          "metrics": {
+            "prompt_tokens": 606,
+            "generated_tokens": 19,
+            "prefill_tokens": 31,
+            "cached_prompt_tokens": 575,
+            "cache_retained": true,
+            "cache_retained_tokens": 605,
+            "total_seconds": 1.126073166000424,
+            "time_to_first_token_seconds": 0.2701725830011128,
+            "tokens_per_second": 16.872793503715233,
+            "decode_tokens_per_second": 22.698073149470897,
+            "finish_reason": "stop",
+            "structured_decoding": "json-action-shape-v1",
+            "runtime_constraint_count": 2,
+            "context_window": 8192,
+            "mlx_active_gib": 4.398935325443745,
+            "mlx_peak_gib": 4.72439244017005,
+            "process_peak_rss_gib": 4.361968994140625
+          }
+        },
+        {
+          "raw_output": "{\"final\":\"0.3\"}",
+          "seconds": 0.968809,
+          "metrics": {
+            "prompt_tokens": 691,
+            "generated_tokens": 8,
+            "prefill_tokens": 89,
+            "cached_prompt_tokens": 602,
+            "cache_retained": true,
+            "cache_retained_tokens": 690,
+            "total_seconds": 0.9657545000009122,
+            "time_to_first_token_seconds": 0.6229531659992062,
+            "tokens_per_second": 8.283678719583955,
+            "decode_tokens_per_second": 24.69075790192969,
+            "finish_reason": "stop",
+            "structured_decoding": "json-action-shape-v1",
+            "runtime_constraint_count": 2,
+            "context_window": 8192,
+            "mlx_active_gib": 4.398202903568745,
+            "mlx_peak_gib": 4.72439244017005,
+            "process_peak_rss_gib": 4.361968994140625
+          }
+        }
+      ]
+    },
+    {
+      "id": "calculator-observed-invoice",
+      "category": "calculator",
+      "prompts": [
+        "Read invoice.txt, then use calculate to find the total cost in credits. Reply with only the integer total."
+      ],
+      "passed": true,
+      "grading_reason": "Final content and required observations passed",
+      "seconds": 5.886613,
+      "turns": [
+        {
+          "status": "completed",
+          "answer": "92",
+          "steps": 3,
+          "events": [
+            {
+              "action": {
+                "tool": "read_file",
+                "arguments": {
+                  "path": "invoice.txt"
+                }
+              },
+              "observation": {
+                "ok": true,
+                "result": {
+                  "path": "invoice.txt",
+                  "content": "Beams: quantity 7, unit cost 11 credits.\nRods: quantity 3, unit cost 5 credits.\n",
+                  "sha256": "7dbe863e76e31a923e3d2187516a33571b601acb19d405473afeafbcd90bd471",
+                  "total_lines": 2,
+                  "start_line": 1,
+                  "end_line": 2,
+                  "truncated": false
+                }
+              }
+            },
+            {
+              "action": {
+                "tool": "calculate",
+                "arguments": {
+                  "expression": "7 * 11 + 3 * 5"
+                }
+              },
+              "observation": {
+                "ok": true,
+                "result": {
+                  "expression": "7 * 11 + 3 * 5",
+                  "result": "92",
+                  "rounded": false,
+                  "precision_digits": 50
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "generations": [
+        {
+          "raw_output": "{\"tool\":\"read_file\",\"arguments\":{\"path\":\"invoice.txt\"}}",
+          "seconds": 2.771493,
+          "metrics": {
+            "prompt_tokens": 714,
+            "generated_tokens": 14,
+            "prefill_tokens": 333,
+            "cached_prompt_tokens": 381,
+            "cache_retained": true,
+            "cache_retained_tokens": 713,
+            "total_seconds": 2.767458375001297,
+            "time_to_first_token_seconds": 2.1295492089993786,
+            "tokens_per_second": 5.05879334137896,
+            "decode_tokens_per_second": 22.609487427948793,
+            "finish_reason": "stop",
+            "structured_decoding": "json-action-shape-v1",
+            "runtime_constraint_count": 6,
+            "context_window": 8192,
+            "mlx_active_gib": 4.39908791333437,
+            "mlx_peak_gib": 4.739254262298346,
+            "process_peak_rss_gib": 4.361968994140625
+          }
+        },
+        {
+          "raw_output": "{\"tool\":\"calculate\",\"arguments\":{\"expression\":\"7 * 11 + 3 * 5\"}}",
+          "seconds": 2.139108,
+          "metrics": {
+            "prompt_tokens": 893,
+            "generated_tokens": 22,
+            "prefill_tokens": 183,
+            "cached_prompt_tokens": 710,
+            "cache_retained": true,
+            "cache_retained_tokens": 892,
+            "total_seconds": 2.136013625000487,
+            "time_to_first_token_seconds": 1.1712101249977422,
+            "tokens_per_second": 10.299559769893783,
+            "decode_tokens_per_second": 23.253543291660876,
+            "finish_reason": "stop",
+            "structured_decoding": "json-action-shape-v1",
+            "runtime_constraint_count": 6,
+            "context_window": 8192,
+            "mlx_active_gib": 4.42618752270937,
+            "mlx_peak_gib": 4.739254262298346,
+            "process_peak_rss_gib": 4.361968994140625
+          }
+        },
+        {
+          "raw_output": "{\"final\":\"92\"}",
+          "seconds": 0.964154,
+          "metrics": {
+            "prompt_tokens": 983,
+            "generated_tokens": 7,
+            "prefill_tokens": 94,
+            "cached_prompt_tokens": 889,
+            "cache_retained": true,
+            "cache_retained_tokens": 982,
+            "total_seconds": 0.9619525419984711,
+            "time_to_first_token_seconds": 0.6400959579987102,
+            "tokens_per_second": 7.27686626354497,
+            "decode_tokens_per_second": 23.177775001314174,
+            "finish_reason": "stop",
+            "structured_decoding": "json-action-shape-v1",
+            "runtime_constraint_count": 6,
+            "context_window": 8192,
+            "mlx_active_gib": 4.450693137943745,
+            "mlx_peak_gib": 4.739254262298346,
+            "process_peak_rss_gib": 4.361968994140625
+          }
+        }
+      ]
+    },
+    {
+      "id": "calculator-negative-floor-remainder",
+      "category": "calculator",
+      "prompts": [
+        "Use calculate to evaluate -7 // 3 and -7 % 3 separately. Reply only with a JSON array containing those two results in that order."
+      ],
+      "passed": true,
+      "grading_reason": "Final content and required observations passed",
+      "seconds": 4.774762,
+      "turns": [
+        {
+          "status": "completed",
+          "answer": "[-3, 2]",
+          "steps": 3,
+          "events": [
+            {
+              "action": {
+                "tool": "calculate",
+                "arguments": {
+                  "expression": "-7 // 3"
+                }
+              },
+              "observation": {
+                "ok": true,
+                "result": {
+                  "expression": "-7 // 3",
+                  "result": "-3",
+                  "rounded": false,
+                  "precision_digits": 50
+                }
+              }
+            },
+            {
+              "action": {
+                "tool": "calculate",
+                "arguments": {
+                  "expression": "-7 % 3"
+                }
+              },
+              "observation": {
+                "ok": true,
+                "result": {
+                  "expression": "-7 % 3",
+                  "result": "2",
+                  "rounded": false,
+                  "precision_digits": 50
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "generations": [
+        {
+          "raw_output": "{\"tool\":\"calculate\",\"arguments\":{\"expression\":\"-7 // 3\"}}",
+          "seconds": 2.268813,
+          "metrics": {
+            "prompt_tokens": 616,
+            "generated_tokens": 16,
+            "prefill_tokens": 235,
+            "cached_prompt_tokens": 381,
+            "cache_retained": true,
+            "cache_retained_tokens": 615,
+            "total_seconds": 2.267385374998412,
+            "time_to_first_token_seconds": 1.5511679579976771,
+            "tokens_per_second": 7.056586046829912,
+            "decode_tokens_per_second": 22.93516885863015,
+            "finish_reason": "stop",
+            "structured_decoding": "json-action-shape-v1",
+            "runtime_constraint_count": 2,
+            "context_window": 8192,
+            "mlx_active_gib": 4.45145607739687,
+            "mlx_peak_gib": 4.76273650676012,
+            "process_peak_rss_gib": 4.361968994140625
+          }
+        },
+        {
+          "raw_output": "{\"tool\":\"calculate\",\"arguments\":{\"expression\":\"-7 % 3\"}}",
+          "seconds": 1.323904,
+          "metrics": {
+            "prompt_tokens": 694,
+            "generated_tokens": 16,
+            "prefill_tokens": 82,
+            "cached_prompt_tokens": 612,
+            "cache_retained": true,
+            "cache_retained_tokens": 693,
+            "total_seconds": 1.3223856670010719,
+            "time_to_first_token_seconds": 0.6202700419999019,
+            "tokens_per_second": 12.09934469139027,
+            "decode_tokens_per_second": 23.411938918178198,
+            "finish_reason": "stop",
+            "structured_decoding": "json-action-shape-v1",
+            "runtime_constraint_count": 2,
+            "context_window": 8192,
+            "mlx_active_gib": 4.451486594974995,
+            "mlx_peak_gib": 4.76273650676012,
+            "process_peak_rss_gib": 4.361968994140625
+          }
+        },
+        {
+          "raw_output": "{\"final\":\"[-3, 2]\"}",
+          "seconds": 1.174046,
+          "metrics": {
+            "prompt_tokens": 771,
+            "generated_tokens": 11,
+            "prefill_tokens": 81,
+            "cached_prompt_tokens": 690,
+            "cache_retained": true,
+            "cache_retained_tokens": 770,
+            "total_seconds": 1.1720301250024932,
+            "time_to_first_token_seconds": 0.6341587499991874,
+            "tokens_per_second": 9.385424286749116,
+            "decode_tokens_per_second": 21.35558107555406,
+            "finish_reason": "stop",
+            "structured_decoding": "json-action-shape-v1",
+            "runtime_constraint_count": 2,
+            "context_window": 8192,
+            "mlx_active_gib": 4.450693137943745,
+            "mlx_peak_gib": 4.76273650676012,
+            "process_peak_rss_gib": 4.361968994140625
+          }
+        }
+      ]
+    }
+  ],
+  "model": {
+    "format_version": 1,
+    "backend": "mlx-lm",
+    "model_id": "mlx-community/Qwen3-8B-4bit",
+    "revision": "545dc4251c05440727734bcd94334791f6ab0192",
+    "original_model_id": "Qwen/Qwen3-8B",
+    "original_model_revision": "b968826d9c46dd6066d109eabc6255188de91218",
+    "license": "Apache-2.0",
+    "parameter_count": 8190735360,
+    "quantization_bits": 4,
+    "context_window": 8192,
+    "files": {
+      "README.md": {
+        "size_bytes": 857,
+        "sha256": "a0cd248b30da7a23710c9290fe42ca83a84dc06593978877b1e5b32f9bd33aaf"
+      },
+      "added_tokens.json": {
+        "size_bytes": 707,
+        "sha256": "c0284b582e14987fbd3d5a2cb2bd139084371ed9acbae488829a1c900833c680"
+      },
+      "config.json": {
+        "size_bytes": 939,
+        "sha256": "e5485285fd7e289e76e9cffa112f6dc2e3426519082f7db9b69041589f81a218"
+      },
+      "merges.txt": {
+        "size_bytes": 1671853,
+        "sha256": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5"
+      },
+      "model.safetensors": {
+        "size_bytes": 4607835174,
+        "sha256": "f2d29621aab300336ad645567ff38c42aac755513006ef4e8a579cf7ef5256d8"
+      },
+      "model.safetensors.index.json": {
+        "size_bytes": 64065,
+        "sha256": "3fb25463b4078b1fc27159daa605190029c2e965f533bf0b1b594f96cbfceb8a"
+      },
+      "special_tokens_map.json": {
+        "size_bytes": 613,
+        "sha256": "76862e765266b85aa9459767e33cbaf13970f327a0e88d1c65846c2ddd3a1ecd"
+      },
+      "tokenizer.json": {
+        "size_bytes": 11422654,
+        "sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4"
+      },
+      "tokenizer_config.json": {
+        "size_bytes": 9706,
+        "sha256": "253153d0738ceb4c668d2eff957714dd2bea0b56de772a9fdccd96cbf517e6a0"
+      },
+      "vocab.json": {
+        "size_bytes": 2776833,
+        "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+      },
+      "LICENSE": {
+        "size_bytes": 11343,
+        "sha256": "832dd9e00a68dd83b3c3fb9f5588dad7dcf337a0db50f7d9483f310cd292e92e"
+      }
+    }
+  },
+  "summary": {
+    "passed": 4,
+    "total": 4,
+    "accuracy": 1.0,
+    "categories": {
+      "calculator": {
+        "passed": 4,
+        "total": 4
+      }
+    },
+    "total_seconds": 19.175764,
+    "median_case_seconds": 5.3306875,
+    "generation_speed": {
+      "time_to_first_token_seconds": {
+        "median": 0.7180585414989764,
+        "samples": 10
+      },
+      "tokens_per_second": {
+        "median": 7.780272491564462,
+        "samples": 10
+      },
+      "decode_tokens_per_second": {
+        "median": 23.05647192997216,
+        "samples": 10
+      }
+    },
+    "timing_boundary": "Case wall time includes tools and memory; total excludes model loading/hash verification. Generation metrics report prefill plus decode throughput separately from decode throughput. An exact input prefix may be reused within the same model backend; each generation records cached_prompt_tokens and prefill_tokens. No generated tail or persistent KV cache is reused."
+  }
+}

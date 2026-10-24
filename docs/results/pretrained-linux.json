@@ -1,0 +1,136 @@
+{
+  "format_version": 1,
+  "verification_date": "2026-10-24",
+  "execution": "Actual Linux Docker; networking disabled; portable offline-fixture tests; no model inference",
+  "image": "python:3.12-slim",
+  "uv": "0.12.11",
+  "dependency_sync": "Reused Linux environment created by uv sync --locked; pyproject.toml and uv.lock hashes unchanged",
+  "test_invocation": "python -m unittest discover in the reused locked environment",
+  "memory_limit_gib": 2,
+  "cpu_limit": 2,
+  "runtime": {
+    "python": "3.12.15 (main, Oct 21 2026, 01:13:23) [GCC 14.2.0]",
+    "sqlite": "3.46.1",
+    "system": "Linux",
+    "architecture": "aarch64"
+  },
+  "source_sha256": {
+    "src/silivra/pretrained.py": "3973aa183f8c55af1d6555946e636e89c7a631bcdb8b9605d0b43e64f2c1d60a",
+    "src/silivra/structured.py": "331ee5c19af3e2f017ae6ee5b20d721daadb5c605b6368cd5b59bb74084f4b5d",
+    "src/silivra/arithmetic.py": "011828f429f88bc4cbfedbe9841926042f22cc2e5b1c8370978989a5b6a06785",
+    "src/silivra/tools.py": "29b427cac841c8b71263e9c31a09ab8351a404dd906a317cc89a0d1a7878d29e",
+    "src/silivra/agent.py": "ef4da85dc95dadaa4ac4847f75a6ea7841497b13fc3ebba84ab5070602e507d7",
+    "src/silivra/cli.py": "22874376146fc164cdbbc71496674eff5cf85c73879fa9b5f863c296883c726d",
+    "src/silivra/terminal.py": "0fdb0bb800490852671bc3d419348ed6d2ba2f52761843249e2d7e3d5a9183fe",
+    "src/silivra/provision.py": "520653d125c8c4bfa21c0ec6970345e94d0e06c910165fe028284ce7620df5eb",
+    "src/silivra/prompt_cache.py": "22422a6871c53af913a6c4ae6d75cf504ed3adf01095ecebada2a04831a3fa61",
+    "scripts/measure-pretrained.py": "14af65dd523f8e4ed79716478b16dfbbc825c06982bc55a4b1cc1f0b77eba70a",
+    "scripts/check-pretrained-runtime.py": "d4b81fa8acb1137dc7c2cbe5be7d877426702f7e7446aa89144b18ebe20df9db",
+    "pyproject.toml": "71cb9de254bfeac7eb5f6b2c2c541d9fffb3e9e4d9d81c860c230907b0899ace",
+    "uv.lock": "45d6f1f033d93c03bd32de76b7e0999290643ad99269c0f61ae823d3b291ba05"
+  },
+  "patterns": [
+    {
+      "pattern": "test_agent.py",
+      "passed": true,
+      "tests": 29
+    },
+    {
+      "pattern": "test_memory.py",
+      "passed": true,
+      "tests": 17
+    },
+    {
+      "pattern": "test_tools.py",
+      "passed": true,
+      "tests": 13
+    },
+    {
+      "pattern": "test_web.py",
+      "passed": true,
+      "tests": 12
+    },
+    {
+      "pattern": "test_instructions.py",
+      "passed": true,
+      "tests": 10
+    },
+    {
+      "pattern": "test_evaluation.py",
+      "passed": true,
+      "tests": 10
+    },
+    {
+      "pattern": "test_cli.py",
+      "passed": true,
+      "tests": 6
+    },
+    {
+      "pattern": "test_curriculum.py",
+      "passed": true,
+      "tests": 10
+    },
+    {
+      "pattern": "test_curriculum_v2.py",
+      "passed": true,
+      "tests": 9
+    },
+    {
+      "pattern": "test_export.py",
+      "passed": true,
+      "tests": 4
+    },
+    {
+      "pattern": "test_corpus.py",
+      "passed": true,
+      "tests": 12
+    },
+    {
+      "pattern": "test_settings.py",
+      "passed": true,
+      "tests": 7
+    },
+    {
+      "pattern": "test_terminal.py",
+      "passed": true,
+      "tests": 34
+    },
+    {
+      "pattern": "test_pretrained.py",
+      "passed": true,
+      "tests": 13
+    },
+    {
+      "pattern": "test_provision.py",
+      "passed": true,
+      "tests": 10
+    },
+    {
+      "pattern": "test_pretrained_evaluation.py",
+      "passed": true,
+      "tests": 16
+    },
+    {
+      "pattern": "test_structured.py",
+      "passed": true,
+      "tests": 9
+    },
+    {
+      "pattern": "test_arithmetic.py",
+      "passed": true,
+      "tests": 9
+    },
+    {
+      "pattern": "test_prompt_cache.py",
+      "passed": true,
+      "tests": 11
+    },
+    {
+      "pattern": "test_data.py",
+      "passed": true,
+      "tests": 8
+    }
+  ],
+  "total_tests": 249,
+  "all_passed": true
+}

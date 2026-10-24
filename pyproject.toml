@@ -15,6 +15,8 @@ dependencies = [
   "tokenizers==0.23.3",
   "rich==15.0.0",
   "prompt-toolkit==3.0.53",
+  "mlx-lm==0.32.2 ; platform_machine == 'arm64' and sys_platform == 'darwin'",
+  "outlines-core==0.2.14",
 ]
 
 [project.scripts]

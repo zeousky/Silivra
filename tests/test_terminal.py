@@ -15,10 +15,10 @@ from prompt_toolkit.application import create_app_session
 from prompt_toolkit.input import create_pipe_input
 from prompt_toolkit.output import DummyOutput
 
-from silivra.agent import AgentConfig, project_scope
+from silivra.agent import AgentConfig, GenerationBudgetError, project_scope
 from silivra.memory import MemoryStore
 from silivra.settings import TerminalSettings, load_settings, save_settings
-from silivra.terminal import ScopedInputHistory, TerminalApp, run_terminal
+from silivra.terminal import ScopedInputHistory, TerminalApp, default_model_run, model_description, run_terminal
 
 
 class ScriptedBackend:
@@ -40,7 +40,10 @@ class TerminalTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
-        self.workspace = Path(self.temp.name)
+        self.workspace = Path(self.temp.name).resolve()
+        default = patch("silivra.terminal.default_model_run", return_value=self.workspace / "runs" / "original")
+        default.start()
+        self.addCleanup(default.stop)
         self.store = MemoryStore(self.workspace / ".silivra" / "memory.sqlite")
         self.addCleanup(self.store.close)
         self.output = io.StringIO()
@@ -55,6 +58,12 @@ class TerminalTests(unittest.TestCase):
             return self.backend
         return TerminalApp(self.workspace, self.store, console=self.console,
                            backend_factory=factory, **kwargs)
+
+    def pretrained_marker(self, path, model="Qwen3-8B"):
+        from silivra.pretrained import MARKER_NAME
+        path.mkdir(parents=True, exist_ok=True)
+        (path / MARKER_NAME).write_text(json.dumps({"original_model_id": f"Qwen/{model}",
+                                                  "quantization_bits": 4, "context_window": 8192}))
 
     def test_help_status_and_memory_do_not_load_model(self):
         for text in ("/help", "/status", "/models", "/memory remember language We use Python.",
@@ -82,15 +91,27 @@ class TerminalTests(unittest.TestCase):
         self.assertTrue(restarted.permissions["read"])
         self.assertEqual(restarted.settings.max_new_tokens, 64)
 
-    def test_disabled_tools_are_not_exposed_to_model(self):
+    def test_disabled_workspace_tools_are_not_exposed_but_calculator_remains(self):
         self.app.handle_input("/tools all")
         self.app.handle_input("/permissions read off")
         self.app.handle_input("What can you do?")
-        self.assertEqual(self.backend.calls[0][1], [])
+        self.assertEqual([schema["function"]["name"] for schema in self.backend.calls[0][1]], ["calculate"])
         self.assertEqual(len(self.factories), 1)
         self.assertEqual(self.output.getvalue().count("Answer without animation."), 1)
         self.app.status()
         self.assertIn("1024 tokens", self.output.getvalue())
+
+    def test_calculator_selection_survives_read_permission_denial_and_none_persists(self):
+        self.app.handle_input("/tools calculate")
+        self.assertEqual(self.app.settings.selected_tools, ["calculate"])
+        self.app.handle_input("/permissions read off")
+        self.app.handle_input('/tool calculate {"expression":"37 * 14 - 59"}')
+        self.assertIn('"459"', self.output.getvalue())
+        self.app.handle_input("/tools none")
+        pretrained = self.workspace / "pretrained"
+        with patch("silivra.pretrained.is_pretrained_run", side_effect=lambda path: Path(path) == pretrained):
+            restarted = self.make_app(run=pretrained)
+            self.assertEqual(restarted.settings.selected_tools, [])
 
     def test_settings_model_switch_is_lazy_and_invalid_change_is_recoverable(self):
         model = self.workspace / "a model"
@@ -105,6 +126,61 @@ class TerminalTests(unittest.TestCase):
         self.app.handle_input("Hello")
         self.assertEqual(self.factories[0][0], model.resolve())
         self.assertEqual(self.make_app().settings.model_run, str(model.resolve()))
+
+    def test_model_switch_resets_output_reservation_and_identifies_pretrained(self):
+        pretrained = self.workspace / "runs" / "pretrained"
+        original = self.workspace / "runs" / "original"
+        pretrained.mkdir(parents=True)
+        original.mkdir()
+        self.pretrained_marker(pretrained)
+        with patch("silivra.pretrained.is_pretrained_run", side_effect=lambda path: Path(path) == pretrained):
+            self.app.handle_input("/config max-new-tokens 64")
+            self.app.handle_input("/model runs/pretrained")
+            self.assertEqual(self.app.settings.max_new_tokens, 768)
+            self.app.handle_input("/status")
+            self.assertIn("Qwen3-8B", self.output.getvalue())
+            self.assertIn("pretrained", self.output.getvalue())
+            self.assertEqual(self.factories, [])
+            self.app.handle_input("/model runs/original")
+            self.assertEqual(self.app.settings.max_new_tokens, 96)
+            selected = self.make_app(run=pretrained)
+            self.assertEqual(selected.settings.max_new_tokens, 768)
+            selected = self.make_app(run=pretrained, max_new_tokens=128)
+            self.assertEqual(selected.settings.max_new_tokens, 128)
+
+    def test_new_pretrained_default_uses_longer_output_without_loading(self):
+        pretrained = self.workspace / "runs" / "pretrained"
+        self.pretrained_marker(pretrained)
+        with patch("silivra.terminal.default_model_run", return_value=pretrained), \
+                patch("silivra.pretrained.is_pretrained_run", side_effect=lambda path: Path(path) == pretrained):
+            app = self.make_app()
+            self.assertEqual(app.settings.max_new_tokens, 768)
+            explicit = self.make_app(run=pretrained)
+            self.assertEqual(explicit.settings.max_new_tokens, 768)
+            app.banner()
+        self.assertEqual(self.factories, [])
+        self.assertIn("Qwen3-8B", self.output.getvalue())
+
+    def test_pretrained_models_listing_reads_metadata_without_load(self):
+        pretrained = self.workspace / "runs" / "pretrained"
+        self.pretrained_marker(pretrained)
+        with patch("silivra.pretrained.is_pretrained_run", side_effect=lambda path: Path(path) == pretrained):
+            self.app.models()
+        self.assertIn("Qwen3-8B", self.output.getvalue())
+        self.assertIn("8192 runtime limit", self.output.getvalue())
+        self.assertEqual(self.factories, [])
+
+    def test_trial_model_name_is_displayed_without_changing_selection(self):
+        trial = self.workspace / "runs" / "silivra-qwen3.5-9b"
+        self.pretrained_marker(trial, "Qwen3.5-9B")
+        selected = self.app.settings.model_run
+        self.app.models()
+        self.assertIn("Qwen3.5-9B", self.output.getvalue())
+        self.assertEqual(self.app.settings.model_run, selected)
+        explicit = self.make_app(run=trial)
+        explicit.banner()
+        self.assertIn("Qwen3.5-9B · pretrained", self.output.getvalue())
+        self.assertEqual(self.factories, [])
 
     def test_explicit_startup_budget_overrides_preserve_other_preferences(self):
         self.app.handle_input("/config max-new-tokens 64")
@@ -196,6 +272,26 @@ class TerminalTests(unittest.TestCase):
         self.assertIn("Draft interrupted; no validated final answer", self.output.getvalue())
         self.assertNotIn("Draft accepted", self.output.getvalue())
 
+    def test_output_budget_rejects_draft_and_explains_token_context_tradeoff(self):
+        class ExhaustedBackend:
+            def generate(self, messages, tools, *, on_text):
+                on_text('{"final":"Long unfinished answer')
+                raise GenerationBudgetError("Output token limit reached before the action completed.")
+
+        self.backend = ExhaustedBackend()
+        result = self.app.run_turn("Write a detailed answer")
+        self.assertEqual(result["status"], "output_budget")
+        self.assertIsNone(result["answer"])
+        output = self.output.getvalue()
+        self.assertIn("Long unfinished answer", output)
+        self.assertIn("Draft rejected or incomplete; no validated final answer", output)
+        self.assertIn("Stopped · output_budget", output)
+        self.assertIn("/config max-new-tokens N", output)
+        self.assertIn("leaves less context", output)
+        self.assertNotIn("Draft accepted", output)
+        stored = self.store.recent_messages(self.app.scope, self.app.session_id)
+        self.assertEqual(stored[-1]["metadata"]["turn_status"], "output_budget")
+
     def test_tool_results_display_and_transcript_are_scoped(self):
         (self.workspace / "demo.py").write_text("print('hello')\n")
         self.backend = ScriptedBackend('{"tool":"read_file","arguments":{"path":"demo.py"}}',
@@ -266,6 +362,62 @@ class TerminalTests(unittest.TestCase):
         self.app._event({"type": "final_text", "text": "two", "provisional": True})
         self.assertIn("draft (awaiting protocol validation)", self.output.getvalue())
         self.assertIn("Real delta two", self.output.getvalue())
+
+
+class ModelSelectionTests(unittest.TestCase):
+    def test_only_provisioned_pretrained_run_takes_priority(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory).resolve()
+            workspace, source = root / "workspace", root / "source"
+            original = source / "runs" / "silivra-assistant-v2"
+            source_pretrained = source / "runs" / "silivra-qwen3-8b"
+            workspace_pretrained = workspace / "runs" / "silivra-qwen3-8b"
+            trial = workspace / "runs" / "silivra-qwen3.5-9b"
+            for path in (original, source_pretrained, workspace_pretrained, trial):
+                path.mkdir(parents=True)
+            provisioned = {trial}
+            with patch("silivra.terminal.__file__", str(source / "src" / "silivra" / "terminal.py")), \
+                    patch("silivra.pretrained.is_pretrained_run", side_effect=lambda path: path in provisioned):
+                self.assertEqual(default_model_run(workspace), original)
+                provisioned.add(source_pretrained)
+                self.assertEqual(default_model_run(workspace), source_pretrained)
+                provisioned.add(workspace_pretrained)
+                self.assertEqual(default_model_run(workspace), workspace_pretrained)
+
+    def test_pretrained_display_metadata_is_bounded_and_untrusted(self):
+        from silivra.pretrained import MARKER_NAME
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            marker = root / MARKER_NAME
+            for text in ('not json', '[]', '{"original_model_id":"Qwen/Qwen3.5-9B","original_model_id":"bad"}',
+                         ' ' * 131073, '{"original_model_id":"Qwen/\\u001b[2J"}'):
+                marker.write_text(text)
+                with self.subTest(text=text[:40]):
+                    description = model_description(root)
+                    self.assertIn("External model", description)
+                    self.assertNotIn("Qwen3-8B", description)
+                    self.assertNotIn("\x1b", description)
+            marker.unlink()
+            outside = root / "outside.json"
+            outside.write_text('{"original_model_id":"Qwen/Qwen3.5-9B"}')
+            marker.symlink_to(outside)
+            self.assertIn("External model", model_description(root))
+
+    def test_backend_factory_selects_only_explicit_pretrained_marker(self):
+        from silivra.terminal import _backend
+        run = Path("local-checkpoint")
+        with patch("silivra.pretrained.is_pretrained_run", return_value=True), \
+                patch("silivra.pretrained.PretrainedMLXBackend") as pretrained, \
+                patch("silivra.agent.MLXBackend") as original:
+            self.assertIs(_backend(run, which="best", max_new_tokens=768), pretrained.return_value)
+            pretrained.assert_called_once_with(run, which="best", max_new_tokens=768)
+            original.assert_not_called()
+        with patch("silivra.pretrained.is_pretrained_run", return_value=False), \
+                patch("silivra.pretrained.PretrainedMLXBackend") as pretrained, \
+                patch("silivra.agent.MLXBackend") as original:
+            self.assertIs(_backend(run, which="latest", max_new_tokens=96), original.return_value)
+            original.assert_called_once_with(run, which="latest", max_new_tokens=96)
+            pretrained.assert_not_called()
 
 
 class InputHistoryTests(unittest.TestCase):

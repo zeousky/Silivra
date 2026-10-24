@@ -30,7 +30,7 @@ from .tools import ToolRegistry
 
 
 _READ_TOOLS = {"list_files", "read_file", "search_files"}
-_ALL_TOOLS = _READ_TOOLS | {"write_file", "run_command", "web_search", "web_fetch"}
+_ALL_TOOLS = _READ_TOOLS | {"calculate", "write_file", "run_command", "web_search", "web_fetch"}
 _COMMANDS = ("/help", "/new", "/sessions", "/resume", "/history", "/status", "/model",
              "/models", "/tools", "/tool", "/permissions", "/memory", "/config", "/clear", "/exit")
 _CONTROL = re.compile(r"[\x00-\x08\x0b-\x1f\x7f-\x9f]")
@@ -38,9 +38,55 @@ _CONTROL = re.compile(r"[\x00-\x08\x0b-\x1f\x7f-\x9f]")
 
 def default_model_run(workspace: Path) -> Path:
     """Locate this source installation's weights while working in another repo."""
+    from .pretrained import is_pretrained_run
     source = Path(__file__).resolve().parents[2]
+    for base in (Path(workspace), source):
+        pretrained = base / "runs" / "silivra-qwen3-8b"
+        if is_pretrained_run(pretrained):
+            return pretrained
     candidates = [source / "runs" / "silivra-assistant-v2", Path(workspace) / "runs" / "silivra-assistant-v2"]
     return next((path for path in candidates if path.is_dir()), candidates[0])
+
+
+def default_output_tokens(run: Path) -> int:
+    """Keep the original short-context model's reservation separate from Qwen3."""
+    from .pretrained import is_pretrained_run
+    return 768 if is_pretrained_run(run) else 96
+
+
+def _pretrained_metadata(run: Path) -> dict:
+    """Read bounded display metadata; backend loading separately verifies weights."""
+    from .pretrained import MARKER_NAME
+    marker = Path(run).expanduser() / MARKER_NAME
+    try:
+        descriptor = os.open(marker, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+        with os.fdopen(descriptor, "rb") as source:
+            metadata = os.fstat(source.fileno())
+            if (not stat.S_ISREG(metadata.st_mode) or metadata.st_nlink != 1
+                    or metadata.st_size > 131072):
+                return {}
+            encoded = source.read(131073)
+        if len(encoded) > 131072:
+            return {}
+        return _json(encoded.decode("utf-8"))
+    except (OSError, ValueError, RecursionError):
+        return {}
+
+
+def _pretrained_description(metadata: dict) -> str:
+    identifier = metadata.get("original_model_id") or metadata.get("model_id")
+    name = "External model"
+    if isinstance(identifier, str) and re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._/-]{0,199}", identifier):
+        name = identifier.rsplit("/", 1)[-1] or name
+    bits = metadata.get("quantization_bits")
+    precision = "4-bit " if type(bits) is int and bits == 4 else ""
+    return f"{name} · pretrained · local {precision}inference"
+
+
+def model_description(run: Path) -> str:
+    from .pretrained import is_pretrained_run
+    return (_pretrained_description(_pretrained_metadata(run)) if is_pretrained_run(run)
+            else "Silivra original · from-scratch checkpoint")
 
 
 def _safe(value) -> str:
@@ -79,8 +125,11 @@ class _PermittedTools:
 
 
 def _backend(run, *, which, max_new_tokens):
-    from .agent import MLXBackend
     try:
+        from .pretrained import PretrainedMLXBackend, is_pretrained_run
+        if is_pretrained_run(run):
+            return PretrainedMLXBackend(run, which=which, max_new_tokens=max_new_tokens)
+        from .agent import MLXBackend
         return MLXBackend(run, which=which, max_new_tokens=max_new_tokens)
     except ImportError as error:
         raise RuntimeError("Local model inference requires Apple silicon, a supported macOS version, and the locked MLX dependencies. Tools and memory remain available.") from error
@@ -115,7 +164,14 @@ class TerminalApp:
             self.error(f"Preferences could not be loaded: {error}")
         changes = {}
         if run is not None:
-            changes["model_run"] = str(self._path(run))
+            selected_run = self._path(run)
+            previous_run = self._path(self.settings.model_run) if self.settings.model_run else default_model_run(self.workspace)
+            changes["model_run"] = str(selected_run)
+            if (selected_run != previous_run or
+                    (self.settings.model_run is None and self.settings.max_new_tokens == 96)):
+                changes["max_new_tokens"] = default_output_tokens(selected_run)
+        elif self.settings.model_run is None and self.settings.max_new_tokens == 96:
+            changes["max_new_tokens"] = default_output_tokens(default_model_run(self.workspace))
         if which is not None:
             changes["which"] = which
         if max_new_tokens is not None:
@@ -163,12 +219,15 @@ class TerminalApp:
         self.console.print(Panel(Text(_safe(encoded)), title=Text(_safe(title)), border_style="dim"))
 
     def banner(self):
-        self.console.print(Panel(Text("SILIVRA\nLocal AI · original weights · private project memory", style="cyan"),
+        self.console.print(Panel(Text("SILIVRA\nLocal AI · private project memory", style="cyan"),
                                  border_style="cyan"))
         self.write(f"Workspace: {self.workspace}\nUser: {self.user}")
         self.write("/help for commands · Enter sends · Alt+Enter / Ctrl+J inserts a newline · Ctrl+C cancels")
-        self.write("Experimental checkpoint: training and evaluations determine model ability.", style="dim")
+        self.write(model_description(self._selected_run()), style="dim")
         self.status()
+
+    def _selected_run(self):
+        return self._path(self.settings.model_run) if self.settings.model_run else default_model_run(self.workspace)
 
     def _save(self, candidate):
         # Save before accepting preferences so malformed private state stays intact.
@@ -194,11 +253,12 @@ class TerminalApp:
         if self.backend is not None:
             checkpoint = str(getattr(self.backend, "checkpoint", "injected backend"))
             model_config = getattr(getattr(self.backend, "model", None), "config", None)
-            limit = getattr(model_config, "max_seq_len", None)
+            limit = getattr(self.backend, "context_window", None) or getattr(model_config, "max_seq_len", None)
             if limit is not None:
                 context = f"{limit} tokens; output reservation {self.settings.max_new_tokens}"
         table = Table(show_header=False, box=None, padding=(0, 2))
-        for key, value in (("Model", model), ("Checkpoint", checkpoint), ("Context", context),
+        for key, value in (("Model", model), ("Backend", model_description(self._selected_run())),
+                           ("Checkpoint", checkpoint), ("Context", context),
                            ("Session", self.session_id or "new; created on first turn"),
                            ("Permissions", ", ".join(f"{key}={'on' if value else 'off'}" for key, value in self.permissions.items())),
                            ("Model tools", "all enabled" if selected is None else ", ".join(selected) or "none"),
@@ -327,7 +387,9 @@ class TerminalApp:
                 path = self._path(name)
                 if not path.is_dir():
                     raise ValueError("Model path must be an existing local checkpoint or run directory.")
-                self._save(replace(self.settings, model_run=str(path)))
+                reservation = (self.settings.max_new_tokens if path == self._selected_run()
+                               else default_output_tokens(path))
+                self._save(replace(self.settings, model_run=str(path), max_new_tokens=reservation))
                 self.backend = None
                 self.write(f"Selected {path}. Weights load on the next message; use /new to start fresh.", style="cyan")
         elif command == "/permissions":
@@ -438,13 +500,24 @@ class TerminalApp:
 
     def models(self):
         locations = {self.workspace / "runs", Path(__file__).resolve().parents[2] / "runs"}
-        table = Table("Local model/run", "Reference", "Context", "Training mode", box=None)
+        table = Table("Local model/run", "Reference", "Context", "Model / training mode", box=None)
         count = 0
         for runs in sorted(locations):
             if not runs.is_dir():
                 continue
             for path in sorted(runs.iterdir()):
                 if not path.is_dir() or path.is_symlink():
+                    continue
+                from .pretrained import is_pretrained_run
+                if is_pretrained_run(path):
+                    context = "runtime limit at load"
+                    metadata = _pretrained_metadata(path)
+                    limit = metadata.get("context_window")
+                    if type(limit) is int and 512 <= limit <= 8192:
+                        context = f"{limit} runtime limit"
+                    table.add_row(Text(_safe(path)), "local", context,
+                                  Text(_safe(_pretrained_description(metadata))))
+                    count += 1
                     continue
                 for reference in ("best", "latest"):
                     pointer = path / f"{reference}.json"
@@ -495,8 +568,8 @@ class TerminalApp:
         if not isinstance(prompt, str) or not prompt.strip() or len(prompt) > 32_000:
             raise ValueError("prompt must contain 1–32,000 characters.")
         if self.backend is None:
-            run = self._path(self.settings.model_run) if self.settings.model_run else default_model_run(self.workspace)
-            self.write("Loading local checkpoint…", style="dim")
+            run = self._selected_run()
+            self.write("Loading " + model_description(run) + "…", style="dim")
             self.backend = self.backend_factory(run, which=self.settings.which,
                                                 max_new_tokens=self.settings.max_new_tokens)
         tools = self._tools()
@@ -526,6 +599,9 @@ class TerminalApp:
             self.write(f"Stopped · {result['status']}: {result.get('error', 'turn budget or policy limit reached')}", style="yellow")
             if result["status"] == "context_budget" or "Context budget" in result.get("error", ""):
                 self.write("Use /new, fewer /tools, /config memory-chars 0, /config history-messages 0, or a smaller output reservation.", style="dim")
+            elif result["status"] == "output_budget":
+                self.write("Request a shorter answer or use /config max-new-tokens N within the model's context limit (up to 4096). "
+                           "A larger output reservation leaves less context for your request, history and tools.", style="dim")
         self.write(f"Session {self.session_id}", style="dim")
         return result
 
