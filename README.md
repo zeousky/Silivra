@@ -18,7 +18,7 @@ verifies every file's SHA-256, and selects it for this workspace/user. Setup is
 interruptible and resumes partial downloads; each invocation has a 15-minute
 download budget. The first message loads the model; subsequent turns keep it in
 memory. Thinking is disabled for responsive answers; runtime context is capped at
-8,192 tokens on this memory target. Chat never downloads missing weights.
+8,192 tokens on this memory target. Chat never downloads missing weights
 
 **These are externally pretrained Qwen weights and its tokenizer, not an enlarged
 or newly trained Silivra model.** The original 14M model, tokenizer, checkpoints,
