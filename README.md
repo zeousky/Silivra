@@ -1,6 +1,6 @@
 # Silivra
 
-An independent AI project combining **language models trained from random initialization**, a local assistant runtime, coding and research tools, and durable private memory. An explicitly separate **Qwen3 8B local assistant backend** provides a practical inference path on 16 GB Apple silicon while original-model research continues.
+An independent AI project combining **language models trained from random initialization**, a local assistant runtime, coding and research tools, and durable private memory. An explicitly separate **Qwen3 8B local assistant backend** provides a practical inference path on 16 GB Apple silicon while original-model research continues
 
 ## Local 8B assistant
 
