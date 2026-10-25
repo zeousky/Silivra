@@ -39,11 +39,14 @@ _CONTROL = re.compile(r"[\x00-\x08\x0b-\x1f\x7f-\x9f]")
 def default_model_run(workspace: Path) -> Path:
     """Locate this source installation's weights while working in another repo."""
     from .pretrained import is_pretrained_run
+    from .provision import DEFAULT_PROFILE, PROFILES, model_profile
     source = Path(__file__).resolve().parents[2]
-    for base in (Path(workspace), source):
-        pretrained = base / "runs" / "silivra-qwen3-8b"
-        if is_pretrained_run(pretrained):
-            return pretrained
+    profiles = (DEFAULT_PROFILE, *(name for name in PROFILES if name != DEFAULT_PROFILE))
+    for profile in profiles:
+        for base in (Path(workspace), source):
+            pretrained = base / model_profile(profile)["run"]
+            if is_pretrained_run(pretrained):
+                return pretrained
     candidates = [source / "runs" / "silivra-assistant-v2", Path(workspace) / "runs" / "silivra-assistant-v2"]
     return next((path for path in candidates if path.is_dir()), candidates[0])
 

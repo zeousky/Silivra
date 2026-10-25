@@ -17,8 +17,8 @@ import time
 import urllib.request
 
 
-DEFAULT_PROFILE = "qwen3-8b"
-DEFAULT_MODEL_RUN = Path("runs/silivra-qwen3-8b")
+DEFAULT_PROFILE = "qwen3.5-9b"
+DEFAULT_MODEL_RUN = Path("runs/silivra-qwen3.5-9b")
 MODEL_ID = "mlx-community/Qwen3-8B-4bit"
 REVISION = "545dc4251c05440727734bcd94334791f6ab0192"
 ORIGINAL_REVISION = "b968826d9c46dd6066d109eabc6255188de91218"
@@ -57,13 +57,13 @@ _QWEN35_SPECS = {
 PROFILES = {
     "qwen3-8b": {"model_id": MODEL_ID, "revision": REVISION,
         "original_model_id": "Qwen/Qwen3-8B", "original_model_revision": ORIGINAL_REVISION,
-        "parameter_count": 8190735360, "run": DEFAULT_MODEL_RUN,
+        "parameter_count": 8190735360, "run": Path("runs/silivra-qwen3-8b"),
         "download_limit_bytes": 5 * 1024**3},
     "qwen3.5-9b": {"model_id": "mlx-community/Qwen3.5-9B-MLX-4bit",
         "revision": "938d8919941c6e7efd3c7150eff7fe9d12afa631",
         "original_model_id": "Qwen/Qwen3.5-9B",
         "original_model_revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
-        "parameter_count": 8953803264, "run": Path("runs/silivra-qwen3.5-9b"),
+        "parameter_count": 8953803264, "run": DEFAULT_MODEL_RUN,
         "download_limit_bytes": 6 * 1024**3},
 }
 

@@ -2,7 +2,7 @@
 
 Silivra's terminal combines a selected local model, the assistant runtime,
 workspace tools, and private SQLite memory. The practical backend is an explicitly
-separate Qwen3-8B model; Silivra's original from-scratch checkpoints remain
+separate Qwen3.5-9B model; Qwen3-8B and Silivra's original from-scratch checkpoints remain
 selectable for research. Neither backend calls a hosted model service.
 See [external-backend measurements](PRETRAINED_ASSISTANT.md) and
 [original-model capabilities](CAPABILITY_RESULTS.md) separately.
@@ -15,11 +15,13 @@ uv run silivra setup-assistant
 uv run silivra
 ```
 
-The explicit setup downloads at most 4.62 GB of pinned Qwen3-8B 4-bit artifacts,
+The explicit setup downloads 5.98 GB of pinned Qwen3.5-9B 4-bit artifacts,
 checks hashes, and saves the selection for the current workspace/user. It has a
 15-minute download-session limit and resumes partial files on a repeated invocation.
 Use `setup-assistant --output PATH --workspace PATH --user NAME` to change those
 locations. Ordinary terminal/chat startup never downloads model files.
+Use `--profile qwen3-8b` for the existing 4.62 GB 8B option, or `--no-select` to
+prepare either profile without changing saved preferences.
 If the saved tool selection is empty, explicit setup selects `calculate`; custom
 nonempty selections and `all` are preserved. Ordinary launch preserves `/tools none`.
 
@@ -51,14 +53,16 @@ uv run silivra --workspace /path/to/project --model /path/to/Silivra/runs/silivr
 uv run silivra chat --run runs/silivra-assistant-v2 --max-new-tokens 96
 ```
 
-Successful setup selects `runs/silivra-qwen3-8b` for the current workspace/user.
-Without a saved selection, an installed 8B run in the workspace or source checkout
-is preferred; otherwise the original `runs/silivra-assistant-v2` is selected.
+Successful default setup selects `runs/silivra-qwen3.5-9b` for the current workspace/user.
+An explicit saved model remains selected until setup or `/model` changes it.
+Without a saved selection, an installed 9B run is preferred, followed by 8B,
+then the original `runs/silivra-assistant-v2`. Workspace/source discovery requires
+a provisioned model marker; ordinary launch never downloads a missing model.
 The banner and `/status` identify pretrained versus original weights. `/model` paths are
 relative to the selected workspace; absolute paths also work. Both entry points
 honor saved terminal budgets unless an explicit flag overrides that preference
 for the current launch. One-shot `chat "..."` honors the saved model selection,
-with output defaults of 768 tokens for Qwen3 and 96 for the original checkpoint.
+with output defaults of 768 tokens for pretrained models and 96 for the original checkpoint.
 Switching models resets that reservation to the corresponding default; explicit
 `--max-new-tokens` and `/config max-new-tokens` can override it.
 

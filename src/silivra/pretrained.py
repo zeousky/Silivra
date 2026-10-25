@@ -254,7 +254,7 @@ class PretrainedMLXBackend:
         """Release the backend's bounded reusable input-prefix reference."""
         self._prompt_cache.clear()
 
-    def _prompt_tokens(self, messages: list[dict], tools: list[dict]) -> list[int]:
+    def _prompt_tokens(self, messages: list[dict], tools: list[dict], *, cache_prefix=False):
         from silivra.instructions import format_prompt, parse_action
         format_prompt(messages, add_assistant_prefix=False)
         if (not messages or messages[0]["role"] != "system"
@@ -309,6 +309,7 @@ class PretrainedMLXBackend:
                         "expression": "6 * 9", "result": "54", "rounded": False, "precision_digits": 50}})}})},
                 {"role": "assistant", "content": '{"final":"54"}'},
             ])
+        stable = list(converted)
         for message in messages[1:]:
             role = message["role"]
             if role == "tool":
@@ -318,12 +319,30 @@ class PretrainedMLXBackend:
                 converted.append({"role": role, "content": _data_json(parse_action(message["content"]))})
             else:
                 converted.append({"role": role, "content": _data_json({"content": message["content"]})})
+        stable_tokens = (self.tokenizer.apply_chat_template(
+            stable + [{"role": "user", "content": _data_json({"content": ""})}],
+            tokenize=True, add_generation_prompt=True, enable_thinking=False,
+            return_dict=False) if cache_prefix else [])
         tokens = self.tokenizer.apply_chat_template(converted, tokenize=True,
                                                     add_generation_prompt=True, enable_thinking=False,
                                                     return_dict=False)
         if (not isinstance(tokens, list) or not tokens
                 or any(type(token) is not int or token < 0 for token in tokens)):
             raise ValueError("Pretrained chat template must produce a nonempty token list.")
+        if cache_prefix:
+            from silivra.prompt_cache import MAX_PREFIX_TOKENS
+            prefix = 0
+            if (isinstance(stable_tokens, list)
+                    and all(type(token) is int and token >= 0 for token in stable_tokens)):
+                for old, new in zip(stable_tokens, tokens[:-1]):
+                    if old != new or prefix == MAX_PREFIX_TOKENS:
+                        break
+                    prefix += 1
+            # Large prefixes use the existing 256-token prefill chunks. Small
+            # system prefixes remain useful without capturing user content.
+            if prefix > 256:
+                prefix = prefix // 256 * 256
+            return tokens, prefix
         return tokens
 
     def context_usage(self, messages: list[dict], tools: list[dict]) -> dict:
@@ -333,6 +352,15 @@ class PretrainedMLXBackend:
                 "fits": len(tokens) + self.max_new_tokens <= self.context_window}
 
     def generate(self, messages: list[dict], tools: list[dict], *, on_text=None, cancelled=None) -> str:
+        try:
+            return self._generate(messages, tools, on_text=on_text, cancelled=cancelled)
+        except BaseException:
+            # Includes pending hybrid snapshots captured during prefill: no
+            # cancelled, invalid or incomplete action can publish reusable state.
+            self._prompt_cache.clear()
+            raise
+
+    def _generate(self, messages: list[dict], tools: list[dict], *, on_text=None, cancelled=None) -> str:
         for name, callback in (("on_text", on_text), ("cancelled", cancelled)):
             if callback is not None and not callable(callback):
                 raise ValueError(f"{name} must be callable or None.")
@@ -340,11 +368,10 @@ class PretrainedMLXBackend:
 
         def check_cancelled(*_):
             if cancelled and cancelled():
-                self._prompt_cache.clear()
                 raise GenerationCancelled("Pretrained model generation was cancelled.")
 
         check_cancelled()
-        tokens = self._prompt_tokens(messages, tools)
+        tokens, stable_prefix = self._prompt_tokens(messages, tools, cache_prefix=True)
         if len(tokens) + self.max_new_tokens > self.context_window:
             self._prompt_cache.clear()
             raise ContextBudgetError(
@@ -357,7 +384,16 @@ class PretrainedMLXBackend:
         started, first_token = time.perf_counter(), None
         processor = make_action_processor(self.tokenizer, tools)
         check_cancelled()
-        working_cache, prefill_tokens, reused = self._prompt_cache.prepare(tokens)
+        working_cache, prefill_tokens, reused = self._prompt_cache.prepare(
+            tokens, snapshot_prefix_tokens=stable_prefix)
+        prefill_step = (min(stable_prefix, 256) if self._prompt_cache.strategy == "hybrid-snapshot"
+                        and stable_prefix > 0 else 256)
+
+        def progress(processed, total):
+            check_cancelled()
+            self._prompt_cache.record_prefill(working_cache, processed, total)
+            check_cancelled()
+
         chunks, generated, last, characters = [], 0, None, 0
         # No rotating cache: admitted policy/request/evidence stay in full KV
         # context. Chunked prefill limits transient memory and cancellation lag.
@@ -365,7 +401,7 @@ class PretrainedMLXBackend:
                                     max_tokens=self.max_new_tokens, sampler=make_sampler(temp=0),
                                     logits_processors=[processor],
                                     prompt_cache=working_cache,
-                                    prefill_step_size=256, prompt_progress_callback=check_cancelled)
+                                    prefill_step_size=prefill_step, prompt_progress_callback=progress)
         with closing(generator):
             for response in generator:
                 check_cancelled()
@@ -387,6 +423,7 @@ class PretrainedMLXBackend:
         from silivra.runtime import memory_stats
         self.last_metrics = {"prompt_tokens": len(tokens), "generated_tokens": generated,
                              "prefill_tokens": len(prefill_tokens), "cached_prompt_tokens": reused,
+                             "prompt_cache_strategy": self._prompt_cache.strategy,
                              "cache_retained": False, "cache_retained_tokens": 0,
                              "total_seconds": elapsed,
                              "time_to_first_token_seconds": first_token,
@@ -411,6 +448,7 @@ class PretrainedMLXBackend:
         except ValueError:
             # Preserve malformed output for the shared parser; never retain KV
             # after a failed action and never repair it into an executable one.
+            self._prompt_cache.clear()
             return raw
         self.last_metrics["cache_retained"] = self._prompt_cache.commit(working_cache, tokens)
         self.last_metrics["cache_retained_tokens"] = self._prompt_cache.retained_token_count

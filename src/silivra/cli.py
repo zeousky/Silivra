@@ -56,6 +56,8 @@ def parser():
 
 
 def _assistant_parsers(sub):
+    from silivra.provision import DEFAULT_PROFILE, PROFILES
+
     def workspace(command, *, memory=False, permissions=False):
         command.add_argument("--workspace", type=Path, default=Path.cwd())
         if memory:
@@ -75,8 +77,8 @@ def _assistant_parsers(sub):
 
     setup = sub.add_parser("setup-assistant", help="Download a pinned local model profile and optionally select it for chat",
                            description="Set up a separate local pretrained model. Selects calculate when the saved tool selection is empty; preserves custom selections. Use --no-select to prepare a trial without changing chat preferences.")
-    setup.add_argument("--profile", choices=("qwen3-8b", "qwen3.5-9b"), default="qwen3-8b",
-                       help="Pinned model profile (default: qwen3-8b)")
+    setup.add_argument("--profile", choices=tuple(PROFILES), default=DEFAULT_PROFILE,
+                       help="Pinned model profile (default: %(default)s)")
     setup.add_argument("--output", type=Path, help="Separate model directory (default: the selected profile's run directory under WORKSPACE)")
     setup.add_argument("--no-select", action="store_true", help="Download and verify only; leave saved model and tool preferences untouched")
     workspace(setup)

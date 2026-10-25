@@ -33,6 +33,7 @@ jobs:
           uv run python -m unittest discover -s tests -p 'test_pretrained.py' -v &&
           uv run python -m unittest discover -s tests -p 'test_provision.py' -v &&
           uv run python -m unittest discover -s tests -p 'test_pretrained_evaluation.py' -v &&
+          uv run python -m unittest discover -s tests -p 'test_pretrained_runtime.py' -v &&
           uv run python -m unittest discover -s tests -p 'test_structured.py' -v &&
           uv run python -m unittest discover -s tests -p 'test_arithmetic.py' -v &&
           uv run python -m unittest discover -s tests -p 'test_prompt_cache.py' -v &&

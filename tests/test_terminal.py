@@ -182,6 +182,24 @@ class TerminalTests(unittest.TestCase):
         self.assertIn("Qwen3.5-9B · pretrained", self.output.getvalue())
         self.assertEqual(self.factories, [])
 
+    def test_saved_model_and_preferences_survive_a_new_fallback_default(self):
+        preferred = self.workspace / "runs" / "silivra-qwen3.5-9b"
+        self.pretrained_marker(preferred, "Qwen3.5-9B")
+        for saved_model in ("runs/silivra-qwen3-8b", "runs/silivra-assistant-v2"):
+            with self.subTest(saved_model=saved_model):
+                saved = TerminalSettings(model_run=saved_model, max_new_tokens=128,
+                                         selected_tools=[], history_messages=0)
+                save_settings(self.app.settings_path, self.app.scope, saved)
+                before = self.app.settings_path.read_bytes()
+                with patch("silivra.terminal.default_model_run", return_value=preferred):
+                    restarted = self.make_app()
+                self.assertEqual(restarted._selected_run(), self.workspace / saved_model)
+                self.assertEqual(restarted.settings.max_new_tokens, 128)
+                self.assertEqual(restarted.settings.selected_tools, [])
+                self.assertEqual(restarted.settings.history_messages, 0)
+                self.assertEqual(self.app.settings_path.read_bytes(), before)
+                self.assertEqual(self.factories, [])
+
     def test_explicit_startup_budget_overrides_preserve_other_preferences(self):
         self.app.handle_input("/config max-new-tokens 64")
         self.app.handle_input("/config history-messages 0")
@@ -370,12 +388,15 @@ class ModelSelectionTests(unittest.TestCase):
             root = Path(directory).resolve()
             workspace, source = root / "workspace", root / "source"
             original = source / "runs" / "silivra-assistant-v2"
+            workspace_original = workspace / "runs" / "silivra-assistant-v2"
             source_pretrained = source / "runs" / "silivra-qwen3-8b"
             workspace_pretrained = workspace / "runs" / "silivra-qwen3-8b"
-            trial = workspace / "runs" / "silivra-qwen3.5-9b"
-            for path in (original, source_pretrained, workspace_pretrained, trial):
+            source_preferred = source / "runs" / "silivra-qwen3.5-9b"
+            workspace_preferred = workspace / "runs" / "silivra-qwen3.5-9b"
+            for path in (original, workspace_original, source_pretrained, workspace_pretrained,
+                         source_preferred, workspace_preferred):
                 path.mkdir(parents=True)
-            provisioned = {trial}
+            provisioned = set()
             with patch("silivra.terminal.__file__", str(source / "src" / "silivra" / "terminal.py")), \
                     patch("silivra.pretrained.is_pretrained_run", side_effect=lambda path: path in provisioned):
                 self.assertEqual(default_model_run(workspace), original)
@@ -383,6 +404,13 @@ class ModelSelectionTests(unittest.TestCase):
                 self.assertEqual(default_model_run(workspace), source_pretrained)
                 provisioned.add(workspace_pretrained)
                 self.assertEqual(default_model_run(workspace), workspace_pretrained)
+                provisioned.add(source_preferred)
+                self.assertEqual(default_model_run(workspace), source_preferred)
+                provisioned.add(workspace_preferred)
+                self.assertEqual(default_model_run(workspace), workspace_preferred)
+                provisioned.clear()
+                original.rmdir()
+                self.assertEqual(default_model_run(workspace), workspace_original)
 
     def test_pretrained_display_metadata_is_bounded_and_untrusted(self):
         from silivra.pretrained import MARKER_NAME

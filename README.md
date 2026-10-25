@@ -1,8 +1,8 @@
 # Silivra
 
-An independent AI project combining **language models trained from random initialization**, a local assistant runtime, coding and research tools, and durable private memory. An explicitly separate **Qwen3 8B local assistant backend** provides a practical inference path on 16 GB Apple silicon while original-model research continues
+An independent AI project combining **language models trained from random initialization**, a local assistant runtime, coding and research tools, and durable private memory. An explicitly separate **Qwen3.5 9B local assistant backend** provides a practical inference path on 16 GB Apple silicon while original-model research continues
 
-## Local 8B assistant
+## Local 9B assistant
 
 ```sh
 uv sync --locked
@@ -12,8 +12,8 @@ uv run silivra
 uv run silivra chat --tool read_file "Read pyproject.toml and tell me the Python requirement."
 ```
 
-`setup-assistant` explicitly downloads **Qwen3-8B, 8,190,735,360 parameters**, in
-4-bit MLX format (4.62 GB including tokenizer/license). It uses a pinned revision,
+`setup-assistant` explicitly downloads **Qwen3.5-9B, 8,953,803,264 text parameters**, in
+4-bit MLX format (5.98 GB including tokenizer/license). It uses a pinned revision,
 verifies every file's SHA-256, and selects it for this workspace/user. Setup is
 interruptible and resumes partial downloads; each invocation has a 15-minute
 download budget. The first message loads the model; subsequent turns keep it in
@@ -25,13 +25,16 @@ or newly trained Silivra model.** The original 14M model, tokenizer, checkpoints
 and training commands are preserved. Select them explicitly with
 `uv run silivra --model runs/silivra-assistant-v2`.
 See [backend provenance, operating limits and local measurements](docs/PRETRAINED_ASSISTANT.md).
+The [fresh 15-task comparison](docs/PRETRAINED_COMPARISON.md) scored 14/15 for
+9B and 11/15 for 8B; these small diagnostics do not establish general intelligence.
+The 8B option remains available with `setup-assistant --profile qwen3-8b`.
 
 After setup, inference is local and needs no API key or model service. Tool writes,
 network, and command execution retain their explicit permission gates. No private
 chats or memories are used to train either model.
 
 Setup selects the bounded `calculate` tool when the previous tool selection is
-empty. One-shot 8B chat also exposes it by default; `--no-tools` disables it.
+empty. One-shot pretrained chat also exposes it by default; `--no-tools` disables it.
 Workspace files still need explicit selections such as `/tools read_file calculate`.
 Constrained decoding enforces the JSON action shape; the runtime separately checks
 argument limits, paths and permissions. Neither mechanism guarantees a correct answer.
@@ -72,7 +75,7 @@ their complete JSON action validates. See the [terminal guide](docs/CLI.md) for
 multiline input, cancellation, settings, permissions, memory and direct tools.
 
 Weights remain local: cloning this public repository does not include model
-weights. The original checkpoint requires its existing local artifacts; the 8B
+weights. The original checkpoint requires its existing local artifacts; the pretrained
 backend requires the explicit setup command above. Consult the separately measured
 results for each backend rather than treating passing runtime tests as model skill.
 

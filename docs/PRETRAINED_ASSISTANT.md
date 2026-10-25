@@ -1,8 +1,10 @@
-# Local pretrained 8B assistant
+# Local pretrained assistant
 
-Silivra provides a separate practical inference backend using **Qwen3-8B** from
-the Qwen team, converted to 4-bit MLX format by MLX Community. Its architecture has
-**8,190,735,360 parameters**. Quantization reduces storage and arithmetic precision;
+Silivra provides a separate practical inference backend using **Qwen3.5-9B** from
+the Qwen team, converted to 4-bit MLX format by MLX Community. Its text backbone has
+**8,953,803,264 parameters**; vision and MTP weights are excluded by the text-only
+loader. Qwen3-8B, with 8,190,735,360 parameters, remains an explicit profile.
+Quantization reduces storage and arithmetic precision;
 it does not turn the model into a 14M model or enlarge the original Silivra weights.
 The pretrained backend and the original research model have distinct provenance.
 
@@ -14,11 +16,13 @@ uv run silivra setup-assistant
 uv run silivra
 ```
 
-Setup downloads 4,623,794,744 bytes across weights, tokenizer, metadata and license,
+Default setup downloads 5,977,084,565 bytes across weights, tokenizer, metadata and license,
 verifies every file, and selects the model for the current local user/project.
 It requires free download space plus 512 MiB headroom, refuses unrelated run
 artifacts, limits each invocation to a 15-minute transfer session, and preserves
 partial transfers for a repeated invocation. It never changes original checkpoints.
+`setup-assistant --profile qwen3-8b` selects the earlier 4,623,794,744-byte profile.
+`--no-select` prepares either profile without reading or modifying saved preferences.
 The marker is written only after all pinned artifacts verify. A size/hash mismatch
 is reported; a corrupt `.partial` must be inspected or removed before retrying.
 
@@ -26,10 +30,15 @@ Use an interactive session for the lowest ongoing latency: the first ordinary
 message loads and verifies the weights, and later messages reuse that loaded model.
 Each one-shot `chat` starts a new process and pays loading/verification again.
 The backend reuses one exact input-token prefix in memory, capped at 1,024 tokens
-and 256 MiB of allocated KV storage. It never retains a generated tail as input,
-always recomputes at least one token, and drops reusable state on cancellation,
-invalid output or an exhausted generation budget. Token accounting still uses
-the complete prompt. Nothing is persisted and no model server is started.
+and 256 MiB of retained cache storage. Qwen3-8B trims its KV state back to verified
+input offsets. Qwen3.5-9B snapshots evaluated hybrid state at a verified stable
+policy/example prefix before real conversation content and decoding; recurrent
+state is never trimmed. Reuse requires the whole hybrid prefix to match and uses
+an independent clone. It never retains a generated tail as input, always
+recomputes at least one token, and drops committed/pending state on cancellation,
+invalid output, exceptions or an exhausted generation budget. Prefill chunks stay
+at most 256 tokens. Token accounting still uses the complete prompt. Nothing is
+persisted and no model server is started.
 
 Setup selects `calculate` if the saved tool selection is empty. Pretrained one-shot
 chat also defaults to this tool; `--no-tools` disables it. Interactive `/tools`
@@ -45,10 +54,13 @@ uv run silivra --model runs/silivra-assistant-v2
 
 ## Identity and operating limits
 
-- External model: `mlx-community/Qwen3-8B-4bit`.
-- Immutable revision: `545dc4251c05440727734bcd94334791f6ab0192`.
-- Original model/tokenizer: `Qwen/Qwen3-8B`; Apache-2.0 license.
-- Original license revision: `b968826d9c46dd6066d109eabc6255188de91218`.
+- Default external model: `mlx-community/Qwen3.5-9B-MLX-4bit`.
+- Immutable revision: `938d8919941c6e7efd3c7150eff7fe9d12afa631`.
+- Original model/tokenizer: `Qwen/Qwen3.5-9B`; Apache-2.0 license.
+- Original license revision: `c202236235762e1c871ad0ccb60c8ee5ba337b9a`.
+- Earlier 8B profile: `mlx-community/Qwen3-8B-4bit` at
+  `545dc4251c05440727734bcd94334791f6ab0192`, original/license revision
+  `b968826d9c46dd6066d109eabc6255188de91218`. Profiles have distinct run directories.
 - Inference: Apple MLX/Metal through pinned `mlx-lm==0.32.2`.
 - Runtime context: 8,192 tokens, including policy, schemas, history, memory,
   current-turn evidence and output reservation. Qwen's upstream configured maximum
@@ -88,12 +100,26 @@ license, hashes and sizes. The downloaded weights/tokenizer remain ignored artif
 No weight updates were performed for this integration. Qwen's existing pretrained
 capabilities provide the larger model. Original Silivra pretraining, tokenizer,
 instruction tuning, v2/v3/v4 checkpoints and measured failures remain intact.
-Full FP32 weights alone for this architecture would occupy about 32.8 GB before
+Full FP32 text weights alone for the 9B architecture would occupy about 35.8 GB before
 gradients or optimizer state. Original 8B pretraining needs a separately planned
 compute/data program; it is not established by connecting tools or downloading
 external weights. No hosted model, paid compute, or paid generation is involved.
 
 ## Local validation
+
+On 2026-10-25 the verified 9B backend scored **14/15** on a newly frozen practical
+diagnostic, compared with **11/15** for 8B using identical source and generation
+budgets. The sole 9B failure was an extra final period. The initial 9B run decoded
+at a median 20.58 tokens/s with 2.99-second median first-token latency; peak MLX
+allocation was 5.255 GiB. These latencies exclude loading/verification. The
+[comparison](PRETRAINED_COMPARISON.md) retains raw reports, failures and the initial
+performance cost alongside subsequent runtime measurements. Stable-prefix snapshot
+reuse retained 14/15 and reduced median first-token latency to 1.89 seconds and
+total v3 time from 117.74 to 82.83 seconds. Its peak MLX allocation was 5.311 GiB;
+the final decode median was 21.04 tokens/s. 9B remains slower than 8B on these tool
+loops, with better observed task outcomes. Final v1/v2/calculator regressions scored
+16/18, 9/12 and 4/4. Unaided arithmetic remains unreliable; `calculate` is the default.
+All 20 live cache/streaming/cancellation/output-budget checks pass for each model.
 
 Measured on the M4 16 GB target on 2026-10-24: the 8B backend passed
 **15/18** development tasks, **8/12** separate diagnostic tasks, and **4/4**
@@ -111,18 +137,11 @@ extended to support local augmented assignment, without changing frozen prompts.
 Repeated diagnostics informed adapter changes and are regression evidence, not
 untouched general-intelligence benchmarks.
 
-The source currently passes 308 Mac tests. The preserved
-[249-test Linux report](results/pretrained-linux.json) covers its recorded source
-hashes before the subsequent 9B profile extension; it is not verification of that
-extension on Linux. No paid inference or training was used.
-
-An optional **Qwen3.5-9B text-only profile** has pinned download/architecture support
-and portable tests, but its local download was interrupted at the user's request
-to save and publish the current state. **No native 9B inference, quality, memory or
-speed result has been established, and it was not promoted.** The default remains
-the tested Qwen3-8B backend. A future explicit trial can resume with
-`uv run silivra setup-assistant --profile qwen3.5-9b --no-select`.
-Its approximately 5.98 GB artifacts are separate from both existing model lineages.
+The final source passes **328 Mac tests** and **281 portable Linux tests**.
+The [Linux report](results/pretrained-linux-20261025.json) records actual portable
+tests with networking disabled and source hashes; Linux tests do not exercise
+Metal inference. The older [249-test snapshot](results/pretrained-linux.json)
+predates 9B support. No paid inference or training was used.
 
 The frozen [pretrained-v1 diagnostic](../examples/evaluations/pretrained-v1.md)
 checks instruction following, mathematics, stable facts, two small Python functions,
@@ -135,13 +154,15 @@ Reproduce with a fresh output path:
 
 ```sh
 uv run python scripts/measure-pretrained.py \
-  --run runs/silivra-qwen3-8b --output docs/results/pretrained-8b.json
+  --run runs/silivra-qwen3.5-9b \
+  --suite examples/evaluations/pretrained-v3.jsonl --max-new-tokens 384 \
+  --output docs/results/my-new-9b-report.json
 ```
 
 The report records raw public synthetic outputs, actual tool observations, objective
 grades, source hashes, cold model verification/loading, per-generation latency,
 decode throughput and memory. Tests mock inference/network separately. These
-eighteen tasks are a small diagnostic; they cannot establish general intelligence,
+small diagnostic suites cannot establish general intelligence,
 reliability on arbitrary software projects, long-context quality, or absence of
 upstream pretraining contamination. Historical original-model scores used other
 suites and must not be presented as a direct accuracy comparison.

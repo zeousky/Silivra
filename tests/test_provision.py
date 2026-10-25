@@ -8,7 +8,7 @@ import time
 import unittest
 from unittest.mock import patch
 
-from silivra.provision import _download, model_profile, setup_pretrained
+from silivra.provision import DEFAULT_MODEL_RUN, DEFAULT_PROFILE, _download, model_profile, setup_pretrained
 
 
 class Response(io.BytesIO):
@@ -102,7 +102,7 @@ class ProvisionTests(unittest.TestCase):
         specs = {"fixture": (len(self.data), self.digest)}
         with patch("silivra.provision._SPECS", specs), \
                 patch("urllib.request.urlopen", return_value=Response(self.data)):
-            result = setup_pretrained(self.target)
+            result = setup_pretrained(self.target, profile="qwen3-8b")
         self.assertEqual(result["status"], "verified")
         self.assertTrue((self.target / "silivra-pretrained.json").is_file())
         self.assertEqual((self.target / "fixture").read_bytes(), self.data)
@@ -128,6 +128,25 @@ class ProvisionTests(unittest.TestCase):
         self.assertEqual(trial["download_limit_bytes"], 6 * 1024**3)
         trial["parameter_count"] = 1
         self.assertEqual(model_profile("qwen3.5-9b")["parameter_count"], 8953803264)
+
+    def test_default_setup_uses_9b_artifacts_and_keeps_8b_directory_distinct(self):
+        import json
+        self.assertEqual(DEFAULT_PROFILE, "qwen3.5-9b")
+        self.assertEqual(DEFAULT_MODEL_RUN, Path("runs/silivra-qwen3.5-9b"))
+        self.assertEqual(model_profile(DEFAULT_PROFILE)["run"], DEFAULT_MODEL_RUN)
+        self.assertEqual(model_profile("qwen3-8b")["run"], Path("runs/silivra-qwen3-8b"))
+        specs = {"fixture": (len(self.data), self.digest)}
+        with patch("silivra.provision._QWEN35_SPECS", specs), \
+                patch("urllib.request.urlopen", return_value=Response(self.data)) as network:
+            result = setup_pretrained(self.target)
+        self.assertEqual(result["profile"], "qwen3.5-9b")
+        self.assertEqual(result["parameter_count"], 8953803264)
+        url = network.call_args.args[0].full_url
+        self.assertIn("mlx-community/Qwen3.5-9B-MLX-4bit/resolve/", url)
+        manifest = json.loads((self.target / "silivra-pretrained.json").read_text())
+        self.assertEqual(manifest["profile"], DEFAULT_PROFILE)
+        self.assertEqual(manifest["original_model_id"], "Qwen/Qwen3.5-9B")
+        self.assertEqual(set(manifest["files"]), {"fixture"})
 
     def test_other_profile_manifest_is_preserved_before_network(self):
         self.target.mkdir()

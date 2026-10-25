@@ -61,9 +61,10 @@ class PretrainedTests(unittest.TestCase):
         self.processor = SimpleNamespace(deferred_constraints=())
         self.make_processor = patch("silivra.structured.make_action_processor", return_value=self.processor).start()
         self.prompt_cache = Mock()
-        self.prompt_cache.prepare.side_effect = lambda tokens: (["fake KV cache"], tokens, 0)
+        self.prompt_cache.prepare.side_effect = lambda tokens, **_: (["fake KV cache"], tokens, 0)
         self.prompt_cache.commit.return_value = True
         self.prompt_cache.retained_token_count = 99
+        self.prompt_cache.strategy = "trimmed-kv"
         patch("silivra.prompt_cache.PromptCache", return_value=self.prompt_cache).start()
 
     def write_manifest(self):
@@ -265,6 +266,53 @@ class PretrainedTests(unittest.TestCase):
         self.assertEqual(backend.last_metrics["prefill_tokens"], 100)
         self.assertTrue(backend.last_metrics["cache_retained"])
 
+    def test_hybrid_snapshot_target_is_stable_before_actual_user_or_tool_history(self):
+        backend = self.backend()
+        # A template exposing a deterministic shared prefix and changing user
+        # suffix lets this portable test detect accidental prompt-tail capture.
+        def template(messages, **options):
+            if messages[-1]["content"] == '{"content":""}':
+                return [1, 2, 3, 99]
+            return [1, 2, 3, 4, len(messages[-1]["content"])]
+        self.tokenizer.apply_chat_template = template
+        first, prefix = backend._prompt_tokens(self.messages("First"), [], cache_prefix=True)
+        second, second_prefix = backend._prompt_tokens(self.messages("Different request"), [], cache_prefix=True)
+        self.assertEqual((prefix, second_prefix), (3, 3))
+        self.assertEqual(first[:prefix], second[:prefix])
+        self.assertNotEqual(first[prefix:], second[prefix:])
+
+    def test_snapshot_prefix_is_chunk_aligned_bounded_or_cold_on_no_match(self):
+        backend = self.backend()
+        def template(messages, **options):
+            return list(range(700)) + ([999] if messages[-1]["content"] == '{"content":""}' else [1000])
+        self.tokenizer.apply_chat_template = template
+        _, prefix = backend._prompt_tokens(self.messages(), [], cache_prefix=True)
+        self.assertEqual(prefix, 512)
+        def mismatched(messages, **options):
+            return [99, 1] if messages[-1]["content"] == '{"content":""}' else [1, 2, 3]
+        self.tokenizer.apply_chat_template = mismatched
+        _, prefix = backend._prompt_tokens(self.messages(), [], cache_prefix=True)
+        self.assertEqual(prefix, 0)
+
+    def test_hybrid_progress_snapshot_hook_is_bounded_and_errors_drop_pending_state(self):
+        backend = self.backend()
+        self.prompt_cache.strategy = "hybrid-snapshot"
+        def generated(*args, **kwargs):
+            self.assertEqual(kwargs["prefill_step_size"], 99)
+            kwargs["prompt_progress_callback"](99, 100)
+            yield SimpleNamespace(text='{"final":"ok"}', generation_tokens=8)
+        self.stream_generate.side_effect = generated
+        self.assertEqual(parse_action(backend.generate(self.messages(), [])), {"final": "ok"})
+        self.prompt_cache.record_prefill.assert_called_once_with(["fake KV cache"], 99, 100)
+        self.prompt_cache.clear.reset_mock()
+        self.prompt_cache.commit.reset_mock()
+        def broken_callback(_):
+            raise ValueError("UI callback failed")
+        with self.assertRaisesRegex(ValueError, "UI callback failed"):
+            backend.generate(self.messages(), [], on_text=broken_callback)
+        self.prompt_cache.clear.assert_called_once_with()
+        self.prompt_cache.commit.assert_not_called()
+
     def test_context_overflow_never_calls_generation_or_truncates_policy(self):
         backend = self.backend()
         self.tokenizer.token_count = 8192
@@ -369,6 +417,7 @@ class PretrainedTests(unittest.TestCase):
             backend.generate(self.messages(), [])
         self.assertEqual(backend.last_metrics["finish_reason"], "length")
         self.prompt_cache.commit.assert_not_called()
+        self.prompt_cache.clear.assert_called_once_with()
 
     def test_complete_action_at_exact_output_limit_can_still_validate(self):
         backend = self.backend(max_new_tokens=32)

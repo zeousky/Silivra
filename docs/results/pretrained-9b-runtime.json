@@ -1,0 +1,367 @@
+{
+  "format_version": 2,
+  "verification_date": "2026-10-25",
+  "purpose": "Bounded live runtime checks, not a model intelligence benchmark",
+  "model": {
+    "model_id": "mlx-community/Qwen3.5-9B-MLX-4bit",
+    "revision": "938d8919941c6e7efd3c7150eff7fe9d12afa631",
+    "original_model_id": "Qwen/Qwen3.5-9B",
+    "parameter_count": 8953803264,
+    "quantization_bits": 4
+  },
+  "native_cache": {
+    "trimmable": false,
+    "snapshot_supported": true,
+    "layer_types": [
+      "ArraysCache",
+      "KVCache"
+    ],
+    "layer_count": 32
+  },
+  "source_sha256": {
+    "src/silivra/pretrained.py": "007ee97a6c73e4cd9baceacaa2e0d6c23facdb49a2ef5e6c9fcd0b13ee28f8d8",
+    "src/silivra/structured.py": "5dff63ee19f0a0d7b113013bb2b600d45e80fe1239e66f781153f7d942a2dde1",
+    "src/silivra/prompt_cache.py": "bbe2a1629eebfd9b0842d8e2fa2ae998fda2feffead6a5e2af3c7e3a8828acd8",
+    "scripts/check-pretrained-runtime.py": "33a53602865c787b0c04629dbeb274bb0b927163b604d4d317992b5a6acc0843"
+  },
+  "checks": {
+    "plain_cache_equal": true,
+    "plain_snapshot_reused": true,
+    "plain_stream": true,
+    "plain_content": true,
+    "code_cache_equal": true,
+    "code_snapshot_reused": true,
+    "code_stream": true,
+    "code_content": true,
+    "calculator_cache_equal": true,
+    "calculator_snapshot_reused": true,
+    "calculator_stream": true,
+    "calculator_content": true,
+    "changed_user_cache_equal": true,
+    "changed_user_reuses_only_input_prefix": true,
+    "cancelled": true,
+    "cancel_discards_cache": true,
+    "recovery_starts_cold": true,
+    "recovered_after_cancel": true,
+    "output_budget": true,
+    "budget_discards_cache": true
+  },
+  "records": [
+    {
+      "prompt": "Reply with exactly READY.",
+      "raw_output": "{\"final\":\"READY\"}",
+      "action": {
+        "final": "READY"
+      },
+      "stream_matches": true,
+      "metrics": {
+        "prompt_tokens": 198,
+        "generated_tokens": 6,
+        "prefill_tokens": 198,
+        "cached_prompt_tokens": 0,
+        "prompt_cache_strategy": "hybrid-snapshot",
+        "cache_retained": true,
+        "cache_retained_tokens": 182,
+        "total_seconds": 2.575464124998689,
+        "time_to_first_token_seconds": 2.3006563329981873,
+        "tokens_per_second": 2.329677180031795,
+        "decode_tokens_per_second": 23.631478902245032,
+        "finish_reason": "stop",
+        "structured_decoding": "json-action-shape-v1",
+        "runtime_constraint_count": 0,
+        "context_window": 8192,
+        "mlx_active_gib": 4.805918226018548,
+        "mlx_peak_gib": 5.141764711588621,
+        "process_peak_rss_gib": 1.017120361328125
+      }
+    },
+    {
+      "prompt": "Reply with exactly READY.",
+      "raw_output": "{\"final\":\"READY\"}",
+      "action": {
+        "final": "READY"
+      },
+      "stream_matches": true,
+      "metrics": {
+        "prompt_tokens": 198,
+        "generated_tokens": 6,
+        "prefill_tokens": 16,
+        "cached_prompt_tokens": 182,
+        "prompt_cache_strategy": "hybrid-snapshot",
+        "cache_retained": true,
+        "cache_retained_tokens": 182,
+        "total_seconds": 0.5393770409973513,
+        "time_to_first_token_seconds": 0.2579090830004134,
+        "tokens_per_second": 11.123944001964785,
+        "decode_tokens_per_second": 23.209597168509,
+        "finish_reason": "stop",
+        "structured_decoding": "json-action-shape-v1",
+        "runtime_constraint_count": 0,
+        "context_window": 8192,
+        "mlx_active_gib": 4.805918226018548,
+        "mlx_peak_gib": 5.141764711588621,
+        "process_peak_rss_gib": 1.017120361328125
+      }
+    },
+    {
+      "prompt": "Write Python function identity(value) that returns value. Reply only with function source, without Markdown.",
+      "raw_output": "{\"final\":\"def identity(value):\\n    return value\"}",
+      "action": {
+        "final": "def identity(value):\n    return value"
+      },
+      "stream_matches": true,
+      "metrics": {
+        "prompt_tokens": 212,
+        "generated_tokens": 13,
+        "prefill_tokens": 212,
+        "cached_prompt_tokens": 0,
+        "prompt_cache_strategy": "hybrid-snapshot",
+        "cache_retained": true,
+        "cache_retained_tokens": 182,
+        "total_seconds": 1.969216540997877,
+        "time_to_first_token_seconds": 1.3463239160009834,
+        "tokens_per_second": 6.601610198445929,
+        "decode_tokens_per_second": 21.62061623143435,
+        "finish_reason": "stop",
+        "structured_decoding": "json-action-shape-v1",
+        "runtime_constraint_count": 0,
+        "context_window": 8192,
+        "mlx_active_gib": 4.8062996957451105,
+        "mlx_peak_gib": 5.141844157129526,
+        "process_peak_rss_gib": 1.017120361328125
+      }
+    },
+    {
+      "prompt": "Write Python function identity(value) that returns value. Reply only with function source, without Markdown.",
+      "raw_output": "{\"final\":\"def identity(value):\\n    return value\"}",
+      "action": {
+        "final": "def identity(value):\n    return value"
+      },
+      "stream_matches": true,
+      "metrics": {
+        "prompt_tokens": 212,
+        "generated_tokens": 13,
+        "prefill_tokens": 30,
+        "cached_prompt_tokens": 182,
+        "prompt_cache_strategy": "hybrid-snapshot",
+        "cache_retained": true,
+        "cache_retained_tokens": 182,
+        "total_seconds": 0.9308425830022315,
+        "time_to_first_token_seconds": 0.282123708002473,
+        "tokens_per_second": 13.96584152614861,
+        "decode_tokens_per_second": 20.721877130720177,
+        "finish_reason": "stop",
+        "structured_decoding": "json-action-shape-v1",
+        "runtime_constraint_count": 0,
+        "context_window": 8192,
+        "mlx_active_gib": 4.8062996957451105,
+        "mlx_peak_gib": 5.141844157129526,
+        "process_peak_rss_gib": 1.017120361328125
+      }
+    },
+    {
+      "prompt": "Use calculate to evaluate 19 * 23.",
+      "raw_output": "{\"tool\":\"calculate\",\"arguments\":{\"expression\":\"19 * 23\"}}",
+      "action": {
+        "tool": "calculate",
+        "arguments": {
+          "expression": "19 * 23"
+        }
+      },
+      "stream_matches": true,
+      "metrics": {
+        "prompt_tokens": 600,
+        "generated_tokens": 17,
+        "prefill_tokens": 600,
+        "cached_prompt_tokens": 0,
+        "prompt_cache_strategy": "hybrid-snapshot",
+        "cache_retained": true,
+        "cache_retained_tokens": 512,
+        "total_seconds": 4.3884328749991255,
+        "time_to_first_token_seconds": 3.5584564999990107,
+        "tokens_per_second": 3.873820218795847,
+        "decode_tokens_per_second": 21.0292086343474,
+        "finish_reason": "stop",
+        "structured_decoding": "json-action-shape-v1",
+        "runtime_constraint_count": 2,
+        "context_window": 8192,
+        "mlx_active_gib": 4.830790052190423,
+        "mlx_peak_gib": 5.229298250749707,
+        "process_peak_rss_gib": 1.017120361328125
+      }
+    },
+    {
+      "prompt": "Use calculate to evaluate 19 * 23.",
+      "raw_output": "{\"tool\":\"calculate\",\"arguments\":{\"expression\":\"19 * 23\"}}",
+      "action": {
+        "tool": "calculate",
+        "arguments": {
+          "expression": "19 * 23"
+        }
+      },
+      "stream_matches": true,
+      "metrics": {
+        "prompt_tokens": 600,
+        "generated_tokens": 17,
+        "prefill_tokens": 88,
+        "cached_prompt_tokens": 512,
+        "prompt_cache_strategy": "hybrid-snapshot",
+        "cache_retained": true,
+        "cache_retained_tokens": 512,
+        "total_seconds": 1.4594134160033718,
+        "time_to_first_token_seconds": 0.6330782500008354,
+        "tokens_per_second": 11.648515638944026,
+        "decode_tokens_per_second": 21.126601947583435,
+        "finish_reason": "stop",
+        "structured_decoding": "json-action-shape-v1",
+        "runtime_constraint_count": 2,
+        "context_window": 8192,
+        "mlx_active_gib": 4.830790052190423,
+        "mlx_peak_gib": 5.229298250749707,
+        "process_peak_rss_gib": 1.017120361328125
+      }
+    },
+    {
+      "prompt": "Reply with exactly FIRST.",
+      "raw_output": "{\"final\":\"FIRST\"}",
+      "action": {
+        "final": "FIRST"
+      },
+      "stream_matches": true,
+      "metrics": {
+        "prompt_tokens": 198,
+        "generated_tokens": 6,
+        "prefill_tokens": 198,
+        "cached_prompt_tokens": 0,
+        "prompt_cache_strategy": "hybrid-snapshot",
+        "cache_retained": true,
+        "cache_retained_tokens": 182,
+        "total_seconds": 1.6234708340016368,
+        "time_to_first_token_seconds": 1.3307871249999152,
+        "tokens_per_second": 3.695785519725543,
+        "decode_tokens_per_second": 22.100773722873488,
+        "finish_reason": "stop",
+        "structured_decoding": "json-action-shape-v1",
+        "runtime_constraint_count": 0,
+        "context_window": 8192,
+        "mlx_active_gib": 4.8062691781669855,
+        "mlx_peak_gib": 5.229298250749707,
+        "process_peak_rss_gib": 1.017120361328125
+      }
+    },
+    {
+      "prompt": "Reply with exactly SECOND.",
+      "raw_output": "{\"final\":\"SECOND\"}",
+      "action": {
+        "final": "SECOND"
+      },
+      "stream_matches": true,
+      "metrics": {
+        "prompt_tokens": 198,
+        "generated_tokens": 6,
+        "prefill_tokens": 16,
+        "cached_prompt_tokens": 182,
+        "prompt_cache_strategy": "hybrid-snapshot",
+        "cache_retained": true,
+        "cache_retained_tokens": 182,
+        "total_seconds": 0.5823024169985729,
+        "time_to_first_token_seconds": 0.270574582998961,
+        "tokens_per_second": 10.303924257993772,
+        "decode_tokens_per_second": 20.67517363905201,
+        "finish_reason": "stop",
+        "structured_decoding": "json-action-shape-v1",
+        "runtime_constraint_count": 0,
+        "context_window": 8192,
+        "mlx_active_gib": 4.8062691781669855,
+        "mlx_peak_gib": 5.229298250749707,
+        "process_peak_rss_gib": 1.017120361328125
+      }
+    },
+    {
+      "prompt": "Reply with exactly SECOND.",
+      "raw_output": "{\"final\":\"SECOND\"}",
+      "action": {
+        "final": "SECOND"
+      },
+      "stream_matches": true,
+      "metrics": {
+        "prompt_tokens": 198,
+        "generated_tokens": 6,
+        "prefill_tokens": 198,
+        "cached_prompt_tokens": 0,
+        "prompt_cache_strategy": "hybrid-snapshot",
+        "cache_retained": true,
+        "cache_retained_tokens": 182,
+        "total_seconds": 1.6362164160018438,
+        "time_to_first_token_seconds": 1.326609208001173,
+        "tokens_per_second": 3.6669965790107555,
+        "decode_tokens_per_second": 20.840234851947518,
+        "finish_reason": "stop",
+        "structured_decoding": "json-action-shape-v1",
+        "runtime_constraint_count": 0,
+        "context_window": 8192,
+        "mlx_active_gib": 4.806284436956048,
+        "mlx_peak_gib": 5.229298250749707,
+        "process_peak_rss_gib": 1.017120361328125
+      }
+    },
+    {
+      "prompt": "Reply with exactly RECOVERED.",
+      "raw_output": "{\"final\":\"RECOVERED\"}",
+      "action": {
+        "final": "RECOVERED"
+      },
+      "stream_matches": true,
+      "metrics": {
+        "prompt_tokens": 200,
+        "generated_tokens": 8,
+        "prefill_tokens": 200,
+        "cached_prompt_tokens": 0,
+        "prompt_cache_strategy": "hybrid-snapshot",
+        "cache_retained": true,
+        "cache_retained_tokens": 182,
+        "total_seconds": 1.7056249999986903,
+        "time_to_first_token_seconds": 1.333647542000108,
+        "tokens_per_second": 4.690362770249113,
+        "decode_tokens_per_second": 22.79267215596674,
+        "finish_reason": "stop",
+        "structured_decoding": "json-action-shape-v1",
+        "runtime_constraint_count": 0,
+        "context_window": 8192,
+        "mlx_active_gib": 4.806284436956048,
+        "mlx_peak_gib": 5.229298250749707,
+        "process_peak_rss_gib": 1.017120361328125
+      }
+    },
+    {
+      "prompt": "Reply with exactly RECOVERED.",
+      "raw_output": "{\"final\":\"RECOVERED\"}",
+      "action": {
+        "final": "RECOVERED"
+      },
+      "stream_matches": true,
+      "metrics": {
+        "prompt_tokens": 200,
+        "generated_tokens": 8,
+        "prefill_tokens": 200,
+        "cached_prompt_tokens": 0,
+        "prompt_cache_strategy": "hybrid-snapshot",
+        "cache_retained": true,
+        "cache_retained_tokens": 182,
+        "total_seconds": 1.744175792002352,
+        "time_to_first_token_seconds": 1.346155582999927,
+        "tokens_per_second": 4.586693632994312,
+        "decode_tokens_per_second": 21.23648786994331,
+        "finish_reason": "stop",
+        "structured_decoding": "json-action-shape-v1",
+        "runtime_constraint_count": 0,
+        "context_window": 8192,
+        "mlx_active_gib": 4.806284436956048,
+        "mlx_peak_gib": 5.229298250749707,
+        "process_peak_rss_gib": 1.017120361328125
+      }
+    }
+  ],
+  "seconds_including_load": 26.03895299999931,
+  "all_passed": true
+}

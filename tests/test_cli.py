@@ -69,7 +69,7 @@ class CLITests(unittest.TestCase):
                                                             history_messages=0, selected_tools=["read_file"]))
         with patch("silivra.provision.setup_pretrained", return_value={"model_id": "pinned/model"}) as provision:
             result = self.call("setup-assistant", "--workspace", str(self.root), "--output", "runs/capable-assistant")
-        provision.assert_called_once_with(output, profile="qwen3-8b")
+        provision.assert_called_once_with(output, profile="qwen3.5-9b")
         self.assertTrue(result["selected"])
         self.assertEqual(result["selected_model"], str(output))
         selected = load_settings(settings_path, scope)
@@ -127,13 +127,30 @@ class CLITests(unittest.TestCase):
                     self.assertEqual(settings_path.read_text(), existing)
 
     def test_explicit_profile_selection_uses_its_separate_run(self):
-        output = self.root / "runs" / "silivra-qwen3.5-9b"
+        for profile, directory in (("qwen3-8b", "silivra-qwen3-8b"),
+                                   ("qwen3.5-9b", "silivra-qwen3.5-9b")):
+            with self.subTest(profile=profile):
+                output = self.root / "runs" / directory
+                with patch("silivra.provision.setup_pretrained", return_value={"status": "verified"}) as provision:
+                    result = self.call("setup-assistant", "--workspace", str(self.root), "--profile", profile)
+                provision.assert_called_once_with(output, profile=profile)
+                self.assertTrue(result["selected"])
+                self.assertEqual(load_settings(self.root / ".silivra" / "config.json", project_scope(self.root)).model_run,
+                                 str(output))
+
+    def test_setup_default_profile_directory_and_help_agree(self):
+        from silivra.cli import parser
+        from silivra.provision import DEFAULT_MODEL_RUN, DEFAULT_PROFILE
+        output = self.root / DEFAULT_MODEL_RUN
         with patch("silivra.provision.setup_pretrained", return_value={"status": "verified"}) as provision:
-            result = self.call("setup-assistant", "--workspace", str(self.root), "--profile", "qwen3.5-9b")
-        provision.assert_called_once_with(output, profile="qwen3.5-9b")
-        self.assertTrue(result["selected"])
-        self.assertEqual(load_settings(self.root / ".silivra" / "config.json", project_scope(self.root)).model_run,
-                         str(output))
+            result = self.call("setup-assistant", "--workspace", str(self.root))
+        provision.assert_called_once_with(output, profile=DEFAULT_PROFILE)
+        self.assertEqual(result["selected_model"], str(output))
+        help_text = io.StringIO()
+        with redirect_stdout(help_text), self.assertRaises(SystemExit) as raised:
+            parser().parse_args(["setup-assistant", "--help"])
+        self.assertEqual(raised.exception.code, 0)
+        self.assertIn(f"default: {DEFAULT_PROFILE}", help_text.getvalue())
 
     def test_one_shot_calculator_default_and_explicit_tool_flags(self):
         pretrained = self.root / "pretrained"

@@ -6,6 +6,25 @@ together. Every milestone needs evidence before it is called complete.
 
 ## Practical local assistant with external weights
 
+2026-10-25: the pinned Qwen3.5-9B text-only profile completed verified provisioning
+and real Metal inference. A newly frozen 15-task diagnostic scored 14/15 versus
+8B's 11/15 under identical adapter/generation budgets. The sole 9B failure was
+extra punctuation; coding, observed file/calculator use, scoped memory and one
+untrusted-file task passed. Initial median decoding was 20.58 tokens/s, median
+first-token latency 2.99 seconds and peak MLX allocation 5.255 GiB. These small
+diagnostics support a practical default choice, not general-intelligence claims.
+See the [comparison and retained failures](PRETRAINED_COMPARISON.md).
+The final hybrid input-prefix snapshot cache retains 14/15 while reducing that
+suite's wall time from 117.74 to 82.83 seconds and median first-token latency to
+1.89 seconds. Decoding is approximately 21 tokens/s. All 20 live runtime checks
+pass for both 8B and 9B; 9B is the new setup/discovery default, with explicit saved
+choices preserved. Repeated v1/v2/calculator results are 16/18, 9/12 and 4/4.
+These are inference/runtime improvements, not weight training. Unaided arithmetic
+still fails, and total OS memory use can exceed the measured 5.311 GiB MLX peak.
+The final source passes 328 Mac tests and 281 actual portable Linux tests. Default
+interactive chat was verified with a coherent Python explanation and a real
+calculator call; no model server or background process is required.
+
 2026-10-24 save point: Qwen3-8B local inference now includes constrained JSON
 actions, a bounded exact-arithmetic tool, explicit output-budget stops, and a
 bounded exact input-prefix KV cache. Live diagnostics scored 15/18 development,
@@ -15,9 +34,9 @@ passes 308 Mac tests; the recorded 249-test Linux snapshot predates the latest
 profile extension. These results are practical inference evidence, not original
 Silivra training or proof of reliable general intelligence.
 
-The separately pinned Qwen3.5-9B profile is implemented and unit-tested, but its
-download/trial remains unfinished. It has not been run or promoted; Qwen3-8B stays
-the assistant default. See [results and limits](PRETRAINED_ASSISTANT.md).
+At that save point the separately pinned Qwen3.5-9B trial was unfinished and
+Qwen3-8B remained the default. The later 2026-10-25 measurements above complete
+its initial native trial. See [results and limits](PRETRAINED_ASSISTANT.md).
 
 On 2026-10-23, an explicitly separate Qwen3-8B 4-bit MLX backend was implemented
 to provide an 8B-class local assistant on the 16 GB target. Explicit bounded setup

@@ -62,7 +62,7 @@ New manifests record input/artifact hashes, deterministic sampling and exclusion
 
 ### Optional external local assistant
 
-`setup-assistant` downloads **Qwen3-8B**, developed by the Qwen team at Alibaba,
+`setup-assistant --profile qwen3-8b` downloads **Qwen3-8B**, developed by the Qwen team at Alibaba,
 in MLX Community's 4-bit conversion. The 8,190,735,360-parameter architecture,
 pretrained weights and tokenizer are external artifacts; they are not Silivra's
 original randomly initialized model or its learned tokenizer.
@@ -84,7 +84,7 @@ relabeling ownership. Quantization was performed upstream. The provisioner recor
 all file sizes/hashes; downloaded artifacts are ignored by Git and are not bundled
 with the source repository. Distribution must retain applicable upstream notices.
 
-The optional, unfinished text-only Qwen3.5-9B trial uses
+The default text-only Qwen3.5-9B profile uses
 [Qwen/Qwen3.5-9B](https://huggingface.co/Qwen/Qwen3.5-9B) at revision
 `c202236235762e1c871ad0ccb60c8ee5ba337b9a`, and
 [MLX Community's conversion](https://huggingface.co/mlx-community/Qwen3.5-9B-MLX-4bit)
@@ -92,7 +92,8 @@ at `938d8919941c6e7efd3c7150eff7fe9d12afa631`, under Apache-2.0.
 The text backbone has 8,953,803,264 parameters; MLX-LM excludes vision/MTP weights.
 Its upstream license is retained with SHA-256
 `bbedc3fda3305820b977265f01b8619d87570a6739de3a5582c3464840f1e57a`.
-Download support does not establish native inference or capability results.
+Native inference and its bounded diagnostic results are recorded separately in
+[the local comparison](docs/PRETRAINED_COMPARISON.md). No weight updates were performed.
 
 - [Apple MLX-LM](https://github.com/ml-explore/mlx-lm), MIT, Copyright Apple Inc.
 - [Hugging Face Transformers](https://github.com/huggingface/transformers), Apache-2.0.
@@ -102,7 +103,7 @@ Download support does not establish native inference or capability results.
   Safetensors (Apache-2.0), and other locked transitive dependencies retain their
   installed distributions' license notices.
 
-The pretrained-v1/pretrained-v2 and calculator-v1 diagnostics are original
+The pretrained-v1/pretrained-v2/pretrained-v3 and calculator-v1 diagnostics are original
 Codex-authored synthetic MIT material.
 It is evaluation-only and does not train either model; upstream pretraining
 contamination cannot be ruled out for general knowledge and elementary exercises.

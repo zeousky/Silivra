@@ -5,7 +5,8 @@ and an assistant system that can give that model access to tools and memory.
 Improving the system and training better weights are separate engineering tasks.
 
 The optional practical assistant uses an explicitly identified external model:
-Qwen3-8B (8,190,735,360 parameters), quantized to 4 bits by MLX Community.
+Qwen3.5-9B (8,953,803,264 text parameters), quantized to 4 bits by MLX Community.
+The earlier Qwen3-8B profile (8,190,735,360 parameters) remains selectable.
 It does not alter the original Silivra model/tokenizer lineage. The native training,
 checkpoint, loss evaluation and export code remain specific to that original lineage.
 External inference results must be attributed separately.
@@ -39,14 +40,30 @@ The full result still passes the original strict parser. A token-limited incompl
 action stops as `output_budget`; its draft is rejected and no partial tool runs.
 
 `prompt_cache.py` owns one backend-local exact input prefix, at most 1,024 tokens
-and 256 MiB of actual KV allocations. It verifies all layer offsets and actual trim
-results, accounting for MLX-LM's decoding lookahead. Preparation consumes stored
-state before inference; only a validated complete action can commit a new input
-prefix. Cancelled, malformed and output-limited generations cannot commit. Generated
-answers and lookahead are trimmed away, and at least one prompt token is always
-recomputed. Admission counts the full request, policy and evidence even on a cache
-hit. Changed tool/user content reuses only exactly matching tokens; no KV state is
-persisted or treated as durable memory.
+and 256 MiB of actual retained cache allocations. For Qwen3's trimmable KV layers,
+it verifies all offsets and trim results, accounting for decoding lookahead, and
+removes the generated tail after a valid action.
+
+Qwen3.5's recurrent layers cannot be trimmed. Instead, the backend derives a
+stable prefix from the actual chat template's system policy and any labelled
+calculator example, before the real conversation. It verifies that these tokens
+match the full prompt, caps the target at 1,024 tokens, and aligns longer targets
+to 256-token chunks. Only an evaluated prefill callback strictly before the final
+prompt token may snapshot the known single-sequence `ArraysCache`/`KVCache` types.
+The final callback is excluded because MLX-LM has already performed lookahead.
+Layer state, KV offsets and actual bytes are checked before and after copying.
+Hybrid reuse requires the entire saved prefix to match; recurrent state is never
+partially trimmed. Unsupported or unverified cache shapes stay cold.
+
+Preparation consumes the stored entry before inference, and hybrid inference
+works on an independent clone. Only a validated complete action can commit its
+pending input snapshot. Backend generation cancellation, malformed output, exhausted
+output budgets and exceptions clear committed/pending references. An Agent rejection
+before generation can leave an earlier valid snapshot intact; reuse still requires
+exact input-token equality. At least one input token is always
+recomputed, and prefill chunks stay at most 256 tokens. Admission counts the full
+request, policy and evidence even on a cache hit. No generated answer becomes an
+input snapshot; cache state is never persisted or treated as durable memory.
 
 `arithmetic.py` provides a stateless `calculate` tool. It interprets numeric AST
 nodes with exact fractions and bounded decimal rendering; no Python code is
@@ -59,7 +76,7 @@ explicit `--no-tools` and saved interactive selections retain their meaning.
 
 The terminal identifies the external model. A successful setup selects it in the
 current user/project's private preferences; absent an explicit selection, a complete
-installed 8B run is preferred over the original research checkpoint. No model is
+installed 9B run is preferred, followed by 8B and the original research checkpoint. No model is
 downloaded on ordinary chat startup. See [provenance and measurements](PRETRAINED_ASSISTANT.md).
 
 ## Model and learning
