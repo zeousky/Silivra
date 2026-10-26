@@ -38,58 +38,18 @@ _CONTROL = re.compile(r"[\x00-\x08\x0b-\x1f\x7f-\x9f]")
 
 def default_model_run(workspace: Path) -> Path:
     """Locate this source installation's weights while working in another repo."""
-    from .pretrained import is_pretrained_run
-    from .provision import DEFAULT_PROFILE, PROFILES, model_profile
     source = Path(__file__).resolve().parents[2]
-    profiles = (DEFAULT_PROFILE, *(name for name in PROFILES if name != DEFAULT_PROFILE))
-    for profile in profiles:
-        for base in (Path(workspace), source):
-            pretrained = base / model_profile(profile)["run"]
-            if is_pretrained_run(pretrained):
-                return pretrained
     candidates = [source / "runs" / "silivra-assistant-v2", Path(workspace) / "runs" / "silivra-assistant-v2"]
     return next((path for path in candidates if path.is_dir()), candidates[0])
 
 
 def default_output_tokens(run: Path) -> int:
-    """Keep the original short-context model's reservation separate from Qwen3."""
-    from .pretrained import is_pretrained_run
-    return 768 if is_pretrained_run(run) else 96
-
-
-def _pretrained_metadata(run: Path) -> dict:
-    """Read bounded display metadata; backend loading separately verifies weights."""
-    from .pretrained import MARKER_NAME
-    marker = Path(run).expanduser() / MARKER_NAME
-    try:
-        descriptor = os.open(marker, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
-        with os.fdopen(descriptor, "rb") as source:
-            metadata = os.fstat(source.fileno())
-            if (not stat.S_ISREG(metadata.st_mode) or metadata.st_nlink != 1
-                    or metadata.st_size > 131072):
-                return {}
-            encoded = source.read(131073)
-        if len(encoded) > 131072:
-            return {}
-        return _json(encoded.decode("utf-8"))
-    except (OSError, ValueError, RecursionError):
-        return {}
-
-
-def _pretrained_description(metadata: dict) -> str:
-    identifier = metadata.get("original_model_id") or metadata.get("model_id")
-    name = "External model"
-    if isinstance(identifier, str) and re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._/-]{0,199}", identifier):
-        name = identifier.rsplit("/", 1)[-1] or name
-    bits = metadata.get("quantization_bits")
-    precision = "4-bit " if type(bits) is int and bits == 4 else ""
-    return f"{name} · pretrained · local {precision}inference"
+    """Reserve a bounded answer within the original model's short context."""
+    return 96
 
 
 def model_description(run: Path) -> str:
-    from .pretrained import is_pretrained_run
-    return (_pretrained_description(_pretrained_metadata(run)) if is_pretrained_run(run)
-            else "Silivra original · from-scratch checkpoint")
+    return "Silivra original · from-scratch checkpoint"
 
 
 def _safe(value) -> str:
@@ -129,9 +89,6 @@ class _PermittedTools:
 
 def _backend(run, *, which, max_new_tokens):
     try:
-        from .pretrained import PretrainedMLXBackend, is_pretrained_run
-        if is_pretrained_run(run):
-            return PretrainedMLXBackend(run, which=which, max_new_tokens=max_new_tokens)
         from .agent import MLXBackend
         return MLXBackend(run, which=which, max_new_tokens=max_new_tokens)
     except ImportError as error:
@@ -510,17 +467,6 @@ class TerminalApp:
                 continue
             for path in sorted(runs.iterdir()):
                 if not path.is_dir() or path.is_symlink():
-                    continue
-                from .pretrained import is_pretrained_run
-                if is_pretrained_run(path):
-                    context = "runtime limit at load"
-                    metadata = _pretrained_metadata(path)
-                    limit = metadata.get("context_window")
-                    if type(limit) is int and 512 <= limit <= 8192:
-                        context = f"{limit} runtime limit"
-                    table.add_row(Text(_safe(path)), "local", context,
-                                  Text(_safe(_pretrained_description(metadata))))
-                    count += 1
                     continue
                 for reference in ("best", "latest"):
                     pointer = path / f"{reference}.json"

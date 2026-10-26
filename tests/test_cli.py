@@ -61,124 +61,41 @@ class CLITests(unittest.TestCase):
                            "--arguments", '{"query":"python"}', code=1)
         self.assertEqual(result["error"]["code"], "permission_denied")
 
-    def test_setup_download_is_explicit_and_selects_separate_model(self):
-        output = self.root / "runs" / "capable-assistant"
-        settings_path = self.root / ".silivra" / "config.json"
-        scope = project_scope(self.root)
-        save_settings(settings_path, scope, TerminalSettings(model_run="runs/original", max_new_tokens=96,
-                                                            history_messages=0, selected_tools=["read_file"]))
-        with patch("silivra.provision.setup_pretrained", return_value={"model_id": "pinned/model"}) as provision:
-            result = self.call("setup-assistant", "--workspace", str(self.root), "--output", "runs/capable-assistant")
-        provision.assert_called_once_with(output, profile="qwen3.5-9b")
-        self.assertTrue(result["selected"])
-        self.assertEqual(result["selected_model"], str(output))
-        selected = load_settings(settings_path, scope)
-        self.assertEqual(selected.model_run, str(output))
-        self.assertEqual(selected.max_new_tokens, 768)
-        self.assertEqual(selected.history_messages, 0)
-        self.assertEqual(selected.selected_tools, ["read_file"])
 
-    def test_one_shot_uses_saved_model_and_backend_specific_reservation(self):
-        selected = self.root / "separate-pretrained"
+    def test_one_shot_uses_saved_native_model_and_reservation(self):
+        selected = self.root / "native-assistant"
         save_settings(self.root / ".silivra" / "config.json", project_scope(self.root),
                       TerminalSettings(model_run=str(selected)))
         backend = type("Backend", (), {"generate": lambda *_: '{"final":"Hello."}'})()
-        with patch("silivra.terminal._backend", return_value=backend) as factory, \
-                patch("silivra.pretrained.is_pretrained_run", side_effect=lambda path: Path(path) == selected), \
-                patch("silivra.provision.setup_pretrained", side_effect=AssertionError("chat must not download")):
+        with patch("silivra.terminal._backend", return_value=backend) as factory:
             result = self.call("chat", "--workspace", str(self.root), "--json", "Say hello")
             self.assertEqual(result["answer"], "Hello.")
-            factory.assert_called_once_with(selected, which="best", max_new_tokens=768)
+            factory.assert_called_once_with(selected, which="best", max_new_tokens=96)
             factory.reset_mock()
             self.call("chat", "--workspace", str(self.root), "--json", "--max-new-tokens", "128", "Say hello")
             factory.assert_called_once_with(selected, which="best", max_new_tokens=128)
 
-    def test_setup_selects_calculator_from_empty_selection_and_preserves_all_tools(self):
-        settings_path = self.root / ".silivra" / "config.json"
-        scope = project_scope(self.root)
-        for selected_tools, expected in (([], ["calculate"]), (None, None)):
-            with self.subTest(selected_tools=selected_tools):
-                save_settings(settings_path, scope, TerminalSettings(selected_tools=selected_tools))
-                with patch("silivra.provision.setup_pretrained", return_value={"status": "verified"}):
-                    result = self.call("setup-assistant", "--workspace", str(self.root))
-                self.assertEqual(load_settings(settings_path, scope).selected_tools, expected)
-                self.assertEqual(result["selected_tools"], expected)
 
-    def test_setup_trial_uses_profile_directory_without_reading_or_writing_preferences(self):
-        output = self.root / "runs" / "silivra-qwen3.5-9b"
-        settings_path = self.root / ".silivra" / "config.json"
-        for existing in (None, "invalid preferences that must stay untouched"):
-            with self.subTest(existing=existing):
-                if existing is not None:
-                    settings_path.parent.mkdir(exist_ok=True)
-                    settings_path.write_text(existing)
-                with patch("silivra.provision.setup_pretrained", return_value={"status": "verified"}) as provision, \
-                        patch("silivra.settings.load_settings", side_effect=AssertionError("trial must not read preferences")), \
-                        patch("silivra.settings.save_settings", side_effect=AssertionError("trial must not save preferences")):
-                    result = self.call("setup-assistant", "--workspace", str(self.root),
-                                       "--profile", "qwen3.5-9b", "--no-select")
-                provision.assert_called_once_with(output, profile="qwen3.5-9b")
-                self.assertFalse(result["selected"])
-                self.assertEqual(result["prepared_model"], str(output))
-                self.assertNotIn("selected_model", result)
-                if existing is None:
-                    self.assertFalse(settings_path.parent.exists())
-                else:
-                    self.assertEqual(settings_path.read_text(), existing)
-
-    def test_explicit_profile_selection_uses_its_separate_run(self):
-        for profile, directory in (("qwen3-8b", "silivra-qwen3-8b"),
-                                   ("qwen3.5-9b", "silivra-qwen3.5-9b")):
-            with self.subTest(profile=profile):
-                output = self.root / "runs" / directory
-                with patch("silivra.provision.setup_pretrained", return_value={"status": "verified"}) as provision:
-                    result = self.call("setup-assistant", "--workspace", str(self.root), "--profile", profile)
-                provision.assert_called_once_with(output, profile=profile)
-                self.assertTrue(result["selected"])
-                self.assertEqual(load_settings(self.root / ".silivra" / "config.json", project_scope(self.root)).model_run,
-                                 str(output))
-
-    def test_setup_default_profile_directory_and_help_agree(self):
+    def test_no_external_model_setup_command_exists(self):
         from silivra.cli import parser
-        from silivra.provision import DEFAULT_MODEL_RUN, DEFAULT_PROFILE
-        output = self.root / DEFAULT_MODEL_RUN
-        with patch("silivra.provision.setup_pretrained", return_value={"status": "verified"}) as provision:
-            result = self.call("setup-assistant", "--workspace", str(self.root))
-        provision.assert_called_once_with(output, profile=DEFAULT_PROFILE)
-        self.assertEqual(result["selected_model"], str(output))
-        help_text = io.StringIO()
-        with redirect_stdout(help_text), self.assertRaises(SystemExit) as raised:
-            parser().parse_args(["setup-assistant", "--help"])
-        self.assertEqual(raised.exception.code, 0)
-        self.assertIn(f"default: {DEFAULT_PROFILE}", help_text.getvalue())
+        with redirect_stderr(io.StringIO()), self.assertRaises(SystemExit) as raised:
+            parser().parse_args(["setup-assistant"])
+        self.assertEqual(raised.exception.code, 2)
 
-    def test_one_shot_calculator_default_and_explicit_tool_flags(self):
-        pretrained = self.root / "pretrained"
-        original = self.root / "original"
-        cases = ((pretrained, [], {"calculate"}),
-                 (pretrained, ["--no-tools"], set()),
-                 (pretrained, ["--tool", "read_file"], {"read_file"}),
-                 (pretrained, ["--all-tools"], {"calculate", "list_files", "read_file", "search_files"}),
-                 (original, [], set()),
-                 (original, ["--tool", "calculate"], {"calculate"}))
-
+    def test_one_shot_default_exposes_no_tools_and_honors_explicit_selection(self):
         class Backend:
-            def __init__(self):
-                self.tools = []
-
             def generate(self, messages, tools):
-                self.tools.append(tools)
+                self.tools = tools
                 return '{"final":"Done."}'
-
-        for run, flags, expected in cases:
-            with self.subTest(run=run.name, flags=flags):
+        for flags, expected in (([], set()), (["--no-tools"], set()),
+                                (["--tool", "calculate"], {"calculate"}),
+                                (["--tool", "read_file"], {"read_file"})):
+            with self.subTest(flags=flags):
                 backend = Backend()
-                with patch("silivra.terminal._backend", return_value=backend), \
-                        patch("silivra.pretrained.is_pretrained_run", side_effect=lambda path: Path(path) == pretrained):
-                    result = self.call("chat", "--workspace", str(self.root), "--run", str(run),
-                                       "--json", *flags, "Say done")
+                with patch("silivra.terminal._backend", return_value=backend):
+                    result = self.call("chat", "--workspace", str(self.root), "--json", *flags, "Say done")
                 self.assertEqual(result["status"], "completed")
-                self.assertEqual({schema["function"]["name"] for schema in backend.tools[0]}, expected)
+                self.assertEqual({tool["function"]["name"] for tool in backend.tools}, expected)
 
 
 if __name__ == "__main__":

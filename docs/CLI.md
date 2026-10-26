@@ -1,29 +1,18 @@
 # Silivra terminal
 
-Silivra's terminal combines a selected local model, the assistant runtime,
-workspace tools, and private SQLite memory. The practical backend is an explicitly
-separate Qwen3.5-9B model; Qwen3-8B and Silivra's original from-scratch checkpoints remain
-selectable for research. Neither backend calls a hosted model service.
-See [external-backend measurements](PRETRAINED_ASSISTANT.md) and
-[original-model capabilities](CAPABILITY_RESULTS.md) separately.
+Silivra's terminal combines its own from-scratch checkpoint, the assistant runtime,
+workspace tools, and private SQLite memory. Every inference entry point uses the
+original model and tokenizer lineage. See [measured model capabilities](CAPABILITY_RESULTS.md).
 
 From the repository, install the locked dependencies and open the terminal:
 
 ```sh
 uv sync --locked
-uv run silivra setup-assistant
 uv run silivra
 ```
 
-The explicit setup downloads 5.98 GB of pinned Qwen3.5-9B 4-bit artifacts,
-checks hashes, and saves the selection for the current workspace/user. It has a
-15-minute download-session limit and resumes partial files on a repeated invocation.
-Use `setup-assistant --output PATH --workspace PATH --user NAME` to change those
-locations. Ordinary terminal/chat startup never downloads model files.
-Use `--profile qwen3-8b` for the existing 4.62 GB 8B option, or `--no-select` to
-prepare either profile without changing saved preferences.
-If the saved tool selection is empty, explicit setup selects `calculate`; custom
-nonempty selections and `all` are preserved. Ordinary launch preserves `/tools none`.
+Model files must already exist locally. Ordinary terminal/chat startup never
+downloads model files or substitutes a hosted model.
 
 To make the bare `silivra` command available from another directory, run this once
 from the repository after syncing. It creates a launcher only when that name is
@@ -53,17 +42,12 @@ uv run silivra --workspace /path/to/project --model /path/to/Silivra/runs/silivr
 uv run silivra chat --run runs/silivra-assistant-v2 --max-new-tokens 96
 ```
 
-Successful default setup selects `runs/silivra-qwen3.5-9b` for the current workspace/user.
-An explicit saved model remains selected until setup or `/model` changes it.
-Without a saved selection, an installed 9B run is preferred, followed by 8B,
-then the original `runs/silivra-assistant-v2`. Workspace/source discovery requires
-a provisioned model marker; ordinary launch never downloads a missing model.
-The banner and `/status` identify pretrained versus original weights. `/model` paths are
-relative to the selected workspace; absolute paths also work. Both entry points
-honor saved terminal budgets unless an explicit flag overrides that preference
-for the current launch. One-shot `chat "..."` honors the saved model selection,
-with output defaults of 768 tokens for pretrained models and 96 for the original checkpoint.
-Switching models resets that reservation to the corresponding default; explicit
+Without a saved selection, Silivra discovers `runs/silivra-assistant-v2` beside the
+source installation or selected workspace. `/model` paths are relative to the
+selected workspace; absolute paths also work. Interactive entry points honor saved
+budgets unless an explicit flag overrides that preference for the current launch.
+One-shot `chat "..."` honors the saved model selection, with a default output
+reservation of 96 tokens. Switching models resets that reservation; explicit
 `--max-new-tokens` and `/config max-new-tokens` can override it.
 
 Model weights are local ignored artifacts and are not downloaded by launching the
@@ -100,10 +84,9 @@ long-context ability. System policy, tools, history, memory and the output
 reservation must all fit. Silivra reports overflow instead of silently dropping
 policy or the newest request.
 
-Completed prior turns retain validated user/assistant/tool roles. The original
-backend uses its training format; the pretrained backend uses Qwen's chat template
-with thinking disabled and quotes observations as untrusted data. Incomplete or invalid turns are not
-replayed. When space runs out, Silivra reports omissions and drops entire older
+Completed prior turns retain validated user/assistant/tool roles in the same
+format used for training. Observations remain untrusted data. Incomplete or invalid
+turns are not replayed. When space runs out, Silivra reports omissions and drops entire older
 turns; it keeps current-turn tool evidence. Replaying a prior tool result does not
 execute that tool or grant permission to use it again.
 
@@ -133,9 +116,8 @@ exposes all tools permitted by the current process. A selected tool stays unavai
 until its corresponding capability is enabled. Start with focused selections because
 schemas consume context.
 
-Pretrained one-shot `chat` defaults to the stateless `calculate` tool; original
-one-shot chat defaults to none. `--no-tools` disables that default, while explicit
-`--tool` flags replace it. For file-backed arithmetic, select both tools:
+One-shot `chat` defaults to no tools. Use explicit `--tool` flags to select
+capabilities; `--no-tools` disables model tool selection. For file-backed arithmetic, select both tools:
 `chat --tool read_file --tool calculate "Read the invoice and compute its total."`
 Interactive selections remain saved; use `/tools read_file calculate` as needed.
 Turning workspace reads off does not disable pure arithmetic.
@@ -213,17 +195,16 @@ from transcripts and persistent input history; this is not a secret vault.
 | `history-messages` | 0–100 previous messages. |
 | `memory-chars` | 0 disables retrieval; otherwise 256–16000 characters. |
 
-Both MLX backends can display incremental answer text while generating
+The native MLX backend can display incremental answer text while generating
 the strict JSON action. Such output is labelled **draft**, followed by acceptance
 only after the complete JSON action validates. Rejected or interrupted drafts are
 labelled incomplete; malformed text never executes as a command. Backends without
 streaming display one completed answer rather than an animated replay.
 
-The pretrained backend constrains token generation to a JSON action shape, then
-the runtime validates the complete action and tool constraints. If output tokens
-run out before the action finishes, the turn stops with `output_budget`; partial
-tools never execute. Request a shorter answer or increase `max-new-tokens` within
-context limits. Constrained syntax does not guarantee correct answer content.
+The runtime validates the complete action and tool constraints before executing
+anything. Partial, malformed and interrupted output never runs a tool. Request a
+shorter answer or increase `max-new-tokens` within context limits when the model
+cannot complete its action.
 
 For automation and complete command-line flags, use `uv run silivra --help` and
 `uv run silivra chat --help`. Explicit one-shot prompts, piped input, tools, memory,

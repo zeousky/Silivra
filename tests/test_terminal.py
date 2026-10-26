@@ -59,11 +59,6 @@ class TerminalTests(unittest.TestCase):
         return TerminalApp(self.workspace, self.store, console=self.console,
                            backend_factory=factory, **kwargs)
 
-    def pretrained_marker(self, path, model="Qwen3-8B"):
-        from silivra.pretrained import MARKER_NAME
-        path.mkdir(parents=True, exist_ok=True)
-        (path / MARKER_NAME).write_text(json.dumps({"original_model_id": f"Qwen/{model}",
-                                                  "quantization_bits": 4, "context_window": 8192}))
 
     def test_help_status_and_memory_do_not_load_model(self):
         for text in ("/help", "/status", "/models", "/memory remember language We use Python.",
@@ -108,10 +103,8 @@ class TerminalTests(unittest.TestCase):
         self.app.handle_input('/tool calculate {"expression":"37 * 14 - 59"}')
         self.assertIn('"459"', self.output.getvalue())
         self.app.handle_input("/tools none")
-        pretrained = self.workspace / "pretrained"
-        with patch("silivra.pretrained.is_pretrained_run", side_effect=lambda path: Path(path) == pretrained):
-            restarted = self.make_app(run=pretrained)
-            self.assertEqual(restarted.settings.selected_tools, [])
+        restarted = self.make_app(run=self.workspace / "runs" / "original")
+        self.assertEqual(restarted.settings.selected_tools, [])
 
     def test_settings_model_switch_is_lazy_and_invalid_change_is_recoverable(self):
         model = self.workspace / "a model"
@@ -127,78 +120,6 @@ class TerminalTests(unittest.TestCase):
         self.assertEqual(self.factories[0][0], model.resolve())
         self.assertEqual(self.make_app().settings.model_run, str(model.resolve()))
 
-    def test_model_switch_resets_output_reservation_and_identifies_pretrained(self):
-        pretrained = self.workspace / "runs" / "pretrained"
-        original = self.workspace / "runs" / "original"
-        pretrained.mkdir(parents=True)
-        original.mkdir()
-        self.pretrained_marker(pretrained)
-        with patch("silivra.pretrained.is_pretrained_run", side_effect=lambda path: Path(path) == pretrained):
-            self.app.handle_input("/config max-new-tokens 64")
-            self.app.handle_input("/model runs/pretrained")
-            self.assertEqual(self.app.settings.max_new_tokens, 768)
-            self.app.handle_input("/status")
-            self.assertIn("Qwen3-8B", self.output.getvalue())
-            self.assertIn("pretrained", self.output.getvalue())
-            self.assertEqual(self.factories, [])
-            self.app.handle_input("/model runs/original")
-            self.assertEqual(self.app.settings.max_new_tokens, 96)
-            selected = self.make_app(run=pretrained)
-            self.assertEqual(selected.settings.max_new_tokens, 768)
-            selected = self.make_app(run=pretrained, max_new_tokens=128)
-            self.assertEqual(selected.settings.max_new_tokens, 128)
-
-    def test_new_pretrained_default_uses_longer_output_without_loading(self):
-        pretrained = self.workspace / "runs" / "pretrained"
-        self.pretrained_marker(pretrained)
-        with patch("silivra.terminal.default_model_run", return_value=pretrained), \
-                patch("silivra.pretrained.is_pretrained_run", side_effect=lambda path: Path(path) == pretrained):
-            app = self.make_app()
-            self.assertEqual(app.settings.max_new_tokens, 768)
-            explicit = self.make_app(run=pretrained)
-            self.assertEqual(explicit.settings.max_new_tokens, 768)
-            app.banner()
-        self.assertEqual(self.factories, [])
-        self.assertIn("Qwen3-8B", self.output.getvalue())
-
-    def test_pretrained_models_listing_reads_metadata_without_load(self):
-        pretrained = self.workspace / "runs" / "pretrained"
-        self.pretrained_marker(pretrained)
-        with patch("silivra.pretrained.is_pretrained_run", side_effect=lambda path: Path(path) == pretrained):
-            self.app.models()
-        self.assertIn("Qwen3-8B", self.output.getvalue())
-        self.assertIn("8192 runtime limit", self.output.getvalue())
-        self.assertEqual(self.factories, [])
-
-    def test_trial_model_name_is_displayed_without_changing_selection(self):
-        trial = self.workspace / "runs" / "silivra-qwen3.5-9b"
-        self.pretrained_marker(trial, "Qwen3.5-9B")
-        selected = self.app.settings.model_run
-        self.app.models()
-        self.assertIn("Qwen3.5-9B", self.output.getvalue())
-        self.assertEqual(self.app.settings.model_run, selected)
-        explicit = self.make_app(run=trial)
-        explicit.banner()
-        self.assertIn("Qwen3.5-9B · pretrained", self.output.getvalue())
-        self.assertEqual(self.factories, [])
-
-    def test_saved_model_and_preferences_survive_a_new_fallback_default(self):
-        preferred = self.workspace / "runs" / "silivra-qwen3.5-9b"
-        self.pretrained_marker(preferred, "Qwen3.5-9B")
-        for saved_model in ("runs/silivra-qwen3-8b", "runs/silivra-assistant-v2"):
-            with self.subTest(saved_model=saved_model):
-                saved = TerminalSettings(model_run=saved_model, max_new_tokens=128,
-                                         selected_tools=[], history_messages=0)
-                save_settings(self.app.settings_path, self.app.scope, saved)
-                before = self.app.settings_path.read_bytes()
-                with patch("silivra.terminal.default_model_run", return_value=preferred):
-                    restarted = self.make_app()
-                self.assertEqual(restarted._selected_run(), self.workspace / saved_model)
-                self.assertEqual(restarted.settings.max_new_tokens, 128)
-                self.assertEqual(restarted.settings.selected_tools, [])
-                self.assertEqual(restarted.settings.history_messages, 0)
-                self.assertEqual(self.app.settings_path.read_bytes(), before)
-                self.assertEqual(self.factories, [])
 
     def test_explicit_startup_budget_overrides_preserve_other_preferences(self):
         self.app.handle_input("/config max-new-tokens 64")
@@ -383,69 +304,27 @@ class TerminalTests(unittest.TestCase):
 
 
 class ModelSelectionTests(unittest.TestCase):
-    def test_only_provisioned_pretrained_run_takes_priority(self):
+    def test_only_native_run_is_discovered(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory).resolve()
             workspace, source = root / "workspace", root / "source"
-            original = source / "runs" / "silivra-assistant-v2"
-            workspace_original = workspace / "runs" / "silivra-assistant-v2"
-            source_pretrained = source / "runs" / "silivra-qwen3-8b"
-            workspace_pretrained = workspace / "runs" / "silivra-qwen3-8b"
-            source_preferred = source / "runs" / "silivra-qwen3.5-9b"
-            workspace_preferred = workspace / "runs" / "silivra-qwen3.5-9b"
-            for path in (original, workspace_original, source_pretrained, workspace_pretrained,
-                         source_preferred, workspace_preferred):
+            native = source / "runs" / "silivra-assistant-v2"
+            workspace_native = workspace / "runs" / "silivra-assistant-v2"
+            unrelated = workspace / "runs" / "external-model"
+            for path in (native, workspace_native, unrelated):
                 path.mkdir(parents=True)
-            provisioned = set()
-            with patch("silivra.terminal.__file__", str(source / "src" / "silivra" / "terminal.py")), \
-                    patch("silivra.pretrained.is_pretrained_run", side_effect=lambda path: path in provisioned):
-                self.assertEqual(default_model_run(workspace), original)
-                provisioned.add(source_pretrained)
-                self.assertEqual(default_model_run(workspace), source_pretrained)
-                provisioned.add(workspace_pretrained)
-                self.assertEqual(default_model_run(workspace), workspace_pretrained)
-                provisioned.add(source_preferred)
-                self.assertEqual(default_model_run(workspace), source_preferred)
-                provisioned.add(workspace_preferred)
-                self.assertEqual(default_model_run(workspace), workspace_preferred)
-                provisioned.clear()
-                original.rmdir()
-                self.assertEqual(default_model_run(workspace), workspace_original)
+            with patch("silivra.terminal.__file__", str(source / "src" / "silivra" / "terminal.py")):
+                self.assertEqual(default_model_run(workspace), native)
+                native.rmdir()
+                self.assertEqual(default_model_run(workspace), workspace_native)
+            self.assertEqual(model_description(unrelated), "Silivra original · from-scratch checkpoint")
 
-    def test_pretrained_display_metadata_is_bounded_and_untrusted(self):
-        from silivra.pretrained import MARKER_NAME
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            marker = root / MARKER_NAME
-            for text in ('not json', '[]', '{"original_model_id":"Qwen/Qwen3.5-9B","original_model_id":"bad"}',
-                         ' ' * 131073, '{"original_model_id":"Qwen/\\u001b[2J"}'):
-                marker.write_text(text)
-                with self.subTest(text=text[:40]):
-                    description = model_description(root)
-                    self.assertIn("External model", description)
-                    self.assertNotIn("Qwen3-8B", description)
-                    self.assertNotIn("\x1b", description)
-            marker.unlink()
-            outside = root / "outside.json"
-            outside.write_text('{"original_model_id":"Qwen/Qwen3.5-9B"}')
-            marker.symlink_to(outside)
-            self.assertIn("External model", model_description(root))
-
-    def test_backend_factory_selects_only_explicit_pretrained_marker(self):
+    def test_backend_factory_always_loads_own_checkpoint(self):
         from silivra.terminal import _backend
         run = Path("local-checkpoint")
-        with patch("silivra.pretrained.is_pretrained_run", return_value=True), \
-                patch("silivra.pretrained.PretrainedMLXBackend") as pretrained, \
-                patch("silivra.agent.MLXBackend") as original:
-            self.assertIs(_backend(run, which="best", max_new_tokens=768), pretrained.return_value)
-            pretrained.assert_called_once_with(run, which="best", max_new_tokens=768)
-            original.assert_not_called()
-        with patch("silivra.pretrained.is_pretrained_run", return_value=False), \
-                patch("silivra.pretrained.PretrainedMLXBackend") as pretrained, \
-                patch("silivra.agent.MLXBackend") as original:
-            self.assertIs(_backend(run, which="latest", max_new_tokens=96), original.return_value)
-            original.assert_called_once_with(run, which="latest", max_new_tokens=96)
-            pretrained.assert_not_called()
+        with patch("silivra.agent.MLXBackend") as native:
+            self.assertIs(_backend(run, which="latest", max_new_tokens=96), native.return_value)
+            native.assert_called_once_with(run, which="latest", max_new_tokens=96)
 
 
 class InputHistoryTests(unittest.TestCase):

@@ -60,56 +60,8 @@ New manifests record input/artifact hashes, deterministic sampling and exclusion
 
 ## Runtime dependencies and research
 
-### Optional external local assistant
-
-`setup-assistant --profile qwen3-8b` downloads **Qwen3-8B**, developed by the Qwen team at Alibaba,
-in MLX Community's 4-bit conversion. The 8,190,735,360-parameter architecture,
-pretrained weights and tokenizer are external artifacts; they are not Silivra's
-original randomly initialized model or its learned tokenizer.
-
-- Original model: [Qwen/Qwen3-8B](https://huggingface.co/Qwen/Qwen3-8B).
-- Original license revision: `b968826d9c46dd6066d109eabc6255188de91218`.
-- Conversion: [mlx-community/Qwen3-8B-4bit](https://huggingface.co/mlx-community/Qwen3-8B-4bit).
-- Immutable conversion revision: `545dc4251c05440727734bcd94334791f6ab0192`.
-- License: Apache License 2.0; setup retains the upstream `LICENSE` and conversion
-  model card beside the downloaded weights. Original license SHA-256:
-  `832dd9e00a68dd83b3c3fb9f5588dad7dcf337a0db50f7d9483f310cd292e92e`.
-- Quantized weight SHA-256:
-  `f2d29621aab300336ad645567ff38c42aac755513006ef4e8a579cf7ef5256d8`.
-- Tokenizer SHA-256:
-  `aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4`.
-
-Silivra performs inference only with these artifacts, without fine-tuning or
-relabeling ownership. Quantization was performed upstream. The provisioner records
-all file sizes/hashes; downloaded artifacts are ignored by Git and are not bundled
-with the source repository. Distribution must retain applicable upstream notices.
-
-The default text-only Qwen3.5-9B profile uses
-[Qwen/Qwen3.5-9B](https://huggingface.co/Qwen/Qwen3.5-9B) at revision
-`c202236235762e1c871ad0ccb60c8ee5ba337b9a`, and
-[MLX Community's conversion](https://huggingface.co/mlx-community/Qwen3.5-9B-MLX-4bit)
-at `938d8919941c6e7efd3c7150eff7fe9d12afa631`, under Apache-2.0.
-The text backbone has 8,953,803,264 parameters; MLX-LM excludes vision/MTP weights.
-Its upstream license is retained with SHA-256
-`bbedc3fda3305820b977265f01b8619d87570a6739de3a5582c3464840f1e57a`.
-Native inference and its bounded diagnostic results are recorded separately in
-[the local comparison](docs/PRETRAINED_COMPARISON.md). No weight updates were performed.
-
-- [Apple MLX-LM](https://github.com/ml-explore/mlx-lm), MIT, Copyright Apple Inc.
-- [Hugging Face Transformers](https://github.com/huggingface/transformers), Apache-2.0.
-- [Outlines-core](https://github.com/dottxt-ai/outlines-core), Apache-2.0.
-  Its Rust automaton constrains JSON action syntax; it does not train model weights.
-- Jinja2/MarkupSafe (BSD-3-Clause), SentencePiece (Apache-2.0), Protobuf (BSD-3-Clause),
-  Safetensors (Apache-2.0), and other locked transitive dependencies retain their
-  installed distributions' license notices.
-
-The pretrained-v1/pretrained-v2/pretrained-v3 and calculator-v1 diagnostics are original
-Codex-authored synthetic MIT material.
-It is evaluation-only and does not train either model; upstream pretraining
-contamination cannot be ruled out for general knowledge and elementary exercises.
-
 - [Apple MLX](https://github.com/ml-explore/mlx), MIT, Copyright Apple Inc. The installed distribution provides its own notices.
-- [Hugging Face Tokenizers](https://github.com/huggingface/tokenizers), Apache-2.0. Used to train the original tokenizer; the separate optional Qwen backend downloads its own pretrained tokenizer.
+- [Hugging Face Tokenizers](https://github.com/huggingface/tokenizers), Apache-2.0. Used to train Silivra's original tokenizer from scratch.
 - [NumPy](https://github.com/numpy/numpy), BSD-3-Clause. Used for token storage and sampling.
 
 MLX's [transformer training example](https://github.com/ml-explore/mlx-examples/tree/main/transformer_lm) and [attention documentation](https://ml-explore.github.io/mlx/build/html/python/_autosummary/mlx.core.fast.scaled_dot_product_attention.html) informed the framework integration. Silivra implements the architecture directly using established transformer methods; it makes no claim to have invented those methods.

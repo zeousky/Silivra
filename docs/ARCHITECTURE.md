@@ -4,80 +4,22 @@ Silivra is one AI project with two connected layers: an original language model
 and an assistant system that can give that model access to tools and memory.
 Improving the system and training better weights are separate engineering tasks.
 
-The optional practical assistant uses an explicitly identified external model:
-Qwen3.5-9B (8,953,803,264 text parameters), quantized to 4 bits by MLX Community.
-The earlier Qwen3-8B profile (8,190,735,360 parameters) remains selectable.
-It does not alter the original Silivra model/tokenizer lineage. The native training,
-checkpoint, loss evaluation and export code remain specific to that original lineage.
-External inference results must be attributed separately.
+## Own-model inference policy
 
-## External local assistant backend
-
-`provision.py` implements the explicit `setup-assistant` download. A fixed allowlist
-pins the upstream model/tokenizer revision, original model revision, license, file
-sizes and SHA-256 digests. Setup bounds total bytes and session time, resumes partial
-transfers, preserves unrelated existing files, and writes the selection marker only
-after all artifacts verify. Model files stay under ignored `runs/`.
-
-`pretrained.py` implements the same `generate`/`context_usage` backend contract using
-MLX-LM. It requires local verified files, disables remote code, and never falls back
-to downloading or hosted inference. The original `MLXBackend` remains selectable.
-The Qwen chat template is used with thinking disabled and an 8,192-token runtime
-limit. Tool schemas remain inside Silivra's strict JSON protocol; tool observations
-are quoted as untrusted data rather than translated into permission grants.
-Accounting and generation use the same chat-template tokens and reserve the complete
-output budget. Streaming retains cancellation, strict final parsing and capability
-checks. An 8 GiB MLX memory guideline is advisory; this is not an OS memory cap.
-
-`structured.py` masks token scores through an Outlines-core ByteLevel automaton.
-Each generation gets fresh state while immutable vocabularies/compiled grammars
-are cached. The grammar permits exactly one string-final or an enabled tool action,
-with required fields, declared keys and argument types. Complete actions admit only
-EOS, including MLX-LM's one-token lookahead. Numeric ranges, string lengths/patterns,
-array counts, paths and permissions remain explicit runtime checks; deferred schema
-constraints are recorded rather than silently claimed as grammar guarantees.
-The full result still passes the original strict parser. A token-limited incomplete
-action stops as `output_budget`; its draft is rejected and no partial tool runs.
-
-`prompt_cache.py` owns one backend-local exact input prefix, at most 1,024 tokens
-and 256 MiB of actual retained cache allocations. For Qwen3's trimmable KV layers,
-it verifies all offsets and trim results, accounting for decoding lookahead, and
-removes the generated tail after a valid action.
-
-Qwen3.5's recurrent layers cannot be trimmed. Instead, the backend derives a
-stable prefix from the actual chat template's system policy and any labelled
-calculator example, before the real conversation. It verifies that these tokens
-match the full prompt, caps the target at 1,024 tokens, and aligns longer targets
-to 256-token chunks. Only an evaluated prefill callback strictly before the final
-prompt token may snapshot the known single-sequence `ArraysCache`/`KVCache` types.
-The final callback is excluded because MLX-LM has already performed lookahead.
-Layer state, KV offsets and actual bytes are checked before and after copying.
-Hybrid reuse requires the entire saved prefix to match; recurrent state is never
-partially trimmed. Unsupported or unverified cache shapes stay cold.
-
-Preparation consumes the stored entry before inference, and hybrid inference
-works on an independent clone. Only a validated complete action can commit its
-pending input snapshot. Backend generation cancellation, malformed output, exhausted
-output budgets and exceptions clear committed/pending references. An Agent rejection
-before generation can leave an earlier valid snapshot intact; reuse still requires
-exact input-token equality. At least one input token is always
-recomputed, and prefill chunks stay at most 256 tokens. Admission counts the full
-request, policy and evidence even on a cache hit. No generated answer becomes an
-input snapshot; cache state is never persisted or treated as durable memory.
+Only Silivra's original transformer and tokenizer lineage are supported. All chat
+entry points construct the native `MLXBackend`, which loads hash-verified Silivra
+checkpoints. No external model provisioner, model adapter, tokenizer, or hosted
+model fallback exists. Missing checkpoints and invalid model output fail visibly.
+Tools, retrieval and web search are runtime capabilities; they do not update model
+weights or establish learned intelligence.
 
 `arithmetic.py` provides a stateless `calculate` tool. It interprets numeric AST
 nodes with exact fractions and bounded decimal rendering; no Python code is
 compiled or executed. Only literals, parentheses, unary signs and `+ - * / // %`
 are supported. Expression length, AST size, nesting, operation count and rational
 size/magnitude are bounded. Fifty-digit decimal results identify rounding explicitly.
-The tool grants no filesystem, network or command capability. It is selected by
-default for pretrained one-shot chat and an empty-selection assistant setup;
-explicit `--no-tools` and saved interactive selections retain their meaning.
-
-The terminal identifies the external model. A successful setup selects it in the
-current user/project's private preferences; absent an explicit selection, a complete
-installed 9B run is preferred, followed by 8B and the original research checkpoint. No model is
-downloaded on ordinary chat startup. See [provenance and measurements](PRETRAINED_ASSISTANT.md).
+The tool grants no filesystem, network or command capability. One-shot chat exposes
+no tools unless explicitly selected; interactive selections are saved privately.
 
 ## Model and learning
 

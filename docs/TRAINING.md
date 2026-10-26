@@ -307,3 +307,57 @@ corpus. Keep the saved manifest and source hashes as the run's provenance.
 The public repository contains code, config and sanitized evaluation evidence;
 resuming requires the local ignored datasets, tokenizer and checkpoint artifacts.
 See [capability results](CAPABILITY_RESULTS.md) for measured outcomes and failures.
+
+## Native English v5 experiment
+
+This experiment trains Silivra's existing native weights with its unchanged
+4,096-token tokenizer. It uses no other model for inference or weight updates.
+The original checkpoints remain immutable. The new curriculum is explicitly
+AI-authored, original MIT synthetic data: conversation, short English definitions,
+copying/supplied facts, uncertainty, elementary arithmetic, and calculator/search
+proposals. Tool observations are fictional, computed fixtures; they are never
+represented as live web results. Shared-template validation reserves numeric
+pairs, copied words, search topics and conversational paraphrases.
+
+```sh
+uv run python scripts/build-native-english.py \
+  --output data/native-english-v5-runtime-source --prepare data/native-english-v5-runtime \
+  --tokenizer data/tinystories/tokenizer.json \
+  --exclude-suite examples/evaluations/assistant.jsonl \
+  --exclude-suite examples/evaluations/assistant-v2.jsonl \
+  --exclude-suite examples/evaluations/quality-v1.jsonl \
+  --exclude-suite examples/evaluations/quality-v2.jsonl
+uv run silivra finetune --data data/native-english-v5-runtime \
+  --base runs/silivra-assistant-v2/checkpoints/step-0008000 \
+  --run runs/silivra-native-english-v5-runtime --config configs/native-english-v5.json \
+  --max-minutes 15
+uv run python scripts/measure-native-english.py \
+  --before runs/silivra-assistant-v2 --after runs/silivra-native-english-v5-runtime \
+  --data data/native-english-v5-runtime \
+  --suite examples/evaluations/assistant.jsonl \
+  --suite examples/evaluations/assistant-v2.jsonl \
+  --suite examples/evaluations/quality-v1.jsonl \
+  --suite examples/evaluations/quality-v2.jsonl \
+  --output runs/native-english-v5-comparison.json
+```
+
+The configuration defines at most 2,000 updates, batch eight, 1,024-token context,
+a saved warmup/cosine schedule, and a 6 GiB advisory MLX budget. The command's
+15-minute loop budget can stop before all updates; the last complete checkpoint
+can resume with `--resume` and the identical data/base/config. `best.json` selects
+by fixed validation loss, before diagnostic answers are inspected. Evaluation
+loads one native checkpoint at a time, reports original story and prior instruction
+retention, and records failures alongside successes. Its narrow validation sample
+contains up to eight decisions per family in deterministic record-ID order.
+It does not execute proposed tools or establish broad English fluency, reliable
+reasoning, research skill, or general intelligence. See [native results](NATIVE_ENGLISH_RESULTS.md).
+
+
+The recorded v5 runtime-aligned run is incomplete: logs reach step 1,200, the
+latest complete resumable checkpoint is step 1,000, and validation loss selected
+step 500. Its 2026-10-26 comparison improved narrow shared-template accuracy from
+5/94 to 31/94 but left broader accuracy at 3/85. Prior instruction and original
+story losses regressed 42.26% and 25.48%. It is not promoted to the general default;
+see the [full results and retained failures](NATIVE_ENGLISH_RESULTS.md). Resume
+only from a complete checkpoint with matching data/base/config; unsaved logged
+updates and a missing final summary are not evidence of a completed run.

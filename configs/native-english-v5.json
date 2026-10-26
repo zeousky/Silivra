@@ -1,0 +1,16 @@
+{
+  "steps": 2000,
+  "batch_size": 8,
+  "learning_rate": 0.00012,
+  "weight_decay": 0.01,
+  "eval_every": 500,
+  "eval_batches": 16,
+  "save_every": 500,
+  "log_every": 100,
+  "seed": 20261025,
+  "memory_gib": 6.0,
+  "context_length": 1024,
+  "bucket_size": 64,
+  "warmup_steps": 100,
+  "min_lr_ratio": 0.2
+}
