@@ -22,11 +22,16 @@ jobs:
           uv run python -m unittest discover -s tests -p 'test_tools.py' -v &&
           uv run python -m unittest discover -s tests -p 'test_web.py' -v &&
           uv run python -m unittest discover -s tests -p 'test_instructions.py' -v &&
+          uv run python -m unittest discover -s tests -p 'test_finetune.py' -v &&
           uv run python -m unittest discover -s tests -p 'test_evaluation.py' -v &&
           uv run python -m unittest discover -s tests -p 'test_cli.py' -v &&
           uv run python -m unittest discover -s tests -p 'test_curriculum.py' -v &&
           uv run python -m unittest discover -s tests -p 'test_curriculum_v2.py' -v &&
           uv run python -m unittest discover -s tests -p 'test_native_english.py' -v &&
+          uv run python -m unittest discover -s tests -p 'test_native_english_v6.py' -v &&
+          uv run python -m unittest discover -s tests -p 'test_native_experiment.py' -v &&
+          uv run python -m unittest discover -s tests -p 'test_native_experiment_runner.py' -v &&
+          uv run python -m unittest discover -s tests -p 'test_native_development.py' -v &&
           uv run python -m unittest discover -s tests -p 'test_export.py' -v &&
           uv run python -m unittest discover -s tests -p 'test_corpus.py' -v &&
           uv run python -m unittest discover -s tests -p 'test_settings.py' -v &&

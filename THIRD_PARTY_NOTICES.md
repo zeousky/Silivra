@@ -58,6 +58,16 @@ TinyStories records retain their original licenses. The MIT license on the
 selection code does not relicense those data or designate derived weights MIT.
 New manifests record input/artifact hashes, deterministic sampling and exclusions.
 
+The native English v6 curriculum is original, explicitly AI-authored synthetic
+material under MIT. Its deterministic rehearsal mixer selects unchanged local v2
+records: Dolly remains CC BY-SA 3.0, TinyStories replay remains CDLA-Sharing-1.0,
+and original v2 exercises remain MIT. Every retained source and immutable revision
+is preserved. Fictional tool observations use reserved `example.com` URLs; they
+are authored fixtures, not downloaded web evidence. Tokenizers, raw/prepared data
+and weights remain local. The [experiment methodology](docs/NATIVE_ENGLISH_V6_EXPERIMENT.md)
+records source hashes and actual rehearsal decision/token shares. MIT on the new
+exercises and selection code does not relicense imported data or derived weights.
+
 ## Runtime dependencies and research
 
 - [Apple MLX](https://github.com/ml-explore/mlx), MIT, Copyright Apple Inc. The installed distribution provides its own notices.

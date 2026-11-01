@@ -361,3 +361,66 @@ story losses regressed 42.26% and 25.48%. It is not promoted to the general defa
 see the [full results and retained failures](NATIVE_ENGLISH_RESULTS.md). Resume
 only from a complete checkpoint with matching data/base/config; unsaved logged
 updates and a missing final summary are not evidence of a completed run.
+
+## Supervise a shared experiment budget
+
+For an explicitly approved experiment spanning several pilots and a final run,
+use the same private journal for every session. The supervisor caps the shared
+budget at 7,200 seconds (120 minutes). It conservatively charges **all child wall
+time**, including initialization, validation and checkpoint cleanup, rather than
+only model updates. A 600-second session includes its default 30-second checkpoint
+grace; it passes at most 570 seconds to the trainer's loop timer.
+
+```sh
+uv run python scripts/run-native-experiment.py \
+  --journal .silivra/training-experiment-budget.json \
+  --budget-seconds 7200 --seconds 600 --caffeinate \
+  --data data/native-english-v5-runtime \
+  --base runs/silivra-assistant-v2/checkpoints/step-0008000 \
+  --run runs/new-native-experiment --config configs/native-english-v5.json
+```
+
+Choose a new run directory for a new objective. To continue its exact saved
+optimizer, sampler, schedule and RNG state, repeat the same data/base/config/run
+with `--resume`. The shared journal's original budget cannot be enlarged; request
+no more than its remaining allowance. A global supervisor lock permits one
+supervised trainer at a time. Stop other model inference and unsupervised training
+before starting; the lock does not control unrelated processes. On macOS,
+`--caffeinate` prevents idle sleep only while this child is alive.
+
+The supervisor sends SIGTERM before the deadline so the trainer can save, then
+kills only its own child if checkpoint grace expires. A forced supervisor crash
+leaves the entire reserved session charged. A possibly live or unidentified old
+child prevents another session until its state is checked; it is never killed
+by guessing a PID. Journal records and per-session logs stay under the ignored
+`.silivra/` directory. Keep them private because they contain local run paths.
+This supervisor does not authorize additional training or establish model quality.
+
+The trainer and optional sleep inhibitor inherit the supervisor's process group.
+A campaign that needs to recover from an unresponsive supervisor must launch
+each supervisor in a new session (for example, with `start_new_session=True`).
+It can then stop only that session's owned process group on a watchdog timeout,
+including its trainer, rather than leaving a separately detached trainer alive.
+Never signal a caller's existing process group or guess ownership from a PID.
+
+
+## Weight supervised answers by token or assistant turn
+
+`FinetuneConfig.loss_normalization` defaults to `"token"`, preserving the original
+masked token-mean objective and legacy checkpoint behavior. `"assistant_turn"`
+first averages supervised-token loss within each row, then gives each supervised
+assistant turn equal weight. Rows with no supervised labels do not contribute;
+prompt and padding labels have zero loss weight in both modes.
+
+This distinction matters when answer lengths differ. In the v6 mixture, replay
+supplies 73.33% of assistant decisions but 91.04% of label tokens. Equal-turn
+training changes effective answer weighting without changing data, labels,
+tokenizer, model architecture, or inference. It does not establish better quality.
+
+A new objective requires a separate run. Its own validation and `best.json` use
+the configured normalization; compare those internal losses only within the same
+objective. External v6 development and retention reports always use the original
+token normalization, keeping the baseline and 5% retention gates comparable.
+New artifacts record the mode and trainer source hash. Existing checkpoints with
+no mode field resume as token-normalized training; switching mode on resume is
+rejected. Preserve every original checkpoint and optimizer state.

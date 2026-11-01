@@ -40,6 +40,7 @@ class FinetuneConfig:
     bucket_size: int = 0
     warmup_steps: int = 0
     min_lr_ratio: float = 1.0
+    loss_normalization: str = "token"
 
     def validate(self):
         for name in ("steps", "batch_size", "eval_every", "eval_batches", "save_every", "log_every"):
@@ -67,6 +68,12 @@ class FinetuneConfig:
         if (type(self.min_lr_ratio) not in (int, float) or not math.isfinite(self.min_lr_ratio)
                 or not 0 < self.min_lr_ratio <= 1):
             raise ValueError("min_lr_ratio must be finite and in (0, 1]")
+        _validate_loss_normalization(self.loss_normalization)
+
+
+def _validate_loss_normalization(normalization):
+    if not isinstance(normalization, str) or normalization not in ("token", "assistant_turn"):
+        raise ValueError("loss_normalization must be 'token' or 'assistant_turn'")
 
 
 def learning_rate(config):
@@ -84,24 +91,40 @@ def learning_rate(config):
     ], [config.warmup_steps])
 
 
-def masked_loss(model, x, y, mask):
-    """Token-weighted loss; prompt and pad labels have exactly zero weight."""
+def masked_loss(model, x, y, mask, *, normalization="token"):
+    """Masked action loss, weighted by tokens or equally by supervised turn.
+
+    The default token reduction preserves the original validation/training
+    formula. Equal-turn reduction prevents a long answer from receiving more
+    total weight than a short answer; empty-label rows contribute no weight.
+    Prompt and pad labels have exactly zero weight in either mode.
+    """
+    _validate_loss_normalization(normalization)
     import mlx.core as mx
     import mlx.nn as nn
     losses = nn.losses.cross_entropy(model(x), y, reduction="none")
-    return mx.sum(losses * mask) / mx.maximum(mx.sum(mask), 1)
+    if normalization == "token":
+        return mx.sum(losses * mask) / mx.maximum(mx.sum(mask), 1)
+    row_weights = mx.sum(mask, axis=-1)
+    row_losses = mx.sum(losses * mask, axis=-1) / mx.maximum(row_weights, 1)
+    return mx.sum(row_losses) / mx.maximum(mx.sum(row_weights > 0), 1)
 
 
-def evaluate_loss(model, dataset, batch_size, batches):
+def evaluate_loss(model, dataset, batch_size, batches, *, normalization="token"):
+    """Deterministic validation with matching token or supervised-turn weights."""
+    _validate_loss_normalization(normalization)
     import mlx.core as mx
     rng = np.random.default_rng(12345)
     model.eval()
     total, count = 0.0, 0.0
     for _ in range(batches):
         x, y, mask = (mx.array(value) for value in dataset.batch(rng, batch_size))
-        weight = float(mx.sum(mask).item())
-        total += float(masked_loss(model, x, y, mask).item()) * weight
+        weight = float((mx.sum(mask) if normalization == "token"
+                        else mx.sum(mx.sum(mask, axis=-1) > 0)).item())
+        total += float(masked_loss(model, x, y, mask, normalization=normalization).item()) * weight
         count += weight
+    if count <= 0:
+        raise RuntimeError("Instruction validation has no supervised labels")
     value = total / count
     if not math.isfinite(value):
         raise RuntimeError("Non-finite instruction validation loss")
@@ -152,6 +175,7 @@ def _save(run_dir, model, optimizer, architecture, config, step, rng, data_dir,
         write_json(staging / "state.json", {
             "format_version": 2, "training_mode": "instruction_sft", "prompt_format": PROMPT_FORMAT,
             "step": step, "model_config": architecture.to_dict(), "training_config": asdict(config),
+            "trainer_sha256": sha256(Path(__file__)),
             "tokens_seen": supervised_tokens_seen, "supervised_tokens_seen": supervised_tokens_seen,
             "input_tokens_seen": input_tokens_seen,
             "token_count_basis": "tokens_seen = sampled assistant-action and EOS labels; input_tokens_seen = all nonpadding next-token labels",
@@ -160,6 +184,7 @@ def _save(run_dir, model, optimizer, architecture, config, step, rng, data_dir,
             "best_validation_loss": best_loss, "validation_loss": validation_loss,
             "training_seconds": seconds, "initialization": "verified local Silivra checkpoint",
             "loss": "assistant action and EOS tokens only; context and padding masked",
+            "loss_normalization": config.loss_normalization,
         })
         write_json(staging / "checksums.json", {
             item.name: sha256(item) for item in staging.iterdir() if item.is_file()
@@ -267,16 +292,19 @@ def finetune(data_dir: Path, base_checkpoint: Path, run_dir: Path, config: Finet
             step, best_loss, seconds_before = previous["step"], previous["best_validation_loss"], previous["training_seconds"]
             supervised_tokens_seen, input_tokens_seen = previous["supervised_tokens_seen"], previous["input_tokens_seen"]
         mx.eval(model.parameters(), optimizer.state)
-        baseline = evaluate_loss(model, datasets["valid"], config.batch_size, config.eval_batches)
+        baseline = evaluate_loss(model, datasets["valid"], config.batch_size, config.eval_batches,
+                                 normalization=config.loss_normalization)
         if not resume:
             write_json(run_dir / "run.json", {
                 "format_version": 1, "training_mode": "instruction_sft", "prompt_format": PROMPT_FORMAT,
                 "base_checkpoint": base, "model_config": architecture.to_dict(), "hardware": hardware,
                 "training_config": asdict(config), "baseline_validation_loss": baseline,
+                "trainer_sha256": sha256(Path(__file__)),
                 "data_manifest_sha256": sha256(data_dir / "manifest.json"),
             })
-        print(json.dumps({"event": "sft_start", "step": step, "validation_loss": baseline}), flush=True)
-        loss_and_grad = nn.value_and_grad(model, masked_loss)
+        print(json.dumps({"event": "sft_start", "step": step, "validation_loss": baseline,
+                          "loss_normalization": config.loss_normalization}), flush=True)
+        loss_and_grad = nn.value_and_grad(model, partial(masked_loss, normalization=config.loss_normalization))
         state = [model.state, optimizer.state, mx.random.state]
 
         @partial(mx.compile, inputs=state, outputs=state)
@@ -316,6 +344,7 @@ def finetune(data_dir: Path, base_checkpoint: Path, run_dir: Path, config: Finet
                 input_tokens_seen += int(mx.sum(y != manifest["tokenizer"]["pad_id"]).item())
                 if step % config.log_every == 0 or step == config.steps:
                     row = {"event": "sft_train", "step": step, "loss": float(loss.item()),
+                           "loss_normalization": config.loss_normalization,
                            "gradient_norm": float(norm.item()),
                            "learning_rate": float(optimizer.learning_rate.item()),
                            "input_width": int(x.shape[1]), **memory_stats()}
@@ -325,16 +354,20 @@ def finetune(data_dir: Path, base_checkpoint: Path, run_dir: Path, config: Finet
                     reason = "memory_budget"
                     break
                 if step % config.eval_every == 0 or step % config.save_every == 0:
-                    validation = evaluate_loss(model, datasets["valid"], config.batch_size, config.eval_batches)
-                    log.write(json.dumps({"event": "sft_validation", "step": step, "loss": validation}) + "\n")
+                    validation = evaluate_loss(model, datasets["valid"], config.batch_size, config.eval_batches,
+                                               normalization=config.loss_normalization)
+                    log.write(json.dumps({"event": "sft_validation", "step": step, "loss": validation,
+                                          "loss_normalization": config.loss_normalization}) + "\n")
                     save()
                     model.train()
-            validation = evaluate_loss(model, datasets["valid"], config.batch_size, config.eval_batches)
+            validation = evaluate_loss(model, datasets["valid"], config.batch_size, config.eval_batches,
+                                       normalization=config.loss_normalization)
             destination = save()
         summary = {"status": reason, "step": step, "validation_loss": validation,
                    "tokens_seen": supervised_tokens_seen, "supervised_tokens_seen": supervised_tokens_seen,
                    "input_tokens_seen": input_tokens_seen,
                    "best_validation_loss": best_loss, "training_mode": "instruction_sft",
+                   "loss_normalization": config.loss_normalization,
                    "checkpoint": str(destination.relative_to(run_dir)),
                    "session_seconds": time.monotonic() - start,
                    "total_training_seconds": seconds_before + time.monotonic() - start, **memory_stats()}
