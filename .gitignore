@@ -35,3 +35,11 @@ AGENTS.override.md
 htmlcov/
 .pytest_cache/
 .ruff_cache/
+
+!.env.*.example
+node_modules/
+venv/
+.build/
+.swiftpm/
+/data/
+/backups/
